@@ -1,5 +1,87 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { pbkdf2Sync } from "node:crypto";
+import {
+  hashSecret,
+  verifyPassword,
+  createSessionToken,
+  sessionToken,
+  sessionCookie,
+  safeReturnTo,
+} from "../lib/auth/crypto";
+import { planetaryMetrics, datasets } from "../lib/planetary/manifest";
+
+test("workspace password verification rejects wrong passwords and malformed hashes", async () => {
+  const salt = "0123456789abcdef0123456789abcdef";
+  const verifier =
+    "pbkdf2-sha256$100000$" +
+    salt +
+    "$" +
+    pbkdf2Sync(
+      "fixture-password",
+      Buffer.from(salt, "hex"),
+      100000,
+      32,
+      "sha256",
+    ).toString("hex");
+  assert.equal(await verifyPassword("fixture-password", verifier), true);
+  assert.equal(await verifyPassword("wrong-password", verifier), false);
+  assert.equal(await verifyPassword("fixture-password", "invalid"), false);
+  assert.equal(
+    await verifyPassword(
+      "fixture-password",
+      verifier.replace("$100000$", "$1$"),
+    ),
+    false,
+  );
+});
+test("sessions use opaque unique secrets, hash storage and constrained cookies", async () => {
+  const token = createSessionToken();
+  assert.match(token, /^[a-f0-9]{64}$/);
+  assert.notEqual(token, createSessionToken());
+  assert.notEqual(await hashSecret(token), token);
+  assert.equal((await hashSecret(token)).length, 64);
+  assert.equal(sessionToken("other=x; sozo_session=" + token), token);
+  assert.equal(sessionToken("sozo_session=forged"), null);
+  assert.match(
+    sessionCookie(token, true),
+    /HttpOnly; SameSite=Lax; Max-Age=28800; Secure$/,
+  );
+  assert.match(sessionCookie("", true, 0), /Max-Age=0/);
+});
+test("login return locations stay inside the dashboard", () => {
+  for (const value of [
+    "https://evil.example",
+    "//evil.example",
+    "/dashboard/../../login",
+    "/dashboardevil",
+    "/dashboard\\evil.example",
+    "",
+  ])
+    assert.equal(safeReturnTo(value), "/dashboard");
+  assert.equal(safeReturnTo("/dashboard?view=moon"), "/dashboard?view=moon");
+});
+test("planetary figures preserve different grids and exclude overlapping products", () => {
+  const metrics = planetaryMetrics();
+  assert.equal(metrics.combinedPrimaryCells, 5960000);
+  assert.equal(metrics.bodies.moon.gridMeters, 240);
+  assert.equal(metrics.bodies.mars.gridMeters, 20);
+  assert.equal(metrics.bodies.moon.primaryCells, 2310000);
+  assert.equal(metrics.bodies.moon.areaKm2, 133000);
+  assert.equal(datasets.filter((d) => d.body === "moon").length, 20);
+  assert.equal(datasets.filter((d) => d.body === "mars").length, 16);
+  assert.ok(
+    datasets.every(
+      (d) => d.verifiedInSozo === false && d.lastSynchronized === null,
+    ),
+  );
+  assert.equal(metrics.bodies.moon.notYetAvailable, 7);
+  assert.match(metrics.methodology, /Exclude overlapping/);
+  assert.equal(
+    datasets.find((d) => d.name === "MEDA weather observations")?.mode,
+    "Archived",
+  );
+});
 import { descriptiveStatistics } from "../lib/science/stats";
 import {
   plainText,

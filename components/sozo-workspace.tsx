@@ -38,6 +38,7 @@ import {
   Dna,
   Activity,
   ShieldCheck,
+  Layers3,
   Folder,
   Bell,
   Beaker,
@@ -48,6 +49,11 @@ import {
 } from "lucide-react";
 import type { ResearchRun, Source, Project, Note } from "../lib/science/types";
 import { api, download, date } from "../lib/client";
+import {
+  MissionOverview,
+  PlanetaryExplorer,
+  PlanetaryCatalog,
+} from "./planetary-dashboard";
 import {
   Status,
   Modal,
@@ -65,6 +71,10 @@ import {
 } from "./sozo-panels";
 type View =
   | "overview"
+  | "scientist"
+  | "moon"
+  | "mars"
+  | "catalog"
   | "research"
   | "library"
   | "notebook"
@@ -74,7 +84,7 @@ type View =
   | "analysis"
   | "run";
 type Workspace = {
-  user: { name: string; email: string };
+  user: { name: string; email: string; method?: string };
   projects: Project[];
   runs: ResearchRun[];
   notes: Note[];
@@ -133,7 +143,11 @@ const starters = [
   },
 ];
 const nav = [
-  { view: "overview", label: "Overview", Icon: LayoutDashboard },
+  { view: "overview", label: "Mission overview", Icon: LayoutDashboard },
+  { view: "moon", label: "Moon explorer", Icon: Orbit },
+  { view: "mars", label: "Mars explorer", Icon: Globe2 },
+  { view: "scientist", label: "SOZO scientist", Icon: Sparkles },
+  { view: "catalog", label: "Data catalog", Icon: Layers3 },
   { view: "research", label: "My research", Icon: FlaskConical },
   { view: "library", label: "Source library", Icon: LibraryBig },
   { view: "notebook", label: "Notebook", Icon: NotebookPen },
@@ -148,7 +162,7 @@ export default function SozoWorkspace() {
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [question, setQuestion] = useState("");
-  const [domain, setDomain] = useState("All sciences");
+  const [domain, setDomain] = useState("Planetary science");
   const [mode, setMode] = useState("broad");
   const [sources, setSources] = useState(["crossref", "europepmc"]);
   const [submitting, setSubmitting] = useState(false);
@@ -159,6 +173,7 @@ export default function SozoWorkspace() {
   const [projectId, setProjectId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [catalogBody, setCatalogBody] = useState("all");
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState("");
   const [projectName, setProjectName] = useState("");
@@ -185,6 +200,17 @@ export default function SozoWorkspace() {
   }, []);
   useEffect(() => {
     refresh();
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("view");
+    if (requested && nav.some((n) => n.view === requested))
+      setView(requested as View);
+    const body = params.get("body");
+    if (body === "moon" || body === "mars") setCatalogBody(body);
+    const q = params.get("question");
+    if (q) {
+      setQuestion(q.slice(0, 1500));
+      setView("scientist");
+    }
   }, [refresh]);
   useEffect(() => {
     if (!toast) return;
@@ -240,7 +266,7 @@ export default function SozoWorkspace() {
     setModal(m);
   };
   const newResearch = () => {
-    setView("overview");
+    setView("scientist");
     setQuestion("");
     setMobileNav(false);
     setTimeout(() => composer.current?.focus(), 30);
@@ -248,7 +274,7 @@ export default function SozoWorkspace() {
   const starter = (i: number) => {
     setDomain(starters[i].domain);
     setQuestion(starters[i].prompt);
-    setView("overview");
+    setView("scientist");
     setModal("");
     setTimeout(() => {
       composer.current?.focus();
@@ -396,8 +422,8 @@ export default function SozoWorkspace() {
             <Orbit size={17} />
           </span>
           <div>
-            <strong>Personal workspace</strong>
-            <span>A space for your next idea</span>
+            <strong>Mission workspace</strong>
+            <span>The Moon. Mars. Beyond.</span>
           </div>
           <button
             onClick={() => open("settings")}
@@ -489,7 +515,7 @@ export default function SozoWorkspace() {
             </span>
             <span>
               <strong>{ws.user.name}</strong>
-              <small>Personal account</small>
+              <small>Research workspace</small>
             </span>
             <ChevronDown size={14} />
           </button>
@@ -552,7 +578,7 @@ export default function SozoWorkspace() {
               <AlertCircle size={16} />
               <span>{error}</span>
               {error.includes("Sign in") ? (
-                <a href="/signin-with-chatgpt?return_to=/" target="_top">
+                <a href="/login?returnTo=%2Fdashboard" target="_top">
                   Sign in
                   <ArrowUpRight size={14} />
                 </a>
@@ -562,6 +588,33 @@ export default function SozoWorkspace() {
             </div>
           )}
           {view === "overview" && (
+            <MissionOverview
+              runs={ws.runs}
+              onExplore={(body) => navigate(body)}
+              onResearch={(q) => {
+                setQuestion(q);
+                setDomain("Planetary science");
+                setView("scientist");
+              }}
+              onOpen={openRun}
+              onCatalog={() => navigate("catalog")}
+            />
+          )}
+          {(view === "moon" || view === "mars") && (
+            <PlanetaryExplorer
+              key={view}
+              body={view}
+              onResearch={(q) => {
+                setQuestion(q);
+                setDomain("Planetary science");
+                setView("scientist");
+              }}
+            />
+          )}
+          {view === "catalog" && (
+            <PlanetaryCatalog initialBody={catalogBody} key={catalogBody} />
+          )}
+          {view === "scientist" && (
             <>
               <section className="hero">
                 <div className="hero-copy">
@@ -1132,7 +1185,7 @@ export default function SozoWorkspace() {
                       onClick={() => {
                         setQuestion(run.question);
                         setDomain(run.domain);
-                        setView("overview");
+                        setView("scientist");
                       }}
                     >
                       Research again
@@ -1692,7 +1745,7 @@ export default function SozoWorkspace() {
               <strong>Research engine</strong>
               <small>Live literature discovery · no model configured</small>
             </span>
-            <span className="outline-tag">v0.1</span>
+            <span className="outline-tag">v0.2</span>
           </div>
           <div className="settings-row">
             <span>
@@ -1725,18 +1778,20 @@ export default function SozoWorkspace() {
             </a>
           </div>
           <div className="modal-actions">
-            <a
-              href={
-                ws.user.email
-                  ? "/signout-with-chatgpt?return_to=/"
-                  : "/signin-with-chatgpt?return_to=/"
-              }
-              target="_top"
+            <button
               className="secondary-button"
+              onClick={async () => {
+                if (ws.user.method === "chatgpt") {
+                  window.location.assign("/signout-with-chatgpt?return_to=/");
+                  return;
+                }
+                await fetch("/api/auth/logout", { method: "POST" });
+                window.location.assign("/login");
+              }}
             >
               <LogOut size={15} />
-              {ws.user.email ? "Sign out" : "Sign in with ChatGPT"}
-            </a>
+              Sign out
+            </button>
           </div>
         </Modal>
       )}

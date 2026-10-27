@@ -1,4 +1,10 @@
-import { sqliteTable, text, index, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  integer,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 export const projects = sqliteTable(
   "projects",
   {
@@ -88,3 +94,20 @@ export const audit = sqliteTable(
   },
   (t) => [index("audit_owner_created").on(t.ownerId, t.createdAt)],
 );
+export const sessions = sqliteTable(
+  "workspace_sessions",
+  {
+    hash: text("hash").primaryKey(),
+    ownerId: text("owner_id").notNull(),
+    email: text("email").notNull(),
+    name: text("name").notNull(),
+    createdAt: text("created_at").notNull(),
+    expiresAt: text("expires_at").notNull(),
+  },
+  (t) => [index("sessions_expiry").on(t.expiresAt)],
+);
+export const loginLimits = sqliteTable("login_limits", {
+  key: text("key").primaryKey(),
+  attempts: integer("attempts").notNull().default(0),
+  expiresAt: text("expires_at").notNull(),
+});

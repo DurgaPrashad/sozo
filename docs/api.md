@@ -1,6 +1,6 @@
 # API guide
 
-See `/openapi.json` for exact routes and request properties. All routes except health require Sites browser identity or an application bearer key. All owned resources are filtered by owner. Writes require JSON and reject foreign browser origins. Errors use `{request_id,error:{code,message}}`; successful JSON includes `request_id`.
+See `/openapi.json` for exact routes and request properties. All `/api/v1` routes except health require a SOZO browser session, Sites identity, or an application bearer key. `/api/planetary` is public and contains only project-reported planetary metadata. All owned resources are filtered by owner. Writes require JSON and reject foreign browser origins. Errors use `{request_id,error:{code,message}}`; successful JSON includes `request_id`.
 
 ## cURL
 
@@ -64,3 +64,9 @@ A record includes question, project, domain (organizational metadata, not an aut
 `GET /api/v1/research/{id}/events` returns an authenticated SSE snapshot. Reconnect interval is 1500 ms; events are `progress` while running and `result` when terminal. This is a reconnecting snapshot protocol, not an indefinitely open stream. `POST /research/{id}/cancel` prevents result persistence after cancellation.
 
 API keys currently inherit complete owner access; project-specific roles and narrow token scopes are future work. Write and active-run limits are best-effort checks, not atomic distributed quotas.
+
+## Workspace sign-in
+
+`POST /api/auth/login` accepts JSON `{email, password, returnTo?}` and sets an opaque HttpOnly, SameSite=Lax cookie (Secure over HTTPS), valid for eight hours. `returnTo` is constrained to the dashboard. `GET /api/auth/session` returns the authenticated identity. `POST /api/auth/logout` revokes the session. Foreign browser origins are rejected. Repeated failures are throttled per client IP in ten-minute windows. The account is configured through server secrets, with a salted PBKDF2 verifier; credentials are never bundled into the UI.
+
+Server-side clients can exchange those same credentials with `POST /api/auth/token`, using JSON `{email, password}`. HTTP 201 returns `{access_token, token_type: "Bearer", user}`. Store the returned token securely and send `Authorization: Bearer <access_token>` to `/api/v1` routes. Revoke it under API keys or with `DELETE /api/v1/keys/{id}`. These owner-level keys do not expire automatically. Never expose them in public browser code.

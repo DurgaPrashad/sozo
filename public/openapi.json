@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SOZO Research API",
-    "version": "0.1.0",
-    "description": "Evidence-first scientific literature discovery. No LLM synthesis, live MOMAR, MCP, OAuth, or arbitrary code execution is configured. Browser identity uses Sites sign-in; API clients use a SOZO bearer key and, on a private Site, the separate Sites service-access header."
+    "version": "0.2.0",
+    "description": "Evidence-first scientific literature discovery. No LLM synthesis, live MOMAR, MCP, OAuth, or arbitrary code execution is configured. Browser identity uses an HttpOnly SOZO session or optional Sites sign-in. API clients use a SOZO bearer key; the current landing page is public."
   },
   "servers": [
     {
@@ -13,6 +13,9 @@
   "security": [
     {
       "SozoKey": []
+    },
+    {
+      "SozoSession": []
     }
   ],
   "paths": {
@@ -1181,10 +1184,152 @@
           }
         }
       }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Sign in and create an HttpOnly workspace session",
+        "operationId": "auth_login",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  },
+                  "returnTo": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated; Set-Cookie contains the session"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "429": {
+            "description": "Sign-in rate limit"
+          },
+          "503": {
+            "description": "Workspace sign-in not configured"
+          }
+        }
+      }
+    },
+    "/api/auth/token": {
+      "post": {
+        "summary": "Exchange workspace credentials for a revocable API key",
+        "operationId": "auth_token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Bearer access_token and user identity"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "429": {
+            "description": "Sign-in rate limit"
+          },
+          "503": {
+            "description": "Workspace sign-in not configured"
+          }
+        }
+      }
+    },
+    "/api/auth/session": {
+      "get": {
+        "summary": "Current authenticated identity",
+        "operationId": "auth_session",
+        "responses": {
+          "200": {
+            "description": "Current identity"
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "summary": "Revoke current browser session",
+        "operationId": "auth_logout",
+        "responses": {
+          "200": {
+            "description": "Session revoked and cookie expired"
+          }
+        }
+      }
+    },
+    "/api/planetary": {
+      "get": {
+        "summary": "Public project-reported Moon and Mars metadata and provenance",
+        "operationId": "planetary_metadata",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Reported metrics and source catalog, without user data"
+          }
+        }
+      }
     }
   },
   "components": {
     "securitySchemes": {
+      "SozoSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sozo_session",
+        "description": "Opaque eight-hour session issued by POST /api/auth/login."
+      },
       "SozoKey": {
         "type": "http",
         "scheme": "bearer",

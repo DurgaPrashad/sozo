@@ -189,19 +189,93 @@ add(
 );
 add("/keys/{id}", "delete", "Revoke an API key");
 add("/audit", "get", "Latest 100 owned audit events");
+for (const action of ["login", "token"])
+  paths["/api/auth/" + action] = {
+    post: {
+      summary:
+        action === "login"
+          ? "Sign in and create an HttpOnly workspace session"
+          : "Exchange workspace credentials for a revocable API key",
+      operationId: "auth_" + action,
+      security: [],
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: object(
+              {
+                email: { type: "string", format: "email" },
+                password: { type: "string", format: "password" },
+                ...(action === "login" ? { returnTo: { type: "string" } } : {}),
+              },
+              ["email", "password"],
+            ),
+          },
+        },
+      },
+      responses: {
+        [action === "login" ? "200" : "201"]: {
+          description:
+            action === "login"
+              ? "Authenticated; Set-Cookie contains the session"
+              : "Bearer access_token and user identity",
+        },
+        400: { description: "Invalid input" },
+        401: { description: "Invalid credentials" },
+        429: { description: "Sign-in rate limit" },
+        503: { description: "Workspace sign-in not configured" },
+      },
+    },
+  };
+paths["/api/auth/session"] = {
+  get: {
+    summary: "Current authenticated identity",
+    operationId: "auth_session",
+    responses: {
+      200: { description: "Current identity" },
+      401: { description: "Not authenticated" },
+    },
+  },
+};
+paths["/api/auth/logout"] = {
+  post: {
+    summary: "Revoke current browser session",
+    operationId: "auth_logout",
+    responses: { 200: { description: "Session revoked and cookie expired" } },
+  },
+};
+paths["/api/planetary"] = {
+  get: {
+    summary: "Public project-reported Moon and Mars metadata and provenance",
+    operationId: "planetary_metadata",
+    security: [],
+    responses: {
+      200: {
+        description: "Reported metrics and source catalog, without user data",
+      },
+    },
+  },
+};
 const spec = {
   openapi: "3.0.3",
   info: {
     title: "SOZO Research API",
-    version: "0.1.0",
+    version: "0.2.0",
     description:
-      "Evidence-first scientific literature discovery. No LLM synthesis, live MOMAR, MCP, OAuth, or arbitrary code execution is configured. Browser identity uses Sites sign-in; API clients use a SOZO bearer key and, on a private Site, the separate Sites service-access header.",
+      "Evidence-first scientific literature discovery. No LLM synthesis, live MOMAR, MCP, OAuth, or arbitrary code execution is configured. Browser identity uses an HttpOnly SOZO session or optional Sites sign-in. API clients use a SOZO bearer key; the current landing page is public.",
   },
   servers: [{ url: "/" }],
-  security: [{ SozoKey: [] }],
+  security: [{ SozoKey: [] }, { SozoSession: [] }],
   paths,
   components: {
     securitySchemes: {
+      SozoSession: {
+        type: "apiKey",
+        in: "cookie",
+        name: "sozo_session",
+        description:
+          "Opaque eight-hour session issued by POST /api/auth/login.",
+      },
       SozoKey: {
         type: "http",
         scheme: "bearer",

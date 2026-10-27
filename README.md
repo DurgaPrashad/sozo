@@ -1,8 +1,8 @@
 # SOZO
 
-**Big questions. Brighter discoveries.**
+**Two worlds. One limitless frontier.**
 
-SOZO v0.1 is a working, private scientific-literature workspace. It searches Crossref and Europe PMC, stores research records in Cloudflare D1, preserves citations and source timestamps, and provides projects, a source library, a notebook, reproducible descriptive statistics, a versioned API, and a command-line client.
+SOZO v0.2 has a public Moon + Mars landing page and a protected scientific-literature workspace. It searches Crossref and Europe PMC, stores research records in Cloudflare D1, preserves citations and source timestamps, and provides projects, a source library, a notebook, reproducible descriptive statistics, a versioned API, and a command-line client.
 
 The supplied SOZO symbol has been recreated as vector artwork, with transparent and dark-background SVG and PNG exports in `public/`.
 
@@ -17,13 +17,15 @@ node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1
 npm run dev
 ```
 
-Open the printed loopback URL, then click **Sign in**. The portable development profile uses the isolated local identity `Seedy`. This identity simulation is excluded from production. Local D1 data survives preview restarts in `.wrangler/state/`. Do not reapply an already applied migration; append new migrations for subsequent schema changes.
+Apply `drizzle/0001_lumpy_magus.sql` once after the initial migration. Open the printed loopback URL. `/` is public; `/dashboard` requires sign-in. Configure `SOZO_WORKSPACE_EMAIL` and `SOZO_WORKSPACE_PASSWORD_HASH` in ignored `.dev.vars` for local email/password sign-in. The verifier uses `pbkdf2-sha256$100000$<16-byte-salt-hex>$<32-byte-hash-hex>`, PBKDF2 with SHA-256 and 100,000 iterations. Never commit credentials or put them in client code. The optional ChatGPT sign-in in the portable profile uses the isolated local identity `Seedy`; that simulation is excluded from production. Local D1 data survives preview restarts in `.wrangler/state/`. Do not reapply an already applied migration; append new migrations for subsequent schema changes.
 
 ```sh
 npm run typecheck
 npm test
 # With the local preview running and its local migration applied:
 node scripts/smoke.mjs
+# Supply credentials as process environment, never in source:
+node scripts/auth-smoke.mjs
 ```
 
 The smoke script creates two isolated fake tenants, performs real source requests, and removes only its own fixtures from the local database. It refuses non-loopback targets. Tests never use production data.
@@ -39,7 +41,7 @@ The smoke script creates two isolated fake tenants, performs real source request
 
 ## API and CLI
 
-The complete versioned contract is in [public/openapi.json](public/openapi.json). Browser writes use Sites identity. External API clients use a workspace API key created under **API & developers → API keys**. Keys are shown once and stored as SHA-256 hashes.
+The complete versioned contract is in [public/openapi.json](public/openapi.json). Browser writes use an HttpOnly SOZO session or Sites identity. External API clients use a workspace API key created under **API & developers → API keys**. Keys are shown once and stored as SHA-256 hashes.
 
 ```sh
 export SOZO_BASE_URL="http://localhost:5173"
@@ -52,7 +54,7 @@ node cli/sozo.mjs connect list
 
 `npm link` optionally exposes the same client as `sozo`. See [CLI reference](docs/cli.md) and [Python, TypeScript, and cURL examples](docs/api.md).
 
-**A private hosted Site has two boundaries:** the Sites hosting sign-in gate and the application's own identity/key. An API key alone cannot bypass the hosting gate. External clients must separately configure an authorized Sites service token in `OAI-Sites-Authorization: Bearer <token>`; the CLI reads `SOZO_SITE_ACCESS_TOKEN`. SOZO does not generate or rotate that hosting credential.
+The current Site has a public landing page and app-level authentication on its dashboard and owned API. No hosting service token is needed for the public audience. **If hosting is made private again, it has two boundaries:** the Sites hosting sign-in gate and the application's own identity/key. An API key alone cannot bypass the hosting gate. External clients must separately configure an authorized Sites service token in `OAI-Sites-Authorization: Bearer <token>`; the CLI reads `SOZO_SITE_ACCESS_TOKEN`. SOZO does not generate or rotate that hosting credential.
 
 ## Integrations
 
@@ -60,11 +62,11 @@ The native Crossref and Europe PMC adapters perform live, read-only literature d
 
 Custom OpenAPI 3 JSON specifications can be discovered, explicitly approved, registered, inspected, invoked, and revoked through the API and CLI. Only public GET operations with supported path/query parameters are supported. Configure reviewed hosts in `SOZO_CONNECTOR_HOSTS` through server environment settings, never browser input. Default hosts are `api.crossref.org` and `www.ebi.ac.uk`. Redirects are rejected. See [connector SDK and trust model](docs/connectors.md).
 
-MOMAR is a reference contract fixture in the tests, clearly labeled as a mock. No MOMAR repository, production endpoint, terrain data, or credentials were supplied. The UI provides onboarding without claiming a live connection.
+MOMAR coverage and source labels come from the owner-supplied brief in `lib/planetary/manifest.ts`. `/api/planetary` exposes this public provenance catalog. Counts are project-reported, not independently recomputed or ingested by SOZO. The 240 m lunar and 20 m Martian primary grids total ≈5.96 million cells; overlapping lunar grids are excluded. The interactive NASA-image globes are visualizations, not native-resolution DEMs. The six screenshot previews link to the external MOMAR prototype. No MOMAR API endpoint or credentials were supplied. Contract tests use an explicitly labelled mock.
 
 ## What is and is not complete
 
-Implemented and tested: real scientific retrieval, persisted asynchronous run records, partial failure reporting, cancellation, idempotent submission, polling and reconnecting SSE snapshots, per-owner access checks, hashed/revocable API keys, audit events, a bounded connector registry, CLI, source exports, project/notebook workflows, and deterministic numeric statistics.
+Implemented and tested: public landing page, protected dashboard, server-side email/password verification, hashed opaque eight-hour sessions, sign-in throttling, API token exchange, interactive Moon/Mars globes, searchable provenance catalog, real scientific retrieval, persisted asynchronous run records, partial failure reporting, cancellation, idempotent submission, polling and reconnecting SSE snapshots, per-owner access checks, hashed/revocable API keys, audit events, a bounded connector registry, CLI, source exports, project/notebook workflows, and deterministic numeric statistics.
 
 This is an initial working foundation, **not the full production platform described by the reference brief**. AI answer synthesis and model-provider configuration, MCP, OAuth, GraphQL, browser adapters, generic file/dataset processing, sandboxed Python, arbitrary JSON Schema validation, granular project roles, resumable durable queues, distributed quotas, retention automation, and large-scale benchmarks are not implemented. No foundation model, state-of-the-art performance, or production throughput is claimed.
 

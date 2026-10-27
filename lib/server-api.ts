@@ -8,7 +8,7 @@ import {
   apiKeys,
   audit,
 } from "../db/schema";
-import { getChatGPTUser } from "../app/chatgpt-auth";
+import { getIdentity } from "./auth/identity";
 import { z } from "zod";
 import { retrieveEvidence } from "./science/retrieval";
 import {
@@ -43,24 +43,8 @@ const cleanRun = (run: typeof runs.$inferSelect) => {
   return data;
 };
 async function user(request: Request) {
-  const browser = await getChatGPTUser();
-  if (browser)
-    return {
-      id: browser.userId,
-      name: browser.fullName || browser.email.split("@")[0],
-      email: browser.email,
-    };
-  const match = request.headers
-    .get("authorization")
-    ?.match(/^Bearer (sozo_[a-f0-9]{64})$/);
-  if (match) {
-    const [key] = await getDb()
-      .select()
-      .from(apiKeys)
-      .where(eq(apiKeys.hash, await digest(match[1])))
-      .limit(1);
-    if (key) return { id: key.ownerId, name: "API client", email: "" };
-  }
+  const identity = await getIdentity(request);
+  if (identity) return identity;
   throw new APIError(
     401,
     "Sign in to your SOZO workspace or supply a valid API key.",
@@ -191,7 +175,7 @@ export async function handleAPI(request: Request) {
     if (method === "GET" && resource === "health")
       return json({
         status: "ok",
-        version: "0.1.0",
+        version: "0.2.0",
         mode: "literature-discovery",
       });
     const identity = await user(request);

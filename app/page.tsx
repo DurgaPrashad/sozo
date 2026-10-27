@@ -1,4 +1,4 @@
-import SozoWorkspace from "../components/sozo-workspace";
+import SpaceLanding from "../components/space-landing";
 export default function Home() {
-  return <SozoWorkspace />;
+  return <SpaceLanding />;
 }
