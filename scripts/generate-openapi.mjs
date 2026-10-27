@@ -52,6 +52,25 @@ const str = { type: "string" };
 const id = { type: "string", format: "uuid" };
 add("/health", "get", "Health and actual research engine mode");
 paths["/api/v1/health"].get.security = [];
+add("/space-data", "get", "Search original NASA archive media with provenance");
+paths["/api/v1/space-data"].get.parameters = [
+  {
+    name: "q",
+    in: "query",
+    schema: { type: "string", minLength: 2, maxLength: 160 },
+    description:
+      "Scientific term, mission, or instrument; defaults to lunar south pole.",
+  },
+  {
+    name: "media",
+    in: "query",
+    schema: { type: "string", enum: ["all", "image", "video"], default: "all" },
+  },
+];
+paths["/api/v1/space-data"].get.responses["502"] = {
+  description:
+    "NASA archive unavailable; no substitute records are fabricated.",
+};
 add("/workspace", "get", "Authenticated personal workspace");
 add("/projects", "get", "List owned projects");
 add(
@@ -260,9 +279,9 @@ const spec = {
   openapi: "3.0.3",
   info: {
     title: "SOZO Research API",
-    version: "0.2.0",
+    version: "0.3.0",
     description:
-      "Evidence-first scientific literature discovery. No LLM synthesis, live MOMAR, MCP, OAuth, or arbitrary code execution is configured. Browser identity uses an HttpOnly SOZO session or optional Sites sign-in. API clients use a SOZO bearer key; the current landing page is public.",
+      "Scientific literature discovery and live NASA archive search with source provenance. No LLM synthesis, live MOMAR, MCP, OAuth, or arbitrary code execution is configured. Browser identity uses an HttpOnly SOZO session or optional Sites sign-in. API clients use a SOZO bearer key; the current landing page is public.",
   },
   servers: [{ url: "/" }],
   security: [{ SozoKey: [] }, { SozoSession: [] }],

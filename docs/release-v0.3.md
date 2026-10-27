@@ -1,0 +1,11 @@
+# SOZO v0.3 — cinematic mission workspace
+
+The landing page now opens with three user-supplied AI-generated concept films and a minimal SOZO wordmark. Clips are renamed Orbital assistance, Lunar fieldwork, and Martian frontier. Optimized H.264/AAC copies total about 6.6 MB and support progressive/range playback. Controls select a chapter, pause, and enable sound. Playback advances sequentially, pauses off-screen, and respects reduced-motion preferences. Original download files are unchanged.
+
+A new orbital monogram, obsidian / ice-blue palette, warm Mars accent, and larger scientific text unify the landing page, login, and dashboard. Moon and Mars links open the actual MOMAR planners from the navbar. Separate large globe sections follow the supplied reference. The paired composition uses physically separated spheres, with the Moon farther from the camera and Mars in front. Planet globes remain imagery visualizations, not terrain models.
+
+The protected dashboard adds NASA archive discovery through `GET /api/v1/space-data`. It returns up to 12 original NASA records, original dates and captions, provider and creator, canonical source/metadata URLs, retrieval time, and limitations. A query/media validator, fixed upstream origin, size/time limits, redirect rejection, and safe thumbnail origins bound the integration. No new model-provider secret or MOMAR routing service was introduced. Existing login, owner isolation, literature search, reports, API keys, and data remain intact.
+
+Current checks include 46 unit/contract/CLI tests, 15 authentication integration checks, and 11 NASA/media integration checks. Browser QA covers real sequential playback, pause, off-screen pause, planet placement, responsive sections, NASA results and provenance details. Production publication preserves the existing public landing and protected dashboard/API boundary.
+
+The requested backend rebuild plan is in [unified-api-backend-plan.md](unified-api-backend-plan.md). It inventories current services and proposes one authenticated contract, deterministic mission tools, durable jobs, provenance, and a staged MOMAR/model integration. Proposed operations are not advertised as implemented endpoints.

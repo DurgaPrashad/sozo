@@ -1,10 +1,10 @@
 # SOZO
 
-**Two worlds. One limitless frontier.**
+**Intelligence for life beyond Earth.**
 
-SOZO v0.2 has a public Moon + Mars landing page and a protected scientific-literature workspace. It searches Crossref and Europe PMC, stores research records in Cloudflare D1, preserves citations and source timestamps, and provides projects, a source library, a notebook, reproducible descriptive statistics, a versioned API, and a command-line client.
+SOZO v0.3 has a public cinematic landing page and a protected Moon + Mars scientific workspace. Three user-supplied concept films play sequentially, with pause, sound, and chapter controls. An orbital monogram and ice-blue / warm-Mars palette unify the landing page, login, and dashboard. It searches Crossref, Europe PMC, and the NASA Image and Video Library, stores research records in Cloudflare D1, preserves citations and source timestamps, and provides projects, a source library, a notebook, reproducible descriptive statistics, a versioned API, and a command-line client.
 
-The supplied SOZO symbol has been recreated as vector artwork, with transparent and dark-background SVG and PNG exports in `public/`.
+The refreshed SOZO orbital monogram is supplied as SVG and PNG exports and a downloadable brand kit in `public/`. Original user video files are unchanged; the renamed fast-start H.264/AAC copies and posters live in `public/films/`.
 
 ## Run locally
 
@@ -82,3 +82,9 @@ Runs execute with Worker `waitUntil`, bounded source timeouts, and persisted res
 - [Deployment and troubleshooting](docs/operations.md)
 
 Crossref API behavior follows its [official documentation](https://www.crossref.org/documentation/retrieve-metadata/rest-api/). Europe PMC retrieval follows its [REST service documentation](https://europepmc.org/RestfulWebService). Publication metadata may lack abstracts and may include preprints. Follow the original publication links and applicable licensing terms.
+
+## NASA space archive
+
+The authenticated `/api/v1/space-data?q=<query>&media=all` endpoint searches the original NASA Image and Video Library. Results are bounded to 12 per request and preserve NASA identifiers, record dates, original captions, source links, provider, and retrieval time. Query length and media type are validated; remote JSON is time- and size-bounded, and redirects are rejected. This is archive discovery, not live telemetry or terrain computation. The dashboard includes a NASA space archive with search, media filtering, and provenance details.
+
+MOMAR Moon and Mars planners are linked in the navbar and planetary sections. A direct routing API and a model provider are still needed for SOZO to compute routes through an AI agent; the UI labels that integration as in development.

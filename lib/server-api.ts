@@ -1,3 +1,4 @@
+import { searchSpaceArchive } from "./science/space-data";
 import { and, eq, desc, gte, count } from "drizzle-orm";
 import { getDb } from "../db";
 import {
@@ -175,7 +176,7 @@ export async function handleAPI(request: Request) {
     if (method === "GET" && resource === "health")
       return json({
         status: "ok",
-        version: "0.2.0",
+        version: "0.3.0",
         mode: "literature-discovery",
       });
     const identity = await user(request);
@@ -199,6 +200,26 @@ export async function handleAPI(request: Request) {
           429,
           "Workspace write limit reached. Please wait one minute.",
         );
+    }
+    if (resource === "space-data" && method === "GET") {
+      const params = new URL(request.url).searchParams;
+      const query = z
+        .string()
+        .trim()
+        .min(2)
+        .max(160)
+        .parse(params.get("q") ?? "lunar south pole");
+      const media = z
+        .enum(["all", "image", "video"])
+        .parse(params.get("media") ?? "all");
+      try {
+        return json(await searchSpaceArchive(query, media));
+      } catch {
+        throw new APIError(
+          502,
+          "The NASA archive could not complete this search. Please try again.",
+        );
+      }
     }
     if (resource === "workspace" && method === "GET") {
       const [projectRows, runRows, noteRows, connectorRows] = await Promise.all(

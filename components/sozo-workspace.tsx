@@ -47,6 +47,7 @@ import {
   Sparkles,
   LogOut,
 } from "lucide-react";
+import SpaceArchive from "./space-archive";
 import type { ResearchRun, Source, Project, Note } from "../lib/science/types";
 import { api, download, date } from "../lib/client";
 import {
@@ -71,6 +72,7 @@ import {
 } from "./sozo-panels";
 type View =
   | "overview"
+  | "archive"
   | "scientist"
   | "moon"
   | "mars"
@@ -148,6 +150,7 @@ const nav = [
   { view: "mars", label: "Mars explorer", Icon: Globe2 },
   { view: "scientist", label: "SOZO scientist", Icon: Sparkles },
   { view: "catalog", label: "Data catalog", Icon: Layers3 },
+  { view: "archive", label: "NASA space archive", Icon: Globe2 },
   { view: "research", label: "My research", Icon: FlaskConical },
   { view: "library", label: "Source library", Icon: LibraryBig },
   { view: "notebook", label: "Notebook", Icon: NotebookPen },
@@ -611,6 +614,7 @@ export default function SozoWorkspace() {
               }}
             />
           )}
+          {view === "archive" && <SpaceArchive />}
           {view === "catalog" && (
             <PlanetaryCatalog initialBody={catalogBody} key={catalogBody} />
           )}
@@ -1745,7 +1749,7 @@ export default function SozoWorkspace() {
               <strong>Research engine</strong>
               <small>Live literature discovery · no model configured</small>
             </span>
-            <span className="outline-tag">v0.2</span>
+            <span className="outline-tag">v0.3</span>
           </div>
           <div className="settings-row">
             <span>

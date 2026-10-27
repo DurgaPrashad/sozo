@@ -5,7 +5,7 @@
   --space-line: #21303e;
   --space-text: #edf2f5;
   --space-muted: #8a99aa;
-  --space-lime: #ceff39;
+  --space-lime: #9bdcff;
   --space-heading: "Barlow Condensed", "Arial Narrow", sans-serif;
   --space-ui: "Space Grotesk", "DM Sans", sans-serif;
 }
@@ -22,14 +22,14 @@ html {
 }
 .space-site ::selection,
 .space-login ::selection {
-  background: #ceff39;
-  color: #10170a;
+  background: #9bdcff;
+  color: #071622;
 }
 .space-site a:focus-visible,
 .space-site button:focus-visible,
 .space-login a:focus-visible,
 .space-login button:focus-visible {
-  outline: 2px solid #ceff39;
+  outline: 2px solid #9bdcff;
   outline-offset: 6px;
 }
 .space-skip {
@@ -38,7 +38,7 @@ html {
   left: 20px;
   z-index: 100;
   background: var(--space-lime);
-  color: #141b0a;
+  color: #071622;
   padding: 14px;
 }
 .space-skip:focus {
@@ -101,7 +101,7 @@ html {
   transition: color 0.2s;
 }
 .space-nav > nav > a:hover {
-  color: #ceff39;
+  color: #9bdcff;
 }
 .space-nav-actions {
   display: flex;
@@ -132,11 +132,11 @@ html {
 }
 .space-button.primary {
   background: var(--space-lime);
-  color: #192209;
+  color: #071622;
   border-color: var(--space-lime);
 }
 .space-button.primary:hover {
-  background: #dcff78;
+  background: #c7ecff;
   transform: translateY(-2px);
 }
 .space-button.secondary {
@@ -241,7 +241,7 @@ html {
   color: #f1f5f8;
 }
 .space-hero h1 > span:not(.heading-star) {
-  color: #ceff39;
+  color: #9bdcff;
 }
 .heading-star {
   display: inline-block;
@@ -250,7 +250,7 @@ html {
   font-weight: 400;
   vertical-align: top;
   margin: 5px 0 0 21px;
-  color: #ceff39;
+  color: #9bdcff;
   transform: rotate(-12deg);
 }
 .space-hero-content > p {
@@ -649,9 +649,9 @@ html {
   color: #acbcce;
 }
 .world-title-row > a:hover {
-  background: #ceff39;
+  background: #9bdcff;
   color: #192110;
-  border-color: #ceff39;
+  border-color: #9bdcff;
 }
 .world-card-content > p {
   font-size: 10px;
@@ -797,7 +797,7 @@ html {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #ceff39;
+  background: #9bdcff;
 }
 .coverage-metrics {
   display: grid;
@@ -854,7 +854,7 @@ html {
   gap: 15px;
 }
 .combined-symbol {
-  color: #ceff39;
+  color: #9bdcff;
   font-size: 30px;
   line-height: 1.1;
   font-weight: 400;
@@ -897,7 +897,7 @@ html {
 }
 .coverage-method > a {
   font-size: 9px;
-  color: #ceff39;
+  color: #9bdcff;
   display: flex;
   gap: 8px;
   align-items: center;
@@ -1057,7 +1057,7 @@ html {
   margin: 25px 0 23px;
 }
 .sozo-intelligence h2 > span {
-  color: #ceff39;
+  color: #9bdcff;
 }
 .sozo-intelligence > p,
 .developer-landing > div > p {
@@ -1312,7 +1312,7 @@ html {
   position: relative;
 }
 .space-final-cta h2 > span {
-  color: #ceff39;
+  color: #9bdcff;
 }
 .space-final-cta h2 > i {
   position: absolute;
@@ -1697,8 +1697,8 @@ html {
 }
 .app-shell .primary-button {
   color: #152009;
-  background: #ceff39;
-  border-color: #ceff39;
+  background: #9bdcff;
+  border-color: #9bdcff;
 }
 .app-shell .primary-button:hover:not(:disabled) {
   background: #dfff84;
@@ -2100,8 +2100,8 @@ html {
   color: #91abc0;
 }
 .modal .primary-button {
-  background: #ceff39;
-  border-color: #ceff39;
+  background: #9bdcff;
+  border-color: #9bdcff;
   color: #1d290d;
 }
 .modal .info-callout {
@@ -2148,7 +2148,7 @@ html {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #ceff39;
+  background: #9bdcff;
   display: inline-block;
 }
 .mission-welcome {
@@ -2542,7 +2542,7 @@ html {
 }
 .globe-controls > button:hover {
   background: #24384b;
-  color: #ceff39;
+  color: #9bdcff;
 }
 .explorer-panel {
   background: #0e1b28;
@@ -2597,7 +2597,7 @@ html {
   color: #aac98a;
 }
 .explorer-layer input {
-  accent-color: #ceff39;
+  accent-color: #9bdcff;
   width: 14px;
   height: 14px;
 }

@@ -3,21 +3,20 @@ import { useState } from "react";
 import {
   ArrowUpRight,
   ArrowRight,
-  ArrowDown,
   Menu,
   X,
+  ArrowDown,
   Orbit,
-  MoveUpRight,
-  Sparkles,
   Route,
-  Layers3,
-  ScanLine,
-  Code2,
+  Database,
+  Sparkles,
   ShieldCheck,
-  ChevronRight,
   ExternalLink,
+  Globe2,
+  ScanLine,
 } from "lucide-react";
 import PlanetScene from "./planet-scene";
+import MissionFilm from "./mission-film";
 import {
   planetaryMetrics,
   lunarCapabilities,
@@ -25,302 +24,327 @@ import {
   type PlanetaryBody,
 } from "../lib/planetary/manifest";
 const metrics = planetaryMetrics();
-export default function SpaceLanding() {
-  const [menu, setMenu] = useState(false);
-  const [body, setBody] = useState<PlanetaryBody>("moon");
-  const [showMethod, setShowMethod] = useState(false);
-  const lunar = metrics.bodies.moon;
-  const mars = metrics.bodies.mars;
-  const coverage = metrics.bodies[body];
-  const number = (value: number) => value.toLocaleString("en-US");
+const lunar = metrics.bodies.moon;
+const mars = metrics.bodies.mars;
+const number = (value: number) => value.toLocaleString("en-US");
+function Brand() {
   return (
-    <div className="space-site">
-      <a href="#space-main" className="space-skip">
+    <a className="premium-brand" href="/" aria-label="SOZO home">
+      <img src="/sozo-mark.svg" alt="" />
+      <span>SOZO</span>
+    </a>
+  );
+}
+export default function SpaceLanding() {
+  const [menu, setMenu] = useState(false),
+    [body, setBody] = useState<PlanetaryBody>("moon");
+  const current = metrics.bodies[body];
+  return (
+    <div className="premium-site">
+      <a className="space-skip" href="#frontiers">
         Skip to content
       </a>
-      <header className="space-nav">
-        <a className="space-brand" href="/" aria-label="SOZO home">
-          <img src="/sozo-mark.svg" alt="" />
-          <span>
-            sozo<span className="brand-dot">.</span>
-          </span>
-          <span className="brand-tagline">
-            PLANETARY
-            <br />
-            INTELLIGENCE
-          </span>
-        </a>
-        <nav className={menu ? "open" : ""} aria-label="Site navigation">
-          <a href="#worlds" onClick={() => setMenu(false)}>
-            Our worlds
+      <header className="premium-nav">
+        <Brand />
+        <nav aria-label="Main navigation" className={menu ? "open" : ""}>
+          <a
+            href={lunar.url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="MOMAR Moon planner"
+          >
+            The Moon
+            <ArrowUpRight size={12} />
           </a>
-          <a href="#capabilities" onClick={() => setMenu(false)}>
-            Exploration
+          <a
+            href={mars.url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="MOMAR Mars planner"
+          >
+            Mars
+            <ArrowUpRight size={12} />
           </a>
-          <a href="#sozo" onClick={() => setMenu(false)}>
-            Meet SOZO
+          <a href="#intelligence" onClick={() => setMenu(false)}>
+            SOZO agent
           </a>
-          <a href="#data" onClick={() => setMenu(false)}>
-            Data & provenance
-          </a>
-          <a href="/dashboard?view=developers">
-            Developers
-            <ArrowUpRight size={11} />
+          <a href="#evidence" onClick={() => setMenu(false)}>
+            The evidence
           </a>
         </nav>
-        <div className="space-nav-actions">
-          <a href="/login" className="nav-signin">
+        <div className="premium-nav-actions">
+          <a className="premium-signin" href="/login">
             Sign in
           </a>
-          <a className="space-button primary compact" href="/dashboard">
-            Launch workspace
-            <ArrowUpRight size={14} />
+          <a href="/dashboard" className="premium-button light">
+            Open SOZO
+            <ArrowUpRight size={16} />
           </a>
           <button
-            className="space-menu"
+            className="premium-menu"
             aria-label={menu ? "Close menu" : "Open menu"}
             aria-expanded={menu}
-            onClick={() => setMenu(!menu)}
+            onClick={() => setMenu((value) => !value)}
           >
-            {menu ? <X size={21} /> : <Menu size={21} />}
+            {menu ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </header>
-      <main id="space-main">
-        <section className="space-hero">
-          <div className="hero-starfield" aria-hidden="true" />
-          <div className="hero-orbit" aria-hidden="true" />
-          <div className="hero-planet-stage">
-            <PlanetScene duo />
-            <span className="planet-caption moon-caption">
-              <i />
-              01 / THE MOON<span>OUR NEAREST FRONTIER</span>
+      <main>
+        <MissionFilm />
+        <section className="frontier-intro premium-section" id="frontiers">
+          <div className="frontier-intro-copy">
+            <span className="premium-eyebrow">
+              <i />A SCIENCE WORKSPACE FOR WHAT COMES NEXT
             </span>
-            <span className="planet-caption mars-caption">
-              <i />
-              02 / MARS<span>A WORLD OF QUESTIONS</span>
-            </span>
-            <div className="hero-visual-label">
-              NASA SOURCE IMAGERY · 3D VISUALIZATION
-            </div>
-          </div>
-          <div className="space-hero-content">
-            <span className="space-eyebrow">
-              <i />
-              CURIOSITY DOESN’T STOP AT EARTH
-            </span>
-            <h1>
-              Two worlds.
+            <h2>
+              Intelligence for
               <br />
-              One <span>limitless</span>
-              <br />
-              frontier<span className="heading-star">✳</span>
-            </h1>
+              life <span>beyond Earth.</span>
+            </h2>
             <p>
-              Explore the Moon. Investigate Mars.
-              <br />
-              Turn planetary evidence into your next discovery
-              <br className="desktop-break" /> with SOZO and the MOMAR
-              workspaces.
+              Connect the evidence. Understand the terrain. Help people explore,
+              build, and work on worlds beyond our own.
             </p>
-            <div className="space-hero-buttons">
-              <a href="/dashboard" className="space-button primary">
-                Enter mission control
-                <ArrowUpRight size={18} />
-              </a>
-              <a href="#worlds" className="space-button text">
-                Explore our worlds
-                <ArrowDown size={15} />
-              </a>
-            </div>
-            <div className="hero-small-note">
-              <span className="two-world-dots">
-                <i />
-                <i />
-              </span>
-              <span>For researchers. For explorers. For what comes next.</span>
-            </div>
-          </div>
-          <a href="#worlds" className="hero-scroll">
-            <span>SCROLL TO DISCOVER</span>
-            <ArrowDown size={14} />
-          </a>
-          <div className="hero-bottom-coordinate">
-            MOON + MARS<span>SCIENTIFIC OBSERVATION ZONE OPERATOR</span>
-          </div>
-        </section>
-        <div className="space-capability-strip">
-          <span>
-            <ScanLine size={14} />
-            Planetary data
-          </span>
-          <i>+</i>
-          <span>
-            <Sparkles size={14} />
-            Scientific research
-          </span>
-          <i>+</i>
-          <span>
-            <Orbit size={14} />
-            3D exploration
-          </span>
-          <i>+</i>
-          <span>
-            <Route size={14} />
-            Mission planning
-          </span>
-          <i>+</i>
-          <span>
-            <Code2 size={14} />
-            Open integrations
-          </span>
-        </div>
-        <section className="space-section worlds-section" id="worlds">
-          <div className="space-section-heading">
-            <div>
-              <span className="space-eyebrow">01 / CHOOSE YOUR FRONTIER</span>
-              <h2>
-                Familiar in the sky.
-                <br />
-                <span>Extraordinary up close.</span>
-              </h2>
-            </div>
-            <p>
-              From the shadows of the lunar south pole to the ancient landscapes
-              of Mars. Two worlds, connected by a drive to understand.
-            </p>
-          </div>
-          <div className="world-card-grid">
-            <article className="world-card lunar">
-              <div className="world-card-visual">
-                <div className="world-orbit" />
-                <div className="world-sphere moon" />
-                <span className="world-index">01 / OUR NATURAL SATELLITE</span>
-                <span className="world-distance">THE LUNAR FRONTIER</span>
-              </div>
-              <div className="world-card-content">
-                <div className="world-title-row">
-                  <h3>
-                    The Moon<span>Selene. Luna. Our next chapter.</span>
-                  </h3>
-                  <a href="/dashboard?view=moon" aria-label="Explore the Moon">
-                    <ArrowUpRight size={25} />
-                  </a>
-                </div>
-                <p>
-                  Investigate polar terrain, trace the light, and follow the
-                  evidence for resources in the Moon’s most challenging
-                  environments.
-                </p>
-                <div className="world-card-stats">
-                  <span>
-                    <strong>
-                      ≈{number(lunar.areaKm2)}
-                      <small>km²</small>
-                    </strong>
-                    <small>South-pole workspace</small>
-                  </span>
-                  <span>
-                    <strong>
-                      {(lunar.primaryCells / 1e6).toFixed(2)}
-                      <small>M</small>
-                    </strong>
-                    <small>Primary terrain cells</small>
-                  </span>
-                  <span>
-                    <strong>
-                      {lunar.gridMeters}
-                      <small>m</small>
-                    </strong>
-                    <small>Workspace grid</small>
-                  </span>
-                </div>
-                <div className="world-card-bottom">
-                  <span>
-                    <i />
-                    SHACKLETON · DE GERLACHE · HAWORTH
-                  </span>
-                  <a href="/dashboard?view=moon">
-                    Explore the Moon
-                    <ArrowUpRight size={14} />
-                  </a>
-                </div>
-              </div>
-            </article>
-            <article className="world-card martian">
-              <div className="world-card-visual">
-                <div className="world-orbit" />
-                <div className="world-sphere mars" />
-                <span className="world-index">02 / THE RED PLANET</span>
-                <span className="world-distance">THE MARTIAN FRONTIER</span>
-              </div>
-              <div className="world-card-content">
-                <div className="world-title-row">
-                  <h3>
-                    Mars<span>Ancient landscapes. New possibilities.</span>
-                  </h3>
-                  <a href="/dashboard?view=mars" aria-label="Explore Mars">
-                    <ArrowUpRight size={25} />
-                  </a>
-                </div>
-                <p>
-                  Explore Jezero and Gale. Connect geology, rover observations,
-                  and terrain to the questions that drive planetary science.
-                </p>
-                <div className="world-card-stats">
-                  <span>
-                    <strong>
-                      ≈{number(mars.areaKm2)}
-                      <small>km²</small>
-                    </strong>
-                    <small>Detailed terrain</small>
-                  </span>
-                  <span>
-                    <strong>
-                      {(mars.primaryCells / 1e6).toFixed(2)}
-                      <small>M</small>
-                    </strong>
-                    <small>Primary terrain cells</small>
-                  </span>
-                  <span>
-                    <strong>
-                      {mars.gridMeters}
-                      <small>m</small>
-                    </strong>
-                    <small>Workspace grid</small>
-                  </span>
-                </div>
-                <div className="world-card-bottom">
-                  <span>
-                    <i />
-                    JEZERO CRATER · GALE CRATER
-                  </span>
-                  <a href="/dashboard?view=mars">
-                    Explore Mars
-                    <ArrowUpRight size={14} />
-                  </a>
-                </div>
-              </div>
-            </article>
-          </div>
-          <div className="worlds-footnote">
-            <ShieldCheck size={13} />
-            <span>
-              MOMAR prototype coverage, as reported in the project brief. These
-              are workspace figures, not terrain independently ingested or
-              analysed by SOZO.
-            </span>
-            <a href="#data">
-              Inspect the evidence
-              <ArrowRight size={12} />
+            <a className="premium-text-link" href="#moon">
+              Two worlds. A shared frontier.
+              <ArrowDown size={17} />
             </a>
           </div>
+          <div className="frontier-pair">
+            <PlanetScene duo />
+            <span className="pair-label moon">01 / MOON · FAR FIELD</span>
+            <span className="pair-label mars">02 / MARS · FOREGROUND</span>
+            <span className="visualization-caption">
+              NASA SOURCE IMAGERY · VISUALIZATION
+            </span>
+          </div>
         </section>
-        <section className="coverage-section" id="data">
-          <div className="space-section-heading">
+        <section className="frontier-world moon-world" id="moon">
+          <div className="frontier-globe">
+            <PlanetScene body="moon" interactive />
+            <span className="world-credit">
+              NASA SVS · LROC & LOLA · imagery visualization
+            </span>
+          </div>
+          <div className="frontier-world-copy">
+            <span className="premium-eyebrow">FRONTIER 01</span>
+            <h2>The Moon</h2>
+            <p>
+              Understand the lunar surface. Follow the light. Plan the next step
+              with the evidence in view.
+            </p>
+            <div className="world-capabilities">
+              <a href={lunar.url} target="_blank" rel="noreferrer">
+                <span>South-pole terrain & illumination</span>
+                <span className="premium-status">MOMAR PROTOTYPE</span>
+              </a>
+              <a href={lunar.url} target="_blank" rel="noreferrer">
+                <span>Route optimization</span>
+                <span className="premium-status">MOMAR PROTOTYPE</span>
+              </a>
+              <div>
+                <span>Habitats & infrastructure</span>
+                <span className="premium-status planned">VISION</span>
+              </div>
+            </div>
+            <div className="frontier-world-links">
+              <a href={lunar.url} target="_blank" rel="noreferrer">
+                Lunar south pole
+                <ArrowRight size={17} />
+              </a>
+              <a href={lunar.globeUrl} target="_blank" rel="noreferrer">
+                The whole Moon
+                <ArrowRight size={17} />
+              </a>
+              <a href="/dashboard?view=moon">
+                Explore in SOZO
+                <ArrowUpRight size={16} />
+              </a>
+            </div>
+            <div className="frontier-world-stats">
+              <span>
+                <strong>
+                  ≈{number(lunar.areaKm2)}
+                  <small>km²</small>
+                </strong>
+                South-pole workspace
+              </span>
+              <span>
+                <strong>
+                  {(lunar.primaryCells / 1e6).toFixed(2)}
+                  <small>M</small>
+                </strong>
+                Primary terrain cells
+              </span>
+              <span>
+                <strong>
+                  {lunar.gridMeters}
+                  <small>m</small>
+                </strong>
+                Workspace grid
+              </span>
+            </div>
+          </div>
+        </section>
+        <section className="frontier-world mars-world" id="mars">
+          <div className="frontier-world-copy">
+            <span className="premium-eyebrow">FRONTIER 02</span>
+            <h2>Mars</h2>
+            <p>
+              Read ancient landscapes. Investigate Jezero and Gale. Turn
+              planetary context into a better scientific question.
+            </p>
+            <div className="world-capabilities">
+              <a href={mars.url} target="_blank" rel="noreferrer">
+                <span>Terrain intelligence & mapping</span>
+                <span className="premium-status">MOMAR PROTOTYPE</span>
+              </a>
+              <a href={mars.url} target="_blank" rel="noreferrer">
+                <span>Route optimization</span>
+                <span className="premium-status">MOMAR PROTOTYPE</span>
+              </a>
+              <div>
+                <span>Rovers, habitats & infrastructure</span>
+                <span className="premium-status planned">VISION</span>
+              </div>
+            </div>
+            <div className="frontier-world-links">
+              <a
+                href={mars.url}
+                target="_blank"
+                rel="noreferrer"
+                className="premium-button warm"
+              >
+                Open the Mars planner
+                <ArrowRight size={17} />
+              </a>
+              <a href="/dashboard?view=mars">
+                Explore in SOZO
+                <ArrowUpRight size={16} />
+              </a>
+            </div>
+            <div className="frontier-world-stats">
+              <span>
+                <strong>
+                  ≈{number(mars.areaKm2)}
+                  <small>km²</small>
+                </strong>
+                Detailed workspace
+              </span>
+              <span>
+                <strong>
+                  {(mars.primaryCells / 1e6).toFixed(2)}
+                  <small>M</small>
+                </strong>
+                Primary terrain cells
+              </span>
+              <span>
+                <strong>
+                  {mars.gridMeters}
+                  <small>m</small>
+                </strong>
+                Workspace grid
+              </span>
+            </div>
+          </div>
+          <div className="frontier-globe">
+            <PlanetScene body="mars" interactive />
+            <span className="world-credit">
+              NASA/JPL-Caltech · Viking / USGS · imagery visualization
+            </span>
+          </div>
+        </section>
+        <section
+          className="intelligence-section premium-section"
+          id="intelligence"
+        >
+          <div className="intelligence-heading">
+            <span className="premium-eyebrow">
+              <Sparkles size={14} />
+              THE SOZO AGENT / OUR DIRECTION
+            </span>
+            <h2>
+              From a question
+              <br />
+              to the <span>next possibility.</span>
+            </h2>
+            <p>
+              A scientific copilot for space exploration. Bring real sources
+              into view, investigate mission constraints, and keep the reasoning
+              with the work.
+            </p>
+            <a
+              href="/dashboard?view=scientist"
+              className="premium-button light"
+            >
+              Open the research workspace
+              <ArrowUpRight size={17} />
+            </a>
+          </div>
+          <div className="mission-agent-panel">
+            <div className="agent-panel-header">
+              <img src="/sozo-mark.svg" alt="" />
+              <span>SOZO / MISSION RESEARCH</span>
+              <span className="agent-live">
+                <i />
+                AVAILABLE NOW
+              </span>
+            </div>
+            <div className="agent-question">
+              <span>START WITH A REAL QUESTION</span>
+              <h3>What would it take to explore the lunar south pole?</h3>
+            </div>
+            <div className="agent-pipeline">
+              <a href="/dashboard?view=archive">
+                <Database size={18} />
+                <div>
+                  <strong>Find original space records</strong>
+                  <p>
+                    Search the live NASA archive with original links, dates, and
+                    provenance.
+                  </p>
+                </div>
+                <ArrowUpRight size={16} />
+              </a>
+              <a href="/dashboard?view=scientist">
+                <ScanLine size={18} />
+                <div>
+                  <strong>Follow the scientific evidence</strong>
+                  <p>
+                    Discover publications through Crossref and Europe PMC. Keep
+                    the citations.
+                  </p>
+                </div>
+                <ArrowUpRight size={16} />
+              </a>
+              <a href={lunar.url} target="_blank" rel="noreferrer">
+                <Route size={18} />
+                <div>
+                  <strong>Move into mission planning</strong>
+                  <p>
+                    Open the MOMAR prototype to compute terrain routes and
+                    inspect its constraints.
+                  </p>
+                </div>
+                <ArrowUpRight size={16} />
+              </a>
+            </div>
+            <div className="agent-development">
+              <span className="premium-status planned">IN DEVELOPMENT</span>
+              <p>
+                Model-powered synthesis and direct MOMAR route tools. SOZO does
+                not yet compute a terrain route or control mission hardware.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section className="evidence-section premium-section" id="evidence">
+          <div className="evidence-heading">
             <div>
-              <span className="space-eyebrow">
-                02 / THE EVIDENCE BENEATH EXPLORATION
+              <span className="premium-eyebrow">
+                <ShieldCheck size={14} />
+                SCIENCE STARTS WITH PROVENANCE
               </span>
               <h2>
                 Big worlds.
@@ -328,184 +352,155 @@ export default function SpaceLanding() {
                 <span>Details that matter.</span>
               </h2>
             </div>
-            <div className="coverage-tabs" aria-label="Coverage body">
-              {(["moon", "mars"] as const).map((b) => (
+            <div
+              className="premium-body-tabs"
+              aria-label="Reported planetary coverage"
+            >
+              {(["moon", "mars"] as const).map((value) => (
                 <button
-                  key={b}
-                  className={body === b ? "active" : ""}
-                  aria-pressed={body === b}
-                  onClick={() => setBody(b)}
+                  key={value}
+                  onClick={() => setBody(value)}
+                  aria-pressed={body === value}
+                  className={body === value ? "active" : ""}
                 >
-                  {b === "moon" ? "The Moon" : "Mars"}
-                  <span>{b === "moon" ? "01" : "02"}</span>
+                  {value === "moon" ? "The Moon" : "Mars"}
                 </button>
               ))}
             </div>
           </div>
-          <div className="coverage-meta">
-            <span>
-              <i />
-              MOMAR PROTOTYPE / PROJECT-REPORTED
-            </span>
-            <span>BRIEF DATED 27 OCT 2026</span>
+          <div className="evidence-meta">
+            <span>MOMAR PROJECT-REPORTED COVERAGE</span>
+            <a href={metrics.sourceUrl} target="_blank" rel="noreferrer">
+              Source project
+              <ExternalLink size={12} />
+            </a>
           </div>
-          <div className="coverage-metrics">
-            {(body === "moon"
-              ? [
-                  [
-                    "≈" + number(lunar.areaKm2),
-                    "km²",
-                    "South-pole workspace",
-                    "240 m grid, extending to ≈84°S",
-                  ],
-                  [
-                    (lunar.primaryCells / 1e6).toFixed(2),
-                    "M",
-                    "Terrain cells analysed",
-                    "Primary lunar workspace only",
-                  ],
-                  [
-                    String(lunar.integratedOrDerivedSources),
-                    "",
-                    "Integrated or derived sources",
-                    "7 additional sources reported as not yet available",
-                  ],
-                  [
-                    number(lunar.namedFeatures),
-                    "",
-                    "IAU feature names",
-                    `Plus ${lunar.locatedObjects} located human-made objects`,
-                  ],
-                ]
-              : [
-                  [
-                    "≈" + number(mars.areaKm2),
-                    "km²",
-                    "Detailed terrain",
-                    "Jezero + Gale · 20 m grid",
-                  ],
-                  [
-                    (mars.primaryCells / 1e6).toFixed(2),
-                    "M",
-                    "Terrain cells analysed",
-                    "Primary Mars workspaces",
-                  ],
-                  [
-                    `${mars.sourceCounts.Jezero} / ${mars.sourceCounts.Gale}`,
-                    "",
-                    "Regional source counts",
-                    "Jezero / Gale · overlapping inventories",
-                  ],
-                  [
-                    number(mars.namedFeatures),
-                    "",
-                    "IAU feature names",
-                    "Reported for the Mars globe",
-                  ],
-                ]
-            ).map(([value, unit, label, detail]) => (
-              <div key={label}>
-                <strong>
-                  {value}
-                  <small>{unit}</small>
-                </strong>
-                <h3>{label}</h3>
-                <p>{detail}</p>
-              </div>
-            ))}
-          </div>
-          <div className="coverage-integrity">
+          <div className="evidence-numbers">
             <div>
-              <span className="combined-symbol">⊕</span>
-              <div>
-                <strong>
-                  Two worlds. ≈{(metrics.combinedPrimaryCells / 1e6).toFixed(2)}{" "}
-                  million primary terrain cells.
-                </strong>
-                <p>
-                  The grids are different: 20 m on Mars and 240 m in the lunar
-                  workspace. The lunar 960 m far-field and 480 m Diviner grids
-                  overlap it and are not counted.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowMethod(!showMethod)}
-              aria-expanded={showMethod}
-            >
-              How the numbers work
-              <ChevronRight size={15} className={showMethod ? "rotated" : ""} />
-            </button>
-          </div>
-          {showMethod && (
-            <div className="coverage-method">
-              <p>{metrics.methodology}</p>
+              <strong>
+                ≈{number(current.areaKm2)}
+                <small>km²</small>
+              </strong>
+              <h3>
+                {body === "moon"
+                  ? "South-pole workspace"
+                  : "Jezero + Gale workspaces"}
+              </h3>
               <p>
-                The lunar area is a square polar-stereographic workspace.
-                Observations and effective resolution vary across it. Source
-                labels, grid spacing, scientific resolution, and integration
-                status are distinct. No independent recalculation of these
-                project-reported counts has been performed by SOZO.
+                {current.gridMeters} m grid
+                {body === "moon" ? " · to ≈84°S" : ""}
               </p>
-              <a href={metrics.sourceUrl} target="_blank" rel="noreferrer">
-                MOMAR source project
-                <ExternalLink size={13} />
-              </a>
             </div>
-          )}
-          <div className="dataset-ribbon">
+            <div>
+              <strong>
+                {(current.primaryCells / 1e6).toFixed(2)}
+                <small>M</small>
+              </strong>
+              <h3>Primary terrain cells</h3>
+              <p>Reported as analysed in MOMAR</p>
+            </div>
+            <div>
+              <strong>
+                {body === "moon"
+                  ? lunar.integratedOrDerivedSources
+                  : `${mars.sourceCounts.Jezero} / ${mars.sourceCounts.Gale}`}
+              </strong>
+              <h3>
+                {body === "moon"
+                  ? "Integrated or derived sources"
+                  : "Regional source counts"}
+              </h3>
+              <p>
+                {body === "moon"
+                  ? `${lunar.notYetAvailable} additional sources listed as not yet available`
+                  : "Jezero / Gale · inventories overlap"}
+              </p>
+            </div>
+            <div>
+              <strong>{number(current.namedFeatures)}</strong>
+              <h3>IAU feature names</h3>
+              <p>
+                {body === "moon"
+                  ? `${lunar.locatedObjects} located human-made objects`
+                  : "Names reported for the Mars globe"}
+              </p>
+            </div>
+          </div>
+          <div className="evidence-integrity">
+            <Globe2 size={30} strokeWidth={1} />
+            <div>
+              <h3>
+                Both worlds: ≈{(metrics.combinedPrimaryCells / 1e6).toFixed(2)}{" "}
+                million primary terrain cells.
+              </h3>
+              <p>
+                20 m on Mars. 240 m in the lunar workspace. Overlapping lunar
+                960 m far-field and 480 m Diviner grids are excluded. The lunar
+                area is a square polar-stereographic grid, with uneven
+                observational coverage.
+              </p>
+            </div>
+          </div>
+          <details className="evidence-method">
+            <summary>Read the methodology and limits</summary>
+            <p>{metrics.methodology}</p>
+            <p>
+              Counts and source status come from the supplied MOMAR brief dated
+              27 October 2026. SOZO has not independently recomputed those
+              figures or ingested those terrain grids. Potential ice and
+              modelled stability never establish confirmed ice. Grid spacing and
+              effective scientific resolution are different.
+            </p>
+          </details>
+          <div className="evidence-datasets">
             {datasets
-              .filter((d) => d.body === body)
-              .slice(0, 10)
-              .map((d) => (
-                <a href={`/dashboard?view=catalog&body=${body}`} key={d.id}>
-                  {d.name}
-                  <ArrowUpRight size={10} />
+              .filter((item) => item.body === body)
+              .slice(0, 8)
+              .map((item) => (
+                <a key={item.id} href={`/dashboard?view=catalog&body=${body}`}>
+                  {item.name}
+                  <ArrowUpRight size={12} />
                 </a>
               ))}
             <a
-              className="catalog-link"
+              className="evidence-catalog-link"
               href={`/dashboard?view=catalog&body=${body}`}
             >
-              Inspect the full catalog
-              <ArrowRight size={12} />
+              Inspect all {body === "moon" ? 20 : 16} source labels
+              <ArrowRight size={14} />
             </a>
           </div>
         </section>
-        <section className="space-section capability-section" id="capabilities">
-          <div className="space-section-heading">
+        <section className="prototype-section premium-section" id="prototype">
+          <div className="prototype-heading">
             <div>
-              <span className="space-eyebrow">03 / THE LUNAR WORKSPACE</span>
+              <span className="premium-eyebrow">
+                INSIDE THE MOMAR LUNAR PROTOTYPE
+              </span>
               <h2>
-                Follow the terrain.
+                See the surface.
                 <br />
-                <span>Find the bigger picture.</span>
+                <span>Understand the possibilities.</span>
               </h2>
             </div>
-            <div>
-              <p>
-                Six connected ways to investigate the lunar south pole and the
-                whole Moon.
-              </p>
-              <span className="prototype-note">
-                <i />
-                WORKING IN THE MOMAR PROTOTYPE
-              </span>
-            </div>
+            <p>
+              Six connected perspectives, from terrain and light to the mission
+              plan. Open the external prototype to explore its working tools.
+            </p>
           </div>
-          <div className="lunar-feature-grid">
+          <div className="premium-prototypes">
             {lunarCapabilities.map((feature) => (
-              <article className="lunar-feature" key={feature.letter}>
+              <article key={feature.letter}>
                 <a
-                  href="https://www.momar.si/moon/south-pole/"
+                  className="premium-prototype-image"
+                  href={lunar.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="feature-image-link"
-                  aria-label={`See ${feature.title} in the MOMAR prototype`}
+                  aria-label={`Open MOMAR ${feature.title}`}
                 >
                   <img
                     src={`/planetary/${feature.image}.webp`}
-                    alt={`MOMAR lunar prototype: ${feature.title}`}
+                    alt={`MOMAR prototype: ${feature.title}`}
                     loading="lazy"
                   />
                   <span>
@@ -513,11 +508,10 @@ export default function SpaceLanding() {
                     <ArrowUpRight size={17} />
                   </span>
                 </a>
-                <div className="feature-copy">
-                  <span className="feature-kicker">{feature.subtitle}</span>
+                <div>
                   <h3>{feature.title}</h3>
                   <p>{feature.detail}</p>
-                  <details className="feature-specifics">
+                  <details>
                     <summary>Inside the prototype</summary>
                     <ul>
                       {feature.specifics.map((item) => (
@@ -529,243 +523,65 @@ export default function SpaceLanding() {
               </article>
             ))}
           </div>
-          <div className="prototype-links">
-            <p>
-              These previews show the external MOMAR prototype. Its live terrain
-              services are not yet connected to SOZO.
-            </p>
-            <a
-              className="space-button secondary"
-              href="https://www.momar.si/moon/south-pole/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open lunar south pole
-              <ArrowUpRight size={15} />
-            </a>
-            <a
-              className="space-button text"
-              href="https://www.momar.si/moon/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Or explore the whole Moon
-              <ArrowUpRight size={13} />
-            </a>
-          </div>
         </section>
-        <section className="sozo-section" id="sozo">
-          <div className="sozo-intelligence">
-            <span className="space-eyebrow">
-              04 / THE INTELLIGENCE BETWEEN WORLDS
-            </span>
-            <h2>
-              Meet your
-              <br />
-              scientific <span>copilot.</span>
-            </h2>
-            <p>
-              SOZO brings the research together. Ask a question, discover
-              scientific publications, keep the sources, and build a record of
-              how you got there.
-            </p>
-            <div className="sozo-acronym">
-              <span>SOZO</span>
-              <div>
-                SCIENTIFIC OBSERVATION
-                <br />
-                ZONE OPERATOR
-              </div>
-            </div>
-            <a
-              className="space-button primary"
-              href="/dashboard?view=scientist"
-            >
-              Start an investigation
-              <ArrowUpRight size={17} />
-            </a>
-            <span className="sozo-mode">
-              Available now: live literature discovery & deterministic
-              statistics.
-              <br />
-              Model-powered synthesis and live terrain tools are the next stage.
-            </span>
-          </div>
-          <div className="research-preview">
-            <div className="preview-top">
-              <span>
-                <img src="/sozo-mark.svg" alt="" />
-                SOZO / RESEARCH WORKSPACE
-              </span>
-              <span className="preview-pill">EXAMPLE QUESTION</span>
-            </div>
-            <div className="preview-question">
-              How might terrain and illumination affect a lunar rover mission?
-            </div>
-            <div className="preview-path">
-              <span className="preview-step-number">01</span>
-              <div>
-                <strong>Start with a scientific question</strong>
-                <p>Set a clear scope and select your research sources.</p>
-              </div>
-              <CheckMark />
-            </div>
-            <div className="preview-path">
-              <span className="preview-step-number">02</span>
-              <div>
-                <strong>Follow the original evidence</strong>
-                <p>
-                  Inspect publication metadata, abstracts, and canonical links.
-                </p>
-              </div>
-              <CheckMark />
-            </div>
-            <div className="preview-path">
-              <span className="preview-step-number">03</span>
-              <div>
-                <strong>Keep a reproducible research record</strong>
-                <p>
-                  Save sources and notes. Export the report with its limits.
-                </p>
-              </div>
-              <CheckMark />
-            </div>
-            <div className="preview-source-row">
-              <span>Crossref</span>
-              <span>Europe PMC</span>
-              <span>Your notebook</span>
-              <ArrowRight size={14} />
-            </div>
-            <a className="preview-bottom-link" href="/dashboard?view=scientist">
-              Your next question belongs here
-              <ArrowUpRight size={16} />
-            </a>
-          </div>
-        </section>
-        <section className="developer-landing">
-          <div>
-            <span className="space-eyebrow">05 / SCIENCE WITHOUT SILOS</span>
-            <h2>
-              Your tools.
-              <br />
-              <span>A wider universe.</span>
-            </h2>
-            <p>
-              A versioned research API, a connector interface, and a real
-              command-line client. Bring scientific discovery into your own
-              workflow.
-            </p>
-            <a
-              href="/dashboard?view=developers"
-              className="space-button secondary"
-            >
-              Explore the developer platform
-              <ArrowUpRight size={15} />
-            </a>
-          </div>
-          <div className="landing-code">
-            <div>
-              <span />
-              <span />
-              <span />
-              <small>SOZO / RESEARCH API</small>
-            </div>
-            <pre>
-              <code>
-                <span className="code-muted">
-                  // A question. A source. A research record.
-                </span>
-                {"\n\n"}
-                <span className="code-lime">POST</span> /api/v1/research{"\n\n"}
-                {"{\n  "}
-                <span className="code-light">"question"</span>
-                {": "}
-                <span className="code-warm">
-                  "Lunar south-pole illumination"
-                </span>
-                {",\n  "}
-                <span className="code-light">"sources"</span>
-                {': ["crossref", "europepmc"],\n  '}
-                <span className="code-light">"mode"</span>
-                {': "broad"\n}'}
-              </code>
-            </pre>
-            <a href="/openapi.json">
-              View the OpenAPI specification
-              <ArrowUpRight size={13} />
-            </a>
-          </div>
-        </section>
-        <section className="space-final-cta">
-          <div className="cta-orbit" aria-hidden="true" />
-          <span className="space-eyebrow">
-            THE NEXT FRONTIER STARTS WITH A QUESTION
-          </span>
+        <section className="premium-final">
+          <div className="final-orbit" aria-hidden="true" />
+          <span className="premium-eyebrow">FOR THE ENDLESSLY CURIOUS</span>
           <h2>
-            Stay curious.
+            The next frontier
             <br />
-            <span>Go beyond.</span>
-            <i>✳</i>
+            starts with <span>a question.</span>
           </h2>
-          <a className="space-button primary" href="/dashboard">
-            Launch your workspace
+          <a className="premium-button light" href="/dashboard">
+            Enter your workspace
             <ArrowUpRight size={18} />
           </a>
-          <p>Two worlds to explore. A new way to connect the evidence.</p>
         </section>
       </main>
-      <footer className="space-footer">
-        <div className="space-footer-top">
-          <a className="space-brand" href="/">
-            <img src="/sozo-mark.svg" alt="" />
-            <span>
-              sozo<span className="brand-dot">.</span>
-            </span>
-          </a>
+      <footer className="premium-footer">
+        <div>
+          <Brand />
           <p>
-            For the endlessly curious.
-            <br />
-            For the worlds beyond.
+            Scientific intelligence.
+            <br />A wider universe.
           </p>
-          <div>
-            <a href="#worlds">Moon & Mars</a>
-            <a href="#sozo">SOZO</a>
-            <a href="/dashboard?view=catalog">Data catalog</a>
-            <a href="/dashboard?view=developers">API & developers</a>
-            <a href="/login">
-              Mission control
+          <nav aria-label="Footer">
+            <a href={lunar.url} target="_blank" rel="noreferrer">
+              MOMAR Moon
               <ArrowUpRight size={12} />
             </a>
-          </div>
+            <a href={mars.url} target="_blank" rel="noreferrer">
+              MOMAR Mars
+              <ArrowUpRight size={12} />
+            </a>
+            <a href="/dashboard?view=archive">NASA archive</a>
+            <a href="/dashboard?view=developers">Developers</a>
+          </nav>
         </div>
-        <div className="space-footer-bottom">
-          <span>© 2026 SOZO · SCIENTIFIC OBSERVATION ZONE OPERATOR</span>
-          <div>
+        <div className="premium-credits">
+          <span>© 2026 SOZO</span>
+          <p>
+            Films: user-supplied AI-generated concepts. Globe imagery:{" "}
             <a
               href="https://svs.gsfc.nasa.gov/4720/"
               target="_blank"
               rel="noreferrer"
             >
-              Moon imagery: NASA SVS / LROC / LOLA
-            </a>
+              NASA SVS / LROC / LOLA
+            </a>{" "}
+            and{" "}
             <a
               href="https://science.nasa.gov/3d-resources/mars/"
               target="_blank"
               rel="noreferrer"
             >
-              Mars imagery: NASA/JPL-Caltech
+              NASA/JPL-Caltech
             </a>
-          </div>
+            . Prototype previews: MOMAR. Visualizations are illustrative; NASA
+            affiliation or endorsement is not implied.
+          </p>
         </div>
-        <p className="imagery-credit">
-          Globe imagery is used for visualization, not quantitative terrain
-          analysis. Prototype screenshots: MOMAR. No NASA affiliation or
-          endorsement is implied.
-        </p>
       </footer>
     </div>
   );
-}
-function CheckMark() {
-  return <span className="preview-check">↗</span>;
 }

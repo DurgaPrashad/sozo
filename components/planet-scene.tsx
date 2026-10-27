@@ -48,7 +48,7 @@ export default function PlanetScene({
         renderer.setClearColor(0x000000, 0);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.35;
+        renderer.toneMappingExposure = 1.2;
         renderer.domElement.setAttribute("aria-hidden", "true");
         element.appendChild(renderer.domElement);
         const scene = new THREE.Scene();
@@ -61,9 +61,9 @@ export default function PlanetScene({
         controls.minDistance = 4;
         controls.maxDistance = 10;
         controls.enableDamping = true;
-        scene.add(new THREE.AmbientLight(0x9da9c2, 1.35));
+        scene.add(new THREE.AmbientLight(0x9da9c2, 0.55));
         const sun = new THREE.DirectionalLight(0xfff0db, 4);
-        sun.position.set(-3, 4, 5);
+        sun.position.set(-5, 3, 2);
         scene.add(sun);
         const rim = new THREE.DirectionalLight(0x5c8aff, 1.7);
         rim.position.set(4, 0, -3);
@@ -76,6 +76,7 @@ export default function PlanetScene({
           radius: number,
           x: number,
           y: number,
+          z = 0,
         ) {
           const map = loader.load(`/planetary/${kind}-color.jpg`, () => {
             if (!disposed) setReady(true);
@@ -103,15 +104,16 @@ export default function PlanetScene({
             new THREE.SphereGeometry(radius, 96, 64),
             material,
           );
-          mesh.position.set(x, y, 0);
+          mesh.position.set(x, y, z);
           mesh.rotation.set(0.08, kind === "mars" ? 2.8 : Math.PI, 0.08);
           scene.add(mesh);
           meshes.push(mesh);
           return mesh;
         }
         if (duo) {
-          planet("moon", 1.12, -1.13, 0.75);
-          planet("mars", 1.8, 1.18, -0.28);
+          // Keep the spheres physically separate: the Moon is farther from the camera.
+          planet("moon", 1.08, -1.35, 0.62, -0.9);
+          planet("mars", 1.65, 1.0, -0.22, 0.6);
         } else planet(body, 1.65, 0, 0);
         const starCoordinates = [];
         for (let i = 0; i < 380; i++) {

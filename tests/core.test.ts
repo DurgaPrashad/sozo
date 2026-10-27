@@ -378,3 +378,95 @@ test("complex or regex-based parameter schemas are not exposed as validated oper
     0,
   );
 });
+
+test("NASA archive preserves original dates and provenance while constraining external links", async () => {
+  const { searchSpaceArchive } = await import("../lib/science/space-data");
+  let requested = "";
+  const result = await searchSpaceArchive(
+    "Mars rover",
+    "image",
+    async (url) => {
+      requested = url;
+      return {
+        collection: {
+          metadata: { total_hits: 39 },
+          items: [
+            {
+              data: [
+                {
+                  nasa_id: "PIA-Mars/one",
+                  title: "<b>Mars</b> rover",
+                  description: "Original <em>caption</em>",
+                  date_created: "2014-01-02T00:00:00Z",
+                  media_type: "image",
+                  center: "JPL",
+                  keywords: ["Mars"],
+                },
+              ],
+              links: [
+                {
+                  rel: "preview",
+                  href: "https://images-assets.nasa.gov/image/preview.jpg",
+                },
+              ],
+            },
+            {
+              data: [
+                { nasa_id: "duplicate", media_type: "image", title: "Second" },
+              ],
+              links: [{ rel: "preview", href: "javascript:alert(1)" }],
+            },
+            {
+              data: [
+                {
+                  nasa_id: "duplicate",
+                  media_type: "image",
+                  title: "Duplicate",
+                },
+              ],
+            },
+            {
+              data: [
+                {
+                  nasa_id: "invalid",
+                  media_type: "audio",
+                  title: "Unsupported",
+                },
+              ],
+            },
+          ],
+        },
+      };
+    },
+  );
+  const url = new URL(requested);
+  assert.equal(url.origin, "https://images-api.nasa.gov");
+  assert.equal(url.searchParams.get("page_size"), "12");
+  assert.equal(url.searchParams.get("media_type"), "image");
+  assert.equal(result.records.length, 2);
+  assert.equal(result.records[0].title, "Mars rover");
+  assert.equal(result.records[0].date, "2014-01-02T00:00:00Z");
+  assert.equal(
+    result.records[0].sourceUrl,
+    "https://images.nasa.gov/details/PIA-Mars%2Fone",
+  );
+  assert.equal(result.records[1].thumbnail, null);
+  assert.equal(result.totalAvailable, 39);
+  assert.ok(result.retrievedAt);
+  assert.match(result.limitations[0], /not live spacecraft telemetry/);
+});
+test("NASA archive errors and invalid searches never become fabricated records", async () => {
+  const { searchSpaceArchive } = await import("../lib/science/space-data");
+  await assert.rejects(searchSpaceArchive("x"));
+  await assert.rejects(
+    searchSpaceArchive("Moon", "all", async () => {
+      throw new Error("NASA unavailable");
+    }),
+    /NASA unavailable/,
+  );
+  const empty = await searchSpaceArchive("Moon", "all", async () => ({
+    collection: { items: [] },
+  }));
+  assert.equal(empty.records.length, 0);
+  assert.equal(empty.totalAvailable, null);
+});

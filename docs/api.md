@@ -70,3 +70,9 @@ API keys currently inherit complete owner access; project-specific roles and nar
 `POST /api/auth/login` accepts JSON `{email, password, returnTo?}` and sets an opaque HttpOnly, SameSite=Lax cookie (Secure over HTTPS), valid for eight hours. `returnTo` is constrained to the dashboard. `GET /api/auth/session` returns the authenticated identity. `POST /api/auth/logout` revokes the session. Foreign browser origins are rejected. Repeated failures are throttled per client IP in ten-minute windows. The account is configured through server secrets, with a salted PBKDF2 verifier; credentials are never bundled into the UI.
 
 Server-side clients can exchange those same credentials with `POST /api/auth/token`, using JSON `{email, password}`. HTTP 201 returns `{access_token, token_type: "Bearer", user}`. Store the returned token securely and send `Authorization: Bearer <access_token>` to `/api/v1` routes. Revoke it under API keys or with `DELETE /api/v1/keys/{id}`. These owner-level keys do not expire automatically. Never expose them in public browser code.
+
+## NASA archive discovery
+
+`GET /api/v1/space-data?q=lunar%20south%20pole&media=all` requires the same workspace session or bearer key as other owned APIs. `q` accepts 2–160 characters; `media` accepts `all`, `image`, or `video`. It returns up to 12 original records, `provider`, `retrievedAt`, `requestUrl`, `totalAvailable`, and scientific limitations. Each record preserves NASA ID, date, original caption, source/metadata URLs, center, and creator. An upstream failure returns 502; no synthetic records are substituted. This endpoint neither ingests terrain nor computes routes.
+
+Official contract: [NASA Image and Video Library API](https://images.nasa.gov/docs/images.nasa.gov_api_docs.pdf).
