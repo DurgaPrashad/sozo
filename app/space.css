@@ -4542,3 +4542,207 @@ html {
 .feature-specifics li + li {
   margin-top: 8px;
 }
+/* Keep scientific context and controls readable on compact screens. */
+.space-section-heading > p,
+.world-card-content > p,
+.feature-copy > p,
+.sozo-intelligence > p,
+.developer-landing p {
+  font-size: 13px;
+}
+.coverage-metrics p,
+.coverage-integrity p,
+.coverage-method p,
+.prototype-links > p,
+.worlds-footnote {
+  font-size: 12px;
+}
+.space-footer-note,
+.sozo-mode {
+  font-size: 11px;
+  line-height: 1.8;
+}
+.feature-specifics {
+  font-size: 12px;
+}
+.feature-specifics summary {
+  font-size: 11px;
+}
+@media (max-width: 700px) {
+  .space-hero {
+    min-height: 930px;
+  }
+  .space-hero h1 {
+    font-size: clamp(62px, 15.5vw, 84px);
+  }
+  .space-hero-content > p {
+    font-size: 14px;
+    max-width: 360px;
+    line-height: 1.8;
+  }
+  .space-hero .space-button {
+    font-size: 12px;
+    min-height: 46px;
+  }
+  .space-hero-buttons {
+    gap: 10px !important;
+  }
+  .space-hero-buttons > .space-button.text {
+    font-size: 11px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .hero-small-note {
+    font-size: 10px;
+    max-width: 310px;
+    line-height: 1.6;
+  }
+  .space-button.compact {
+    font-size: 10px;
+    min-height: 40px;
+  }
+  .space-menu {
+    min-width: 40px;
+    min-height: 40px;
+    justify-content: center;
+  }
+  .space-section-heading > p,
+  .world-card-content > p,
+  .feature-copy > p,
+  .sozo-intelligence > p,
+  .developer-landing p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .space-eyebrow,
+  .space-section-heading .space-eyebrow {
+    font-size: 9px;
+  }
+  .world-title-row h3 > span {
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .world-card-stats > span > small {
+    font-size: 10px;
+  }
+  .world-card-bottom > span {
+    font-size: 7px;
+  }
+  .world-card-bottom > a {
+    font-size: 11px;
+  }
+  .worlds-footnote,
+  .worlds-footnote > a {
+    font-size: 11px;
+  }
+  .coverage-metrics h3 {
+    font-size: 13px;
+  }
+  .coverage-metrics p,
+  .coverage-integrity p,
+  .coverage-method p,
+  .prototype-links > p {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .coverage-tabs button {
+    font-size: 12px;
+    min-height: 44px;
+  }
+  .coverage-integrity button {
+    font-size: 11px;
+    min-height: 44px;
+  }
+  .feature-kicker {
+    font-size: 10px;
+    line-height: 1.7;
+  }
+  .dataset-ribbon a {
+    font-size: 10px;
+    min-height: 36px;
+  }
+  .prototype-links .space-button {
+    font-size: 12px;
+    min-height: 44px;
+  }
+  .sozo-mode {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .preview-question {
+    font-size: 21px;
+  }
+  .preview-path strong {
+    font-size: 12px;
+  }
+  .preview-path p {
+    font-size: 11px;
+  }
+  .preview-source-row > span,
+  .preview-bottom-link {
+    font-size: 10px;
+  }
+  .landing-code pre {
+    font-size: 10px;
+    line-height: 1.8;
+  }
+  .space-footer-top > p,
+  .space-footer-top > div > a {
+    font-size: 11px;
+    line-height: 1.8;
+  }
+  .space-footer-bottom,
+  .space-footer-bottom > div {
+    font-size: 10px;
+    line-height: 1.8;
+  }
+  .mission-welcome p,
+  .mission-prompt p,
+  .mission-activity-empty p {
+    font-size: 13px;
+  }
+  .mission-summary > div > span,
+  .mission-summary strong > small {
+    font-size: 10px;
+  }
+  .mission-world-info > p {
+    font-size: 12px;
+  }
+  .mission-world-info > div > span {
+    font-size: 10px;
+  }
+  .mission-source-note p,
+  .explorer-limits p,
+  .explorer-data-note p {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .catalog-notice p {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .dataset-row strong {
+    font-size: 12px;
+  }
+  .dataset-row small,
+  .dataset-status {
+    font-size: 10px;
+  }
+  .catalog-filters input,
+  .catalog-filters select {
+    font-size: 12px;
+    min-height: 44px;
+  }
+  .filter-tabs button {
+    font-size: 12px;
+    min-height: 44px;
+  }
+  .dataset-results-label,
+  .catalog-results-label {
+    font-size: 9px;
+  }
+  .globe-controls button {
+    min-height: 40px;
+    min-width: 40px;
+  }
+}
