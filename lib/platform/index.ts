@@ -49,17 +49,40 @@ export function postgresRunner(connectionString: string): PostgresRunner {
   };
 }
 
-let database: D1Database | undefined;
+// Values copied from .env.example still contain <placeholders>; treat them
+// as unset rather than as addresses to connect to.
+export function configuredValue(value: string | undefined) {
+  const trimmed = value?.trim();
+  return trimmed && !/[<>]/.test(trimmed) ? trimmed : undefined;
+}
 
+let database: D1Database | undefined;
+let databaseError = false;
+
+// Never throws: a missing or malformed database setting must not break module
+// loading (or the build); callers see "no database" and report it per request.
 export const env: { readonly DB?: D1Database } = {
   get DB() {
-    if (database) return database;
-    const postgresUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
-    if (postgresUrl) return (database = postgresD1(postgresRunner(postgresUrl)));
-    const url = process.env.TURSO_DATABASE_URL;
-    if (!url) return undefined;
-    return (database = libsqlD1(
-      createClient({ url, authToken: process.env.TURSO_AUTH_TOKEN }),
-    ));
+    if (database || databaseError) return database;
+    try {
+      const postgresUrl =
+        configuredValue(process.env.DATABASE_URL) || configuredValue(process.env.POSTGRES_URL);
+      if (postgresUrl) return (database = postgresD1(postgresRunner(postgresUrl)));
+      const url = configuredValue(process.env.TURSO_DATABASE_URL);
+      if (url)
+        return (database = libsqlD1(
+          createClient({ url, authToken: configuredValue(process.env.TURSO_AUTH_TOKEN) }),
+        ));
+    } catch (error) {
+      databaseError = true;
+      console.error(
+        JSON.stringify({
+          code: "DATABASE_CONFIG_INVALID",
+          detail: (error as { code?: string }).code ?? "invalid connection string",
+          hint: "Set DATABASE_URL to Supabase's Transaction pooler URI and URL-encode the password.",
+        }),
+      );
+    }
+    return undefined;
   },
 };

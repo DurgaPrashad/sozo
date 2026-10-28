@@ -112,8 +112,10 @@ async function migrateLibsql(client, log = console.log) {
 
 async function main() {
   const optional = process.argv.includes("--if-configured");
-  const postgresUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
-  const tursoUrl = process.env.TURSO_DATABASE_URL;
+  // Template values such as libsql://<database>-<org>.turso.io count as unset.
+  const configured = (value) => (value?.trim() && !/[<>]/.test(value) ? value.trim() : undefined);
+  const postgresUrl = configured(process.env.DATABASE_URL) || configured(process.env.POSTGRES_URL);
+  const tursoUrl = configured(process.env.TURSO_DATABASE_URL);
   if (!postgresUrl && !tursoUrl) {
     if (optional) {
       console.log("No database is configured; skipping database migrations.");
@@ -143,7 +145,7 @@ async function main() {
     }
   } else {
     const { createClient } = await import("@libsql/client/web");
-    const client = createClient({ url: tursoUrl, authToken: process.env.TURSO_AUTH_TOKEN });
+    const client = createClient({ url: tursoUrl, authToken: configured(process.env.TURSO_AUTH_TOKEN) });
     await migrateLibsql(client);
     client.close();
   }
