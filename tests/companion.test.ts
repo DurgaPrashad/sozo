@@ -97,3 +97,12 @@ test("retrieved citations are returned while unsupported markers are flagged", a
   try { const { handler, request } = setup("fixture-key"); const response = await handler(request("chat", { message: "Lunar terrain", retrieve: true }, { token: "sozo_widget_" + "a".repeat(64), origin: "https://map.example" })); assert.equal(response.status, 200); assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://map.example"); const body = await response.json() as {citations:Array<Record<string,unknown>>;limitations:string[]}; assert.equal(body.citations.length, 1); assert.ok(!("abstract" in body.citations[0])); assert.ok(body.limitations.some((text: string) => text.includes("unsupported citation"))); }
   finally { globalThis.fetch = original; }
 });
+
+import {loadCompanionModel} from "../lib/companion/model";
+test("model proxy resolves the observed canonical-host redirect without sending credentials",async()=>{
+ let calls=0;const response=await loadCompanionModel(new Request("https://sozo-research-lab.sharpscarf8.chatgpt.site/api/companion/model"),async(input,init)=>{calls++;assert.equal(init?.headers,undefined);assert.equal(init?.redirect,"manual");return calls===1?new Response(null,{status:307,headers:{location:"https://sozo-research-lab.durgaprashadreddy996.chatgpt.site/models/sozo-companion.glb"}}):new Response("glTF");});assert.equal(calls,2);assert.equal(response.status,200);assert.equal(await response.text(),"glTF");
+});
+test("model proxy rejects arbitrary redirect hosts and paths",async()=>{
+ for(const location of ["https://attacker.example/models/sozo-companion.glb","https://sozo-research-lab.durgaprashadreddy996.chatgpt.site/private"]){await assert.rejects(()=>loadCompanionModel(new Request("https://sozo-research-lab.sharpscarf8.chatgpt.site/api/companion/model"),async()=>new Response(null,{status:307,headers:{location}})),/redirect is invalid/);}
+});
+test("model redirect loops are bounded",async()=>{let calls=0;await assert.rejects(()=>loadCompanionModel(new Request("https://sozo-research-lab.durgaprashadreddy996.chatgpt.site/api/companion/model"),async()=>{calls++;return new Response(null,{status:307,headers:{location:"/models/sozo-companion.glb"}});}),/redirect limit/);assert.equal(calls,3);});

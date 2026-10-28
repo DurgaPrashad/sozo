@@ -8,7 +8,7 @@ The protected workspace includes Sarvam chat, speech, transcription, optional ex
 
 ## Verification completed before packaging
 
-- TypeScript checks passed across application and API code. The final deterministic suite passed80/80tests with0failures.
+- TypeScript checks passed across application and API code. The final deterministic suite passed83/83tests with0failures.
 - Deterministic tests cover research filtering, DOI matching, metadata normalization, statistics, connector constraints, API ownership, widget origin/expiry/revocation boundaries, route distances and CLI behavior. See `npm test` and the separate fixture evaluation report; fixture success is not a live search accuracy benchmark.
 - Real Sarvam requests returned HTTP200 for conversation, Bulbul v4 speech, Saaras v4 transcription and Gemma4 reading labels on an owned synthetic map image. No personal desktop capture was used for these tests.
 - Local companion API checks passed14/14: authentication, model asset, exact-origin sessions, CORS, revocation, scope restrictions and a real scoped conversation with supplied polyline analysis.
@@ -22,3 +22,5 @@ MOMAR has not supplied routing backend endpoints or credentials. Routes, terrain
 Browser research verification preserved the selected DOI as the first record and produced a cited synthesis. It also exposed an equal-resolution comparison error (5 m described as finer than 5 m). A targeted deterministic comparison check now rejects this error, including equivalent metre units, and retains the discovery record if synthesis fails. This narrow guard is not general numerical or scientific fact verification.
 
 Production article checks exposed shared-upstream Crossref rate limiting. Article discovery now caches actual public metadata in D1 for15minutes, retries transient rate limits up to3times and can retain previously retrieved records for up to7days during a provider failure. The UI labels cached/stale evidence and preserves original upstream retrieval timestamps. Cold-start upstream failure still produces an honest partial/empty state; no fictional records are substituted.
+
+The published model endpoint also encountered the Sites canonical-host redirect. The proxy now follows at most2redirects to the exact owned GLB path on the current/previous SOZO hosts and returns the bytes with its own CORS headers; it never forwards the browser to a static asset that drops those headers.
