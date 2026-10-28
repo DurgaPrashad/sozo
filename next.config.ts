@@ -11,6 +11,17 @@ const nextConfig: NextConfig = {
       headers: [{ key: "Access-Control-Allow-Origin", value: "*" }],
     }));
   },
+  // Supabase returns Google sign-in to its Site URL (with ?code= or an error)
+  // when the callback is missing from its Redirect URLs list. Hand those
+  // arrivals to SOZO's callback; the query string is passed through.
+  async redirects() {
+    return ["code", "error_description"].map((key) => ({
+      source: "/",
+      has: [{ type: "query" as const, key }],
+      destination: "/api/auth/supabase/callback",
+      permanent: false,
+    }));
+  },
 };
 
 export default nextConfig;

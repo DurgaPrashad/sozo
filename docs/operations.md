@@ -33,6 +33,7 @@ SOZO uses Facebook's server-side OAuth code flow (no JavaScript SDK, no Meta pag
 
 ## Symptoms
 
+- **Google sign-in lands on `http://localhost:3000`:** that is Supabase's default Site URL, used when the callback is not on its Redirect URLs list. In Supabase → Authentication → URL Configuration set Site URL to `https://sozo.momar.si` and add `https://sozo.momar.si/api/auth/supabase/callback` to Redirect URLs. With the Site URL right, `next.config.ts` also forwards `/?code=…` arrivals to the callback.
 - **Sign-in prompt:** use `/login`. Production needs the secret runtime values `SOZO_WORKSPACE_EMAIL` and `SOZO_WORKSPACE_PASSWORD_HASH`. The latter is a salted PBKDF2-SHA256 verifier, never the plaintext password. Updating runtime secrets requires a new deployment. If hosting is changed back to private, external clients additionally need hosting service access.
 - **Workspace 500 locally:** build and apply the local migration; ensure `DB` is enabled. Do not create tables at request time.
 - **Unavailable source:** the report preserves a source-level error. Retry later, shorten the query, or select another source. No fake publications are substituted.
