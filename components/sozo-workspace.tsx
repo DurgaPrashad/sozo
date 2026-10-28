@@ -198,6 +198,10 @@ export default function SozoWorkspace() {
   const composer = useRef<HTMLTextAreaElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const notify = useCallback((v: string) => setToast(v), []);
+  // Each view starts at its top rather than at the previous view's offset.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [view]);
   const refresh = useCallback(async () => {
     try {
       setWS(await api("workspace"));
@@ -291,14 +295,16 @@ export default function SozoWorkspace() {
       composer.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 30);
   };
-  const submit = async (e?: FormEvent) => {
-    e?.preventDefault();
-    if (question.trim().length < 5 || !sources.length) return;
+  const startResearch = async (
+    text: string,
+    options: { domain: string; mode: string; sources: string[] },
+  ) => {
+    if (text.trim().length < 5 || !options.sources.length) return;
     setSubmitting(true);
     try {
       const d = await api("research", {
         method: "POST",
-        body: JSON.stringify({ question, domain, mode, sources, projectId }),
+        body: JSON.stringify({ question: text, ...options, projectId }),
       });
       setRun(d.run);
       setRunTab("overview");
@@ -309,6 +315,10 @@ export default function SozoWorkspace() {
     } finally {
       setSubmitting(false);
     }
+  };
+  const submit = (e?: FormEvent) => {
+    e?.preventDefault();
+    return startResearch(question, { domain, mode, sources });
   };
   const openRun = (r: ResearchRun) => {
     setRun(r);
@@ -600,6 +610,18 @@ export default function SozoWorkspace() {
           {view === "overview" && (
             <MissionOverview
               runs={ws.runs}
+              userName={ws.user.name}
+              launching={submitting}
+              onLaunch={(text, depth) => {
+                setQuestion(text);
+                setMode(depth);
+                void startResearch(text, {
+                  domain: "Planetary science",
+                  mode: depth,
+                  sources: ["crossref", "europepmc"],
+                });
+              }}
+              onCompanion={() => navigate("companion")}
               onExplore={(body) => navigate(body)}
               onResearch={(q) => {
                 setQuestion(q);

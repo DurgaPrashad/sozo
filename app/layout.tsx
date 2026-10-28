@@ -3,6 +3,7 @@ import "./globals.css";
 import "./space.css";
 import "./premium.css";
 import "./companion.css";
+import "./cosmos.css";
 
 export const metadata: Metadata = {
   title: "SOZO — Intelligence for life beyond Earth.",
@@ -21,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head><link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous"/></head>
+      <head><link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous"/><link rel="preload" href="/fonts/saira-condensed-latin-600.woff2" as="font" type="font/woff2" crossOrigin="anonymous"/></head>
       <body className="antialiased">{children}</body>
     </html>
   );

@@ -1,0 +1,1166 @@
+/* Cosmos: SOZO's deep-space design layer for the workspace and landing page.
+   Loaded after the other stylesheets, so equal-specificity rules here win. */
+@font-face {
+  font-family: "Saira Condensed";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/saira-condensed-latin-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Saira Condensed";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/saira-condensed-latin-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Saira Condensed";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/saira-condensed-latin-700.woff2") format("woff2");
+}
+
+:root {
+  --display: "Saira Condensed", "DM Sans", system-ui, sans-serif;
+  --cosmos-bg: #02040b;
+  --cosmos-panel: rgba(10, 19, 37, 0.66);
+  --cosmos-panel-strong: rgba(9, 17, 33, 0.9);
+  --cosmos-line: rgba(132, 186, 255, 0.13);
+  --cosmos-line-strong: rgba(132, 186, 255, 0.28);
+  --cosmos-text: #eef4ff;
+  --cosmos-muted: #93a8c6;
+  --cosmos-dim: #5f7695;
+  --cosmos-accent: #22a8ff;
+  --cosmos-accent-soft: #8fd4ff;
+  --cosmos-mars: #ff8a4c;
+  --cosmos-violet: #b88cff;
+}
+
+/* ── Workspace atmosphere ─────────────────────────────────────────────── */
+.app-shell {
+  --bg: var(--cosmos-bg);
+  --paper: var(--cosmos-panel);
+  --ink: #dbe7f8;
+  --muted: var(--cosmos-muted);
+  --line: var(--cosmos-line);
+  --lime: var(--cosmos-accent-soft);
+  position: relative;
+  isolation: isolate;
+  color: var(--ink);
+  background:
+    radial-gradient(1100px 680px at 82% -12%, rgba(37, 99, 235, 0.24), transparent 62%),
+    radial-gradient(900px 620px at 6% 112%, rgba(124, 58, 237, 0.16), transparent 62%),
+    radial-gradient(760px 520px at 48% 46%, rgba(8, 145, 178, 0.07), transparent 70%),
+    var(--cosmos-bg);
+}
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.app-shell::before {
+  background: url("/cosmos/stars-far.svg") 0 0 / 900px 900px repeat;
+}
+.app-shell::after {
+  background: url("/cosmos/stars-near.svg") 120px 80px / 1300px 1300px repeat;
+  animation: cosmos-twinkle 6s ease-in-out infinite alternate;
+}
+@keyframes cosmos-twinkle {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.app-shell .sidebar {
+  background: linear-gradient(180deg, rgba(3, 8, 19, 0.9), rgba(2, 6, 15, 0.82));
+  border-right: 1px solid var(--cosmos-line);
+  backdrop-filter: blur(16px);
+}
+.app-shell .main-shell {
+  background: transparent;
+}
+.app-shell .topbar {
+  background: linear-gradient(180deg, rgba(2, 4, 11, 0.86), rgba(2, 4, 11, 0.62));
+  border-bottom: 1px solid var(--cosmos-line);
+  backdrop-filter: blur(16px);
+}
+.app-shell .brand > span {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 23px;
+  letter-spacing: 0.42em;
+  color: var(--cosmos-text);
+}
+.app-shell .nav-caption,
+.app-shell .projects-caption,
+.app-shell .projects-caption button {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  color: var(--cosmos-dim);
+}
+.app-shell .nav-item {
+  position: relative;
+  font-family: var(--display);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8ea4c3;
+  border-radius: 8px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+.app-shell .nav-item svg {
+  color: #5d7aa0;
+  transition: color 0.2s;
+}
+.app-shell .nav-item:hover {
+  color: #e2edff;
+  background: rgba(255, 255, 255, 0.035);
+}
+.app-shell .nav-item:hover svg {
+  color: var(--cosmos-accent-soft);
+}
+.app-shell .nav-item.active {
+  color: #ffffff;
+  background: linear-gradient(90deg, rgba(34, 168, 255, 0.2), rgba(34, 168, 255, 0) 88%);
+}
+.app-shell .nav-item.active svg {
+  color: var(--cosmos-accent);
+}
+.app-shell .nav-item.active:before {
+  background: var(--cosmos-accent);
+  box-shadow: 0 0 12px var(--cosmos-accent);
+}
+.app-shell .nav-count {
+  background: rgba(34, 168, 255, 0.16);
+  color: var(--cosmos-accent-soft);
+  font-family: var(--sans);
+  letter-spacing: 0;
+}
+.app-shell :is(.workspace-switch, .profile) {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--cosmos-line);
+}
+.app-shell .workspace-switch strong,
+.app-shell .profile strong {
+  color: #d5e3f7;
+}
+.app-shell .workspace-glyph,
+.app-shell .avatar,
+.app-shell .top-avatar {
+  background: radial-gradient(circle at 35% 30%, #3a8dff, #0d3a7a 70%);
+  color: #fff;
+  border-color: rgba(132, 186, 255, 0.3);
+}
+
+/* Electric primary actions, glass secondary actions. */
+.app-shell :is(.new-research, .primary-button) {
+  background: linear-gradient(135deg, #3bb4ff, #0b84ff);
+  color: #00111f;
+  border: 0;
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 30px -12px rgba(34, 168, 255, 0.9);
+  transition:
+    filter 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+.app-shell :is(.new-research, .primary-button):hover {
+  background: linear-gradient(135deg, #5cc2ff, #2391ff);
+  box-shadow: 0 14px 38px -12px rgba(34, 168, 255, 1);
+}
+.app-shell :is(.new-research, .primary-button):disabled {
+  background: rgba(34, 168, 255, 0.14);
+  color: #7d9cc2;
+  border: 1px solid var(--cosmos-line);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.app-shell .hero-period {
+  color: var(--cosmos-accent);
+}
+.app-shell :is(.secondary-button, .text-button) {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--cosmos-line-strong);
+  color: #d6e4f7;
+}
+.app-shell :is(.secondary-button, .text-button):hover {
+  border-color: rgba(143, 212, 255, 0.5);
+  background: rgba(34, 168, 255, 0.08);
+}
+
+.app-shell .breadcrumbs,
+.app-shell .breadcrumbs strong {
+  font-family: var(--display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.app-shell .breadcrumbs strong {
+  color: var(--cosmos-text);
+}
+.app-shell .system-status {
+  font-family: var(--display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: var(--cosmos-muted);
+  padding: 6px 12px;
+  border: 1px solid var(--cosmos-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+}
+.app-shell .system-status i {
+  background: #4ade80;
+  box-shadow: 0 0 10px #4ade80;
+}
+
+/* Headings and labels across every workspace view. */
+.app-shell :is(.page-heading h1, .hero h1, .planetary-explorer h1) {
+  font-family: var(--display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.95;
+  color: var(--cosmos-text);
+}
+.app-shell .page-heading h1 {
+  font-size: clamp(38px, 4.4vw, 56px);
+}
+.app-shell :is(.eyebrow, .space-eyebrow, .section-kicker) {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cosmos-accent-soft);
+}
+.app-shell :is(.section-header h2, .mission-section-head h2) {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cosmos-text);
+}
+.app-shell .page-heading p {
+  color: var(--cosmos-muted);
+  font-size: 13px;
+}
+
+/* Glass surfaces. */
+.app-shell
+  :is(
+    .composer,
+    .knowledge-card,
+    .metric-card,
+    .stat-card,
+    .project-card,
+    .recent-research,
+    .run-summary,
+    .source-card,
+    .quick-domain-card,
+    .explorer-panel,
+    .dataset-table,
+    .catalog-notice,
+    .run-row,
+    .companion-console,
+    .scientific-articles
+  ) {
+  background: linear-gradient(180deg, rgba(14, 27, 50, 0.68), rgba(7, 14, 29, 0.62));
+  border: 1px solid var(--cosmos-line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.app-shell :is(.project-card, .source-card, .quick-domain-card, .run-row, .dataset-row) {
+  transition:
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.app-shell :is(.project-card, .source-card, .quick-domain-card, .run-row):hover {
+  border-color: var(--cosmos-line-strong);
+  box-shadow: 0 16px 40px -24px rgba(34, 168, 255, 0.7);
+}
+.app-shell :is(input, textarea, select):focus-visible {
+  outline: 2px solid var(--cosmos-accent);
+  outline-offset: 2px;
+}
+.app-shell .status {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--cosmos-line);
+  font-family: var(--display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.app-shell .status.completed {
+  color: #6ee7a8;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.app-shell .filter-tabs button.active {
+  background: rgba(34, 168, 255, 0.16);
+  color: #dff1ff;
+  box-shadow: inset 0 0 0 1px rgba(34, 168, 255, 0.35);
+}
+.app-shell .result-metrics > div {
+  background: linear-gradient(180deg, rgba(14, 27, 50, 0.7), rgba(7, 14, 29, 0.62));
+  border-color: var(--cosmos-line);
+}
+.app-shell .result-metrics strong {
+  font-family: var(--display);
+  font-weight: 600;
+  color: var(--cosmos-text);
+}
+.app-shell .research-working h3 {
+  color: var(--cosmos-accent-soft);
+}
+
+/* ── Mission control (overview) ───────────────────────────────────────── */
+.cosmos-overview {
+  --hero-pad: clamp(22px, 4vw, 56px);
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding-bottom: 20px;
+}
+.cosmos-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 56px var(--hero-pad) 0;
+  border-radius: 22px;
+  border: 1px solid var(--cosmos-line);
+  background:
+    radial-gradient(900px 500px at 70% 0%, rgba(30, 64, 175, 0.45), transparent 65%),
+    linear-gradient(180deg, #030a1c 0%, #02040b 100%);
+}
+.cosmos-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+.cosmos-hero-media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/cosmos/stars-near.svg") 0 0 / 900px 900px repeat;
+  opacity: 0.8;
+}
+.cosmos-hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(2, 4, 11, 0) 35%, rgba(2, 4, 11, 0.7) 72%, #02040b 100%);
+}
+.cosmos-hero-planet {
+  position: absolute;
+  width: min(760px, 78vw);
+  aspect-ratio: 1;
+  right: -12%;
+  top: -34%;
+  border-radius: 50%;
+  /* Tint the lunar texture into a cold blue world. */
+  background-image:
+    radial-gradient(circle at 32% 30%, rgba(147, 197, 253, 0.9), rgba(37, 99, 235, 0.95) 55%, rgba(30, 58, 138, 1) 100%),
+    url("/planetary/moon-color.jpg");
+  background-size: 100% 100%, 200% 100%;
+  background-position: center, 30% center;
+  background-blend-mode: color, normal;
+  filter: brightness(0.78) contrast(1.08);
+  box-shadow:
+    inset 90px 40px 120px rgba(1, 4, 14, 0.2),
+    inset -150px -90px 170px rgba(1, 4, 14, 0.97),
+    0 0 70px rgba(56, 140, 255, 0.5),
+    0 0 200px rgba(37, 99, 235, 0.35);
+}
+.cosmos-hero-planet::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  /* Thin atmospheric rim on the lit edge. */
+  background: radial-gradient(circle at 50% 50%, transparent 66%, rgba(125, 200, 255, 0.35) 70.5%, transparent 71%);
+}
+.cosmos-hero-moonlet {
+  position: absolute;
+  width: 58px;
+  aspect-ratio: 1;
+  left: 40%;
+  top: 9%;
+  border-radius: 50%;
+  background-image:
+    linear-gradient(rgba(96, 165, 250, 0.55), rgba(30, 64, 175, 0.75)),
+    url("/planetary/mars-color.jpg");
+  background-size: 100% 100%, 200% 100%;
+  background-position: center, 40% center;
+  background-blend-mode: color, normal;
+  box-shadow:
+    inset -16px -7px 20px rgba(1, 4, 14, 0.95),
+    0 0 22px rgba(56, 140, 255, 0.35);
+}
+.cosmos-hero-copy {
+  position: relative;
+  max-width: 640px;
+  padding-bottom: 36px;
+}
+.cosmos-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--cosmos-line-strong);
+  background: rgba(3, 10, 24, 0.55);
+  backdrop-filter: blur(8px);
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #cfe3ff;
+}
+.cosmos-kicker i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cosmos-accent);
+  box-shadow: 0 0 12px var(--cosmos-accent);
+}
+.cosmos-spaced {
+  display: block;
+  margin: 26px 0 10px;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.62em;
+  text-transform: uppercase;
+  color: var(--cosmos-accent-soft);
+}
+.cosmos-hero h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(52px, 7.4vw, 112px);
+  line-height: 0.88;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: #f4f8ff;
+  text-shadow: 0 6px 40px rgba(34, 168, 255, 0.25);
+}
+.cosmos-hero h1 span {
+  display: block;
+  background: linear-gradient(90deg, #ffffff 0%, #a9dcff 55%, #4fb8ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.cosmos-hero-copy p {
+  max-width: 520px;
+  margin: 20px 0 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #b3c4dc;
+}
+
+.mission-bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(140px, 0.9fr)) minmax(260px, 2.4fr) auto;
+  margin: 0 calc(-1 * var(--hero-pad));
+  border-top: 1px solid var(--cosmos-line-strong);
+  background: rgba(3, 9, 22, 0.78);
+  backdrop-filter: blur(18px);
+}
+.mission-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 16px 22px;
+  border-right: 1px solid var(--cosmos-line);
+  cursor: pointer;
+}
+.mission-field > span {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--cosmos-dim);
+}
+.mission-field :is(select, input) {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background-color: transparent;
+  color: var(--cosmos-text);
+  padding: 2px 0;
+}
+.mission-field select {
+  appearance: none;
+  padding-right: 22px;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238fd4ff' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  cursor: pointer;
+}
+.mission-field select option {
+  background: #0a1426;
+  color: #fff;
+  text-transform: none;
+}
+.mission-field input {
+  font-size: 15px;
+}
+.mission-field input::placeholder {
+  color: #7f95b4;
+}
+.mission-field:focus-within {
+  background: rgba(34, 168, 255, 0.07);
+  box-shadow: inset 0 -2px 0 var(--cosmos-accent);
+}
+.mission-launch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 78px;
+  padding: 0 44px;
+  border: 0;
+  background: linear-gradient(135deg, #3bb4ff, #0b84ff);
+  color: #00111f;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    filter 0.2s,
+    box-shadow 0.2s;
+}
+.mission-launch:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 0 40px rgba(34, 168, 255, 0.55);
+}
+.mission-launch:disabled {
+  cursor: progress;
+  filter: saturate(0.6);
+}
+.mission-launch:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
+
+.cosmos-telemetry {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--cosmos-line);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(12, 24, 46, 0.6), rgba(6, 12, 26, 0.55));
+}
+.cosmos-telemetry > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 22px 26px;
+  border-right: 1px solid var(--cosmos-line);
+}
+.cosmos-telemetry > div:last-child {
+  border-right: 0;
+}
+.cosmos-telemetry span {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--cosmos-accent-soft);
+}
+.cosmos-telemetry strong {
+  font-family: var(--display);
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--cosmos-text);
+}
+.cosmos-telemetry small {
+  font-size: 12px;
+  color: var(--cosmos-muted);
+}
+
+.cosmos-heading {
+  position: relative;
+  text-align: center;
+  padding-top: 18px;
+  margin-bottom: 26px;
+}
+.cosmos-heading::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--cosmos-line-strong);
+  transform: translateX(-50%) rotate(45deg);
+  opacity: 0.6;
+  pointer-events: none;
+}
+.cosmos-heading .cosmos-spaced {
+  margin: 0 0 6px;
+  font-size: 11px;
+}
+.cosmos-heading h2 {
+  position: relative;
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(32px, 3.6vw, 46px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cosmos-text);
+}
+.cosmos-heading button {
+  position: absolute;
+  right: 0;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: none;
+  color: var(--cosmos-accent-soft);
+  font-family: var(--display);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.frontier-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.frontier-card {
+  --tone: var(--cosmos-accent);
+  --deep: #061325;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 460px;
+  padding: 0 24px 28px;
+  border-radius: 20px;
+  border: 1px solid var(--cosmos-line);
+  background: linear-gradient(180deg, #030713 0%, var(--deep) 100%);
+  color: var(--cosmos-text);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s,
+    box-shadow 0.35s;
+}
+.frontier-card.mars {
+  --tone: var(--cosmos-mars);
+  --deep: #2a0f06;
+}
+.frontier-card.orbit {
+  --tone: var(--cosmos-violet);
+  --deep: #1d0f3d;
+}
+.frontier-card:hover,
+.frontier-card:focus-visible {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--tone) 55%, transparent);
+  box-shadow: 0 30px 60px -30px color-mix(in srgb, var(--tone) 80%, transparent);
+  outline: none;
+}
+.frontier-card-image {
+  position: absolute;
+  inset: 38% 0 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center 70%;
+  opacity: 0.85;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 45%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 45%);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.frontier-card-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 20%, color-mix(in srgb, var(--tone) 40%, transparent) 100%);
+  mix-blend-mode: color;
+}
+.frontier-card:hover .frontier-card-image {
+  transform: scale(1.06);
+}
+/* Scrim between the landscape and the card text. */
+.frontier-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent 52%, rgba(2, 4, 11, 0.55) 72%, rgba(2, 4, 11, 0.9) 100%);
+  pointer-events: none;
+}
+.frontier-card-sphere {
+  width: 148px;
+  aspect-ratio: 1;
+  margin: 40px 0 26px;
+  border-radius: 50%;
+  background-size: 200% 100%;
+  background-position: 30% center;
+  box-shadow:
+    inset -36px -14px 42px rgba(0, 0, 0, 0.92),
+    0 0 50px color-mix(in srgb, var(--tone) 45%, transparent);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.frontier-card-sphere.moon {
+  background-image: url("/planetary/moon-color.jpg");
+  filter: saturate(0.6);
+}
+.frontier-card-sphere.mars {
+  background-image: url("/planetary/mars-color.jpg");
+}
+.frontier-card-sphere.orbit {
+  background:
+    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.5) 0 2%, transparent 9%),
+    radial-gradient(ellipse at 40% 45%, rgba(110, 231, 183, 0.55), transparent 32%),
+    radial-gradient(ellipse at 62% 68%, rgba(255, 255, 255, 0.35), transparent 26%),
+    radial-gradient(circle at 35% 30%, #8fd0ff 0%, #2f74e0 34%, #102f7a 66%, #050c24 100%);
+}
+.frontier-card:hover .frontier-card-sphere {
+  transform: scale(1.06) rotate(-4deg);
+}
+.frontier-card-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+.frontier-card-copy small {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--tone) 70%, #ffffff);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+}
+.frontier-card-copy strong {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+}
+.frontier-card-copy > span:not(.frontier-card-stats) {
+  max-width: 260px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #cfdbec;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+.frontier-card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.frontier-card-stats em {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(2, 6, 16, 0.55);
+  backdrop-filter: blur(6px);
+  font-family: var(--display);
+  font-style: normal;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #e8f0fc;
+}
+.frontier-card-arrow {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  color: var(--tone);
+  opacity: 0;
+  transform: translate(-4px, 4px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.frontier-card:hover .frontier-card-arrow {
+  opacity: 1;
+  transform: none;
+}
+
+.cosmos-columns {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 22px;
+}
+.cosmos-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border-radius: 18px;
+  border: 1px solid var(--cosmos-line);
+  background: linear-gradient(180deg, rgba(12, 24, 46, 0.62), rgba(6, 12, 26, 0.58));
+}
+.cosmos-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--cosmos-line);
+  color: var(--cosmos-dim);
+}
+.cosmos-panel-head h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cosmos-text);
+}
+.cosmos-panel-head span {
+  font-family: var(--display);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.mission-brief,
+.flight-log-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 15px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--cosmos-line);
+  border-radius: 10px;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.mission-brief:last-child,
+.flight-log-row:last-child {
+  border-bottom: 0;
+}
+.mission-brief:hover,
+.flight-log-row:hover {
+  background: rgba(34, 168, 255, 0.07);
+}
+.mission-brief > svg,
+.flight-log-row > svg {
+  flex: none;
+  margin-left: auto;
+  color: var(--cosmos-accent-soft);
+}
+.mission-brief-index {
+  flex: none;
+  width: 34px;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--cosmos-accent);
+}
+.mission-brief-copy,
+.flight-log-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.mission-brief-copy small {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--cosmos-dim);
+}
+.flight-log-copy strong {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-weight: 500;
+  color: #e2ecfa;
+}
+.flight-log-copy .status {
+  align-self: flex-start;
+}
+.cosmos-overview .activity-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--cosmos-line-strong);
+  background: rgba(34, 168, 255, 0.08);
+  color: var(--cosmos-accent-soft);
+}
+.cosmos-overview .mission-activity-empty {
+  margin: auto 0;
+  padding: 28px 8px;
+  text-align: center;
+  color: var(--cosmos-muted);
+}
+.cosmos-overview .mission-activity-empty h3 {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cosmos-text);
+}
+.cosmos-overview .mission-source-note {
+  color: var(--cosmos-dim);
+}
+
+@media (max-width: 1180px) {
+  .mission-bar {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .mission-question {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--cosmos-line);
+  }
+  .mission-launch {
+    grid-column: 1 / -1;
+    min-height: 60px;
+  }
+  .mission-field:nth-child(3) {
+    border-right: 0;
+  }
+}
+@media (max-width: 900px) {
+  .cosmos-hero {
+    min-height: 0;
+    padding-top: 40px;
+  }
+  .cosmos-hero-planet {
+    width: 520px;
+    right: -45%;
+    top: -18%;
+    opacity: 0.75;
+  }
+  .cosmos-telemetry {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cosmos-telemetry > div:nth-child(2) {
+    border-right: 0;
+  }
+  .cosmos-telemetry > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--cosmos-line);
+  }
+  .frontier-cards,
+  .cosmos-columns {
+    grid-template-columns: 1fr;
+  }
+  .frontier-card {
+    min-height: 380px;
+  }
+  .cosmos-heading button {
+    position: static;
+    margin-top: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .cosmos-hero-planet {
+    opacity: 0.5;
+  }
+  .cosmos-hero-moonlet {
+    display: none;
+  }
+  .mission-bar {
+    grid-template-columns: 1fr;
+  }
+  .mission-field {
+    border-right: 0;
+    border-bottom: 1px solid var(--cosmos-line);
+  }
+  .cosmos-spaced {
+    letter-spacing: 0.4em;
+  }
+  .cosmos-telemetry strong {
+    font-size: 32px;
+  }
+}
+
+/* ── Landing page: shared display type ────────────────────────────────── */
+.premium-nav nav a,
+.premium-nav-actions a {
+  font-family: var(--display);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.premium-site :is(.premium-eyebrow, .film-chapters small, .film-disclosure) {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+}
+.premium-site main h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+}
+.film-chapters strong {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.film-pitch p {
+  font-size: 18px;
+}
+.film-cta .premium-button,
+.premium-site .premium-button {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.premium-site :is(.frontier-world-stats strong, .evidence-numbers strong) {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* ── Sign-in: the doorway into the workspace ──────────────────────────── */
+.space-login {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(900px 600px at 20% 20%, rgba(37, 99, 235, 0.2), transparent 62%),
+    radial-gradient(700px 520px at 90% 100%, rgba(124, 58, 237, 0.14), transparent 62%),
+    var(--cosmos-bg);
+}
+.space-login::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("/cosmos/stars-near.svg") 120px 80px / 1300px 1300px repeat,
+    url("/cosmos/stars-far.svg") 0 0 / 900px 900px repeat;
+}
+.space-login .login-form-panel {
+  background: linear-gradient(180deg, rgba(4, 9, 21, 0.82), rgba(3, 7, 17, 0.9));
+  border-left: 1px solid var(--cosmos-line);
+  backdrop-filter: blur(16px);
+}
+.space-login :is(.login-form-heading h1, .login-visual-copy h2) {
+  font-family: var(--display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.95;
+}
+.space-login .login-form-heading h1 {
+  font-size: clamp(44px, 4.6vw, 64px);
+}
+.space-login .space-eyebrow {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  color: var(--cosmos-accent-soft);
+}
+.space-login .space-button.primary {
+  background: linear-gradient(135deg, #3bb4ff, #0b84ff);
+  color: #00111f;
+  border: 0;
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 34px -14px rgba(34, 168, 255, 0.95);
+}
+.space-login .space-button.primary:hover {
+  filter: brightness(1.1);
+}
+.space-login .space-button.secondary {
+  border-color: var(--cosmos-line-strong);
+  background: rgba(255, 255, 255, 0.03);
+}
+.space-login input {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--cosmos-line-strong);
+}
+.space-login input:focus-visible {
+  outline: 2px solid var(--cosmos-accent);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell::after {
+    animation: none;
+  }
+  .frontier-card,
+  .frontier-card-image,
+  .frontier-card-sphere {
+    transition: none;
+  }
+  .frontier-card:hover,
+  .frontier-card:hover .frontier-card-image,
+  .frontier-card:hover .frontier-card-sphere {
+    transform: none;
+  }
+}

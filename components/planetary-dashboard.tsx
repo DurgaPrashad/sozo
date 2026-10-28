@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -28,166 +28,261 @@ import {
 import type { ResearchRun } from "../lib/science/types";
 import { PageHeading, Modal, Status } from "./sozo-ui";
 const metrics = planetaryMetrics();
+type Destination = "moon" | "mars" | "both";
+const focuses = [
+  { id: "routes", label: "Routes" },
+  { id: "ice", label: "Ice & water" },
+  { id: "geology", label: "Geology" },
+  { id: "operations", label: "Operations" },
+] as const;
+type Focus = (typeof focuses)[number]["id"];
+const suggestions: Record<Destination, Record<Focus, string>> = {
+  moon: {
+    routes: "How do LOLA slope and illumination constrain rover routes near the lunar south pole?",
+    ice: "What evidence supports water ice in permanently shadowed craters at the lunar south pole?",
+    geology: "What do lunar south-pole impact basins reveal about the Moon's early history?",
+    operations: "Which lunar south-pole sites balance sunlight, Earth visibility and terrain for a base?",
+  },
+  mars: {
+    routes: "How does terrain slope and roughness affect rover route planning in Jezero Crater?",
+    ice: "Where is accessible subsurface water ice on Mars for future crewed missions?",
+    geology: "What evidence for past water has Perseverance found in the Jezero delta?",
+    operations: "What surface conditions shape habitat siting for crewed Mars missions?",
+  },
+  both: {
+    routes: "How do Moon and Mars terrain constraints differ for rover route planning?",
+    ice: "How does water ice on the Moon compare with ice on Mars as a resource?",
+    geology: "What does comparing lunar and Martian geology reveal about planetary evolution?",
+    operations: "What can lunar surface operations teach crews preparing for Mars?",
+  },
+};
+const mentionsBody = /\b(moon|lunar|mars|martian|jezero|gale)\b/i;
+
+const frontiers = [
+  {
+    id: "moon",
+    eyebrow: "The Moon",
+    title: "South pole light",
+    detail: "Illumination, ice and traverse planning across the lunar south pole.",
+    image: "/films/sozo-lunar-fieldwork.jpg",
+    stats: [
+      `≈${metrics.bodies.moon.areaKm2.toLocaleString("en-US")} km²`,
+      `${metrics.bodies.moon.gridMeters} m grid`,
+    ],
+  },
+  {
+    id: "mars",
+    eyebrow: "Mars",
+    title: "Jezero & Gale",
+    detail: "Ancient water, delta geology and rover terrain in two crater workspaces.",
+    image: "/films/sozo-martian-frontier.jpg",
+    stats: [
+      `≈${metrics.bodies.mars.areaKm2.toLocaleString("en-US")} km²`,
+      `${metrics.bodies.mars.gridMeters} m grid`,
+    ],
+  },
+  {
+    id: "orbit",
+    eyebrow: "Earth orbit",
+    title: "Station operations",
+    detail: "Talk with SOZO by voice or text during station and EVA work.",
+    image: "/films/sozo-orbital-assistance.jpg",
+    stats: ["Voice + text", "Cited answers"],
+  },
+] as const;
+
+const briefs = [
+  { body: "Moon", question: "Lunar south-pole illumination and permanently shadowed regions" },
+  { body: "Mars", question: "Jezero Crater geology and evidence of past water" },
+  { body: "Mars", question: "Terrain slope constraints for Mars rover route planning" },
+  { body: "Moon", question: "Radiation exposure for crews on the lunar surface" },
+];
+
 export function MissionOverview({
   runs,
+  userName,
+  launching,
+  onLaunch,
   onExplore,
+  onCompanion,
   onResearch,
   onOpen,
   onCatalog,
 }: {
   runs: ResearchRun[];
+  userName: string;
+  launching: boolean;
+  onLaunch: (question: string, mode: "focused" | "broad") => void;
   onExplore: (b: PlanetaryBody) => void;
+  onCompanion: () => void;
   onResearch: (q: string) => void;
   onOpen: (r: ResearchRun) => void;
   onCatalog: () => void;
 }) {
+  const [destination, setDestination] = useState<Destination>("moon");
+  const [focus, setFocus] = useState<Focus>("routes");
+  const [depth, setDepth] = useState<"focused" | "broad">("focused");
+  const [question, setQuestion] = useState("");
+  const suggestion = suggestions[destination][focus];
+  const sources = new Set(
+    runs.flatMap((r) => r.result?.citations.map((s) => s.doi || s.url) || []),
+  ).size;
+  const launch = (event: FormEvent) => {
+    event.preventDefault();
+    const typed = question.trim();
+    const body = destination === "moon" ? "Moon" : destination === "mars" ? "Mars" : "";
+    // Give literature search the destination when the question omits it.
+    onLaunch(typed ? (body && !mentionsBody.test(typed) ? `${typed} (${body})` : typed) : suggestion, depth);
+  };
+  const greeting = userName && userName !== "Researcher" ? userName.split(" ")[0] : "";
   return (
-    <div className="mission-overview">
-      <div className="mission-page-label">
-        <span>
-          <i />
-          MISSION CONTROL
-        </span>
-        <span>MOON + MARS / YOUR RESEARCH WORKSPACE</span>
-      </div>
-      <div className="mission-welcome">
-        <div>
+    <div className="mission-overview cosmos-overview">
+      <section className="cosmos-hero">
+        <div className="cosmos-hero-media" aria-hidden="true">
+          <div className="cosmos-hero-planet" />
+          <div className="cosmos-hero-moonlet" />
+        </div>
+        <div className="cosmos-hero-copy">
+          <span className="cosmos-kicker">
+            <i />
+            Mission control{greeting ? ` · Welcome back, ${greeting}` : ""}
+          </span>
+          <span className="cosmos-spaced">The next era of exploration</span>
           <h1>
-            A universe of questions.
-            <br />
-            <span>Your next discovery.</span>
+            Your AI <span>space scientist</span>
           </h1>
           <p>
-            Explore the worlds. Follow the evidence. Keep the science connected.
+            Ask about the Moon, Mars and beyond. SOZO finds the evidence, reads
+            the terrain context you share and keeps every answer cited.
           </p>
-          <button className="primary-button" onClick={() => onResearch("")}>
-            <FlaskConical size={15} />
-            Start an investigation
-            <ArrowUpRight size={15} />
+        </div>
+        <form className="mission-bar" onSubmit={launch} aria-label="Launch an investigation">
+          <label className="mission-field">
+            <span>Destination</span>
+            <select value={destination} onChange={(e) => setDestination(e.target.value as Destination)}>
+              <option value="moon">The Moon</option>
+              <option value="mars">Mars</option>
+              <option value="both">Both</option>
+            </select>
+          </label>
+          <label className="mission-field">
+            <span>Focus</span>
+            <select value={focus} onChange={(e) => setFocus(e.target.value as Focus)}>
+              {focuses.map((item) => (
+                <option key={item.id} value={item.id}>{item.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="mission-field">
+            <span>Depth</span>
+            <select value={depth} onChange={(e) => setDepth(e.target.value as "focused" | "broad")}>
+              <option value="focused" title="Up to 4 records per source">Focused</option>
+              <option value="broad" title="Up to 8 records per source">Broad</option>
+            </select>
+          </label>
+          <label className="mission-field mission-question">
+            <span>Your question</span>
+            <input
+              value={question}
+              maxLength={1400}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder={suggestion}
+            />
+          </label>
+          <button type="submit" className="mission-launch" disabled={launching}>
+            {launching ? "Launching…" : "Launch"}
+            <ArrowUpRight size={17} />
+          </button>
+        </form>
+      </section>
+
+      <div className="cosmos-telemetry">
+        <div>
+          <span>Investigations</span>
+          <strong>{runs.length.toString().padStart(2, "0")}</strong>
+          <small>saved in your workspace</small>
+        </div>
+        <div>
+          <span>Evidence</span>
+          <strong>{sources.toString().padStart(2, "0")}</strong>
+          <small>unique publications cited</small>
+        </div>
+        <div>
+          <span>Terrain coverage</span>
+          <strong>≈{(metrics.combinedPrimaryCells / 1e6).toFixed(2)}M</strong>
+          <small>MOMAR-reported primary cells</small>
+        </div>
+        <div>
+          <span>Sources</span>
+          <strong>03</strong>
+          <small>Crossref · Europe PMC · NASA</small>
+        </div>
+      </div>
+
+      <section className="cosmos-section">
+        <div className="cosmos-heading">
+          <span className="cosmos-spaced">Featured</span>
+          <h2>Frontiers</h2>
+          <button onClick={onCatalog}>
+            Dataset catalog
+            <ArrowRight size={14} />
           </button>
         </div>
-        <div className="welcome-globes">
-          <PlanetScene duo />
-        </div>
-      </div>
-      <div className="mission-summary">
-        <div>
-          <span>YOUR RESEARCH</span>
-          <strong>
-            {runs.length.toString().padStart(2, "0")}
-            <small>saved investigations</small>
-          </strong>
-        </div>
-        <div>
-          <span>YOUR EVIDENCE</span>
-          <strong>
-            {new Set(
-              runs.flatMap(
-                (r) => r.result?.citations.map((s) => s.doi || s.url) || [],
-              ),
-            ).size
-              .toString()
-              .padStart(2, "0")}
-            <small>unique publications</small>
-          </strong>
-        </div>
-        <div>
-          <span>TWO WORLDS / PROJECT-REPORTED</span>
-          <strong>
-            ≈{(metrics.combinedPrimaryCells / 1e6).toFixed(2)}
-            <small>million primary terrain cells</small>
-          </strong>
-        </div>
-      </div>
-      <div className="mission-section-head">
-        <h2>Choose your frontier</h2>
-        <button onClick={onCatalog}>
-          View the dataset catalog
-          <ArrowRight size={14} />
-        </button>
-      </div>
-      <div className="mission-worlds">
-        {(["moon", "mars"] as const).map((body) => (
-          <button
-            key={body}
-            className={`mission-world ${body}`}
-            onClick={() => onExplore(body)}
-          >
-            <div className="mission-world-orb">
-              <div className={`world-sphere ${body}`} />
-            </div>
-            <div className="mission-world-info">
-              <span className="space-eyebrow">
-                {body === "moon"
-                  ? "01 / LUNAR WORKSPACE"
-                  : "02 / MARTIAN WORKSPACES"}
-              </span>
-              <h3>
-                {body === "moon" ? "The Moon" : "Mars"}
-                <ArrowUpRight size={24} />
-              </h3>
-              <p>
-                {body === "moon"
-                  ? "Trace the light. Explore the south pole."
-                  : "Jezero. Gale. A planet full of evidence."}
-              </p>
-              <div>
-                <span>
-                  <strong>
-                    ≈{metrics.bodies[body].areaKm2.toLocaleString("en-US")}
-                    <small>km²</small>
-                  </strong>
-                  reported workspace
-                </span>
-                <span>
-                  <strong>
-                    {metrics.bodies[body].gridMeters}
-                    <small>m</small>
-                  </strong>
-                  primary grid
-                </span>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-      <div className="mission-research-layout">
-        <section>
-          <div className="mission-section-head">
-            <h2>Let curiosity lead</h2>
-            <span>SOZO / SCIENTIFIC RESEARCH</span>
-          </div>
-          {[
-            "Lunar south-pole illumination and permanently shadowed regions",
-            "Jezero Crater geology and evidence of past water",
-            "Terrain slope constraints for Mars rover route planning",
-          ].map((q, i) => (
+        <div className="frontier-cards">
+          {frontiers.map((card) => (
             <button
-              className="mission-prompt"
-              key={q}
-              onClick={() => onResearch(q)}
+              key={card.id}
+              className={`frontier-card ${card.id}`}
+              onClick={() => (card.id === "orbit" ? onCompanion() : onExplore(card.id))}
             >
-              <span>0{i + 1}</span>
-              <p>{q}</p>
+              <span className="frontier-card-image" style={{ backgroundImage: `url(${card.image})` }} />
+              <span className={`frontier-card-sphere ${card.id}`} />
+              <span className="frontier-card-copy">
+                <small>{card.eyebrow}</small>
+                <strong>{card.title}</strong>
+                <span>{card.detail}</span>
+                <span className="frontier-card-stats">
+                  {card.stats.map((stat) => <em key={stat}>{stat}</em>)}
+                </span>
+              </span>
+              <ArrowUpRight className="frontier-card-arrow" size={20} />
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <div className="cosmos-columns">
+        <section className="cosmos-panel">
+          <div className="cosmos-panel-head">
+            <h2>Mission briefs</h2>
+            <span>Start with a question</span>
+          </div>
+          {briefs.map((brief, i) => (
+            <button className="mission-brief" key={brief.question} onClick={() => onResearch(brief.question)}>
+              <span className="mission-brief-index">0{i + 1}</span>
+              <span className="mission-brief-copy">
+                <small>{brief.body}</small>
+                {brief.question}
+              </span>
               <ArrowUpRight size={15} />
             </button>
           ))}
         </section>
-        <section className="mission-activity">
-          <div className="mission-section-head">
-            <h2>Recent investigations</h2>
+        <section className="cosmos-panel">
+          <div className="cosmos-panel-head">
+            <h2>Flight log</h2>
             <Clock3 size={14} />
           </div>
           {runs.length ? (
-            runs.slice(0, 3).map((r) => (
-              <button key={r.id} onClick={() => onOpen(r)}>
+            runs.slice(0, 4).map((r) => (
+              <button key={r.id} className="flight-log-row" onClick={() => onOpen(r)}>
                 <span className="activity-icon">
                   <FlaskConical size={15} />
                 </span>
-                <div>
+                <span className="flight-log-copy">
                   <strong>{r.question}</strong>
                   <Status status={r.status} />
-                </div>
+                </span>
                 <ArrowUpRight size={14} />
               </button>
             ))
@@ -195,25 +290,23 @@ export function MissionOverview({
             <div className="mission-activity-empty">
               <Orbit size={31} strokeWidth={1} />
               <h3>A new perspective starts here.</h3>
-              <p>
-                Your investigations and source-backed records will appear as you
-                explore.
-              </p>
+              <p>Launch a question above. Your investigations and cited sources appear here.</p>
             </div>
           )}
         </section>
       </div>
+
       <div className="mission-source-note">
         <ShieldCheck size={15} />
         <p>
-          The globe is a visualization. MOMAR coverage figures are
-          project-reported; SOZO’s saved research and source counts above come
-          from your actual workspace.
+          Imagery is illustrative. MOMAR coverage figures are project-reported;
+          your investigation and source counts come from your actual workspace.
         </p>
       </div>
     </div>
   );
 }
+
 export function PlanetaryExplorer({
   body,
   onResearch,
