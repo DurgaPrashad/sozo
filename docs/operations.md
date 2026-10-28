@@ -4,6 +4,15 @@ Sites owns the hosted access policy, Worker deployment, and D1 binding. Preserve
 
 For local builds use `npm run build`; for local preview use `npm run dev`. The generated `dist/server/wrangler.json` is the config for local D1 commands. Apply generated SQL once to `.wrangler/state`. A local migration does not modify production. To change the schema, update `db/schema.ts`, run `npm run db:generate`, inspect SQL and metadata, and append the new migration.
 
+## Vercel
+
+Vercel builds with the standard Next.js toolchain (`vercel.json` runs `npm run build:vercel`), not vinext. The same code runs on both hosts through `@/lib/platform`: Next.js resolves `lib/platform/index.ts`, and `vite.config.ts` aliases it to `lib/platform/cloudflare.ts` for the Sites Worker.
+
+- **Database:** Vercel has no D1. Create a Turso (libSQL) database, for example through the Vercel Marketplace, and set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`. Production builds apply `drizzle/*.sql` once each through `scripts/migrate-libsql.mjs`. Preview builds skip migrations. Run `npm run db:migrate:libsql` to apply them by hand. Without a database the landing page, planetary catalog and article discovery still work, but sign-in fails with "Sign-in could not complete", so the workspace is unreachable.
+- **Secrets:** set `SOZO_WORKSPACE_EMAIL`, `SOZO_WORKSPACE_PASSWORD_HASH` and, for conversation and speech, `SARVAM_API_KEY` in the project's environment variables, then redeploy.
+- **Identity:** ChatGPT sign-in depends on headers that only the Sites edge sets and strips. On Vercel those headers are ignored and the ChatGPT button is hidden; use workspace email/password or API keys.
+- **Background runs:** research runs continue after the response through Next.js `after()`, within the function's maximum duration.
+
 ## Symptoms
 
 - **Sign-in prompt:** use `/login`. Production needs the secret runtime values `SOZO_WORKSPACE_EMAIL` and `SOZO_WORKSPACE_PASSWORD_HASH`. The latter is a salted PBKDF2-SHA256 verifier, never the plaintext password. Updating runtime secrets requires a new deployment. If hosting is changed back to private, external clients additionally need hosting service access.

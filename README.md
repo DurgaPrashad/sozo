@@ -30,6 +30,18 @@ node scripts/auth-smoke.mjs
 
 The smoke script creates two isolated fake tenants, performs real source requests, and removes only its own fixtures from the local database. It refuses non-loopback targets. Tests never use production data.
 
+## Deploy on Vercel
+
+Import the repository in Vercel; `vercel.json` selects Next.js and runs `npm run build:vercel`. Add these environment variables, then redeploy:
+
+| Variable | Purpose |
+| --- | --- |
+| `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | Turso (libSQL) database, replacing Cloudflare D1. Production builds apply the migrations. |
+| `SOZO_WORKSPACE_EMAIL`, `SOZO_WORKSPACE_PASSWORD_HASH` | Workspace sign-in (PBKDF2 verifier as described above). |
+| `SARVAM_API_KEY` | Conversation, voice and synthesis. Optional. |
+
+ChatGPT sign-in is only available on Sites hosting. See [Deployment and troubleshooting](docs/operations.md#vercel).
+
 ## Use SOZO
 
 1. Ask a focused scientific question, or select a starter discipline.
@@ -87,7 +99,7 @@ Crossref API behavior follows its [official documentation](https://www.crossref.
 
 The authenticated `/api/v1/space-data?q=<query>&media=all` endpoint searches the original NASA Image and Video Library. Results are bounded to 12 per request and preserve NASA identifiers, record dates, original captions, source links, provider, and retrieval time. Query length and media type are validated; remote JSON is time- and size-bounded, and redirects are rejected. This is archive discovery, not live telemetry or terrain computation. The dashboard includes a NASA space archive with search, media filtering, and provenance details.
 
-MOMAR Moon and Mars planners are linked in the navbar and planetary sections. A direct routing API and a model provider are still needed for SOZO to compute routes through an AI agent; the UI labels that integration as in development.
+MOMAR Moon and Mars planners are linked from the Moon and Mars sections and the footer; the navbar links to those sections on the page. A direct routing API and a model provider are still needed for SOZO to compute routes through an AI agent; the UI labels that integration as in development.
 
 ## Companion and interaction update — 28 October 2026
 

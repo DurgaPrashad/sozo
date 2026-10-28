@@ -111,15 +111,27 @@ export default function MissionFilm() {
         <div className="mission-film-shade" aria-hidden="true" />
         <div className="film-wordmark">
           <h1>SOZO</h1>
+          <div className="film-pitch">
+            <p>
+              The AI space scientist for astronauts and mission teams. Ask
+              about the Moon, Mars and beyond, with the evidence in view.
+            </p>
+            <div className="film-cta">
+              <a
+                href="/dashboard?view=companion"
+                className="premium-button light"
+              >
+                Ask SOZO
+                <ArrowUpRight size={17} />
+              </a>
+              <a href="#frontiers" className="film-secondary">
+                Explore the Moon &amp; Mars
+                <ArrowDown size={16} />
+              </a>
+            </div>
+          </div>
         </div>
         <div className="film-bottom">
-          <a
-            href="#frontiers"
-            className="film-explore"
-            aria-label="Explore Moon and Mars"
-          >
-            <ArrowDown size={20} />
-          </a>
           <span className="film-disclosure">
             AI-GENERATED CONCEPT FILM{failed ? " · PLAYBACK UNAVAILABLE" : ""}
           </span>

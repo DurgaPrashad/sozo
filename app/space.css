@@ -77,7 +77,7 @@ html {
   color: var(--space-lime);
 }
 .brand-tagline {
-  font-size: 6px;
+  font-size: 10px;
   line-height: 1.65;
   letter-spacing: 1.4px;
   color: #9ba7b6;
@@ -156,7 +156,7 @@ html {
   color: #e2edf6;
 }
 .space-button.compact {
-  font-size: 9px;
+  font-size: 10px;
   min-height: 35px;
   padding: 10px 14px;
   gap: 13px;
@@ -169,7 +169,7 @@ html {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 2.1px;
   line-height: 1.6;
   font-weight: 500;
@@ -225,7 +225,7 @@ html {
   max-width: 650px;
 }
 .space-hero-content .space-eyebrow {
-  font-size: 7.5px;
+  font-size: 10px;
   color: #92a2b6;
   letter-spacing: 2px;
 }
@@ -269,7 +269,7 @@ html {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 7px;
+  font-size: 10px;
   color: #74879a;
   margin-top: 24px;
 }
@@ -393,7 +393,7 @@ html {
   z-index: 4;
   color: #bbc6d2;
   font-family: var(--space-ui);
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 1.7px;
   display: block;
   white-space: nowrap;
@@ -417,7 +417,7 @@ html {
 }
 .planet-caption > span {
   display: block;
-  font-size: 5.5px;
+  font-size: 10px;
   color: #6d8196;
   letter-spacing: 1.8px;
   margin: 7px 0 0 12px;
@@ -437,7 +437,7 @@ html {
   position: absolute;
   right: 9%;
   bottom: 8%;
-  font-size: 5.8px;
+  font-size: 10px;
   letter-spacing: 1.4px;
   color: #6a7888;
   z-index: 4;
@@ -450,7 +450,7 @@ html {
   display: flex;
   align-items: center;
   gap: 18px;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.6px;
   color: #8697a8;
 }
@@ -459,7 +459,7 @@ html {
   bottom: 29px;
   right: 5%;
   z-index: 4;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 1.5px;
   color: #9daebd;
   display: flex;
@@ -467,7 +467,7 @@ html {
   align-items: center;
 }
 .hero-bottom-coordinate > span {
-  font-size: 5.5px;
+  font-size: 10px;
   color: #556a80;
   letter-spacing: 1.3px;
   border-left: 1px solid #334457;
@@ -488,7 +488,7 @@ html {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 9px;
+  font-size: 10px;
   white-space: nowrap;
 }
 .space-capability-strip svg {
@@ -603,14 +603,14 @@ html {
   z-index: 1;
   top: 22px;
   left: 25px;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.6px;
   color: #7c8fa5;
 }
 .world-distance {
   left: auto;
   right: 22px;
-  font-size: 5px;
+  font-size: 10px;
   color: #5e738b;
 }
 .world-card-content {
@@ -632,7 +632,7 @@ html {
   display: block;
   font-family: "DM Sans", sans-serif;
   text-transform: none;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 400;
   color: #7c8fa5;
   line-height: 1.8;
@@ -683,7 +683,7 @@ html {
   margin-left: 5px;
 }
 .world-card-stats > span > small {
-  font-size: 7px;
+  font-size: 10px;
   color: #71869e;
   display: block;
   margin-top: 8px;
@@ -701,7 +701,7 @@ html {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 5px;
+  font-size: 10px;
   letter-spacing: 1px;
   color: #71889f;
 }
@@ -715,14 +715,14 @@ html {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 8px;
+  font-size: 10px;
   color: #c4d7a9;
 }
 .worlds-footnote {
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  font-size: 7px;
+  font-size: 10px;
   line-height: 1.8;
   color: #6d829b;
   margin-top: 19px;
@@ -765,7 +765,7 @@ html {
   color: #7f93a9;
 }
 .coverage-tabs > button > span {
-  font-size: 6px;
+  font-size: 10px;
   color: #50677f;
 }
 .coverage-tabs > button.active {
@@ -780,7 +780,7 @@ html {
   align-items: center;
   justify-content: space-between;
   color: #60778f;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.6px;
   border-bottom: 1px solid #253644;
   padding-bottom: 19px;
@@ -834,7 +834,7 @@ html {
   color: #b1bfcd;
 }
 .coverage-metrics p {
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.8;
   max-width: 190px;
   color: #657e96;
@@ -864,7 +864,7 @@ html {
   color: #c5d2df;
 }
 .coverage-integrity p {
-  font-size: 8px;
+  font-size: 10px;
   color: #7e93aa;
   line-height: 1.85;
   max-width: 660px;
@@ -874,7 +874,7 @@ html {
   display: flex;
   align-items: center;
   gap: 15px;
-  font-size: 7px;
+  font-size: 10px;
   white-space: nowrap;
   color: #a2b88c;
 }
@@ -895,7 +895,7 @@ html {
   margin-bottom: 10px;
 }
 .coverage-method > a {
-  font-size: 9px;
+  font-size: 10px;
   color: #9bdcff;
   display: flex;
   gap: 8px;
@@ -915,7 +915,7 @@ html {
   padding: 6px 8px;
   border: 1px solid #263847;
   border-radius: 3px;
-  font-size: 6px;
+  font-size: 10px;
   color: #8aa0b5;
   transition:
     border-color 0.2s,
@@ -936,7 +936,7 @@ html {
   display: flex;
   gap: 7px;
   align-items: center;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.3px;
   color: #a7b792;
   margin-top: 17px;
@@ -984,7 +984,7 @@ html {
   display: flex;
   justify-content: space-between;
   color: #dbe5e8;
-  font-size: 8px;
+  font-size: 10px;
   font-family: var(--space-ui);
   text-shadow: 0 1px 3px #000;
 }
@@ -995,7 +995,7 @@ html {
   padding: 17px 3px 0;
 }
 .feature-kicker {
-  font-size: 7px;
+  font-size: 10px;
   color: #6e889f;
   line-height: 1.8;
   display: block;
@@ -1010,7 +1010,7 @@ html {
   margin-top: 7px;
 }
 .feature-copy p {
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.95;
   color: #6f879e;
   margin-top: 12px;
@@ -1025,14 +1025,14 @@ html {
   flex-wrap: wrap;
 }
 .prototype-links > p {
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.9;
   color: #748aa0;
   max-width: 360px;
   margin-right: auto;
 }
 .prototype-links .space-button {
-  font-size: 9px;
+  font-size: 10px;
   min-height: 39px;
   padding: 12px 15px;
   gap: 13px;
@@ -1080,13 +1080,13 @@ html {
 .sozo-acronym > div {
   border-left: 1px solid #3b4d3d;
   padding-left: 17px;
-  font-size: 6px;
+  font-size: 10px;
   line-height: 1.9;
   letter-spacing: 1.3px;
   color: #81986a;
 }
 .sozo-mode {
-  font-size: 7px;
+  font-size: 10px;
   line-height: 1.9;
   color: #5f7a90;
   display: block;
@@ -1120,7 +1120,7 @@ html {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.2px;
   color: #9cafbe;
 }
@@ -1129,7 +1129,7 @@ html {
   height: 18px;
 }
 .preview-pill {
-  font-size: 5px;
+  font-size: 10px;
   padding: 4px 6px;
   border: 1px solid #3b514b;
   border-radius: 3px;
@@ -1153,7 +1153,7 @@ html {
   margin: 22px 0;
 }
 .preview-step-number {
-  font-size: 7px;
+  font-size: 10px;
   background: #132016;
   border: 1px solid #3b4c2f;
   color: #afcc8d;
@@ -1169,12 +1169,12 @@ html {
   padding-top: 1px;
 }
 .preview-path strong {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 500;
   color: #a9bcce;
 }
 .preview-path p {
-  font-size: 7px;
+  font-size: 10px;
   line-height: 1.9;
   color: #657f97;
   margin-top: 5px;
@@ -1193,7 +1193,7 @@ html {
   color: #89a96b;
 }
 .preview-source-row > span {
-  font-size: 6px;
+  font-size: 10px;
   color: #829bb3;
   border: 1px solid #2a4052;
   padding: 4px 7px;
@@ -1206,7 +1206,7 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 8px;
+  font-size: 10px;
   color: #b0c899;
   border-top: 1px solid #1d303e;
   padding-top: 17px;
@@ -1228,7 +1228,7 @@ html {
 }
 .developer-landing .space-button {
   margin-top: 25px;
-  font-size: 9px;
+  font-size: 10px;
 }
 .landing-code {
   background: #0c151f;
@@ -1252,7 +1252,7 @@ html {
 }
 .landing-code > div > small {
   margin-left: 10px;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.5px;
   color: #6e89a2;
 }
@@ -1281,7 +1281,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 7px;
+  font-size: 10px;
   color: #98b47e;
   border-top: 1px solid #213242;
   padding: 15px 21px;
@@ -1298,7 +1298,7 @@ html {
   background: radial-gradient(ellipse at 50% 70%, #3851211a, transparent 60%);
 }
 .space-final-cta > .space-eyebrow {
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 2px;
 }
 .space-final-cta h2 {
@@ -1325,7 +1325,7 @@ html {
   transform: rotate(-14deg);
 }
 .space-final-cta > p {
-  font-size: 8px;
+  font-size: 10px;
   color: #6b849a;
   margin-top: 21px;
 }
@@ -1375,7 +1375,7 @@ html {
   font-size: 30px;
 }
 .space-footer-top > p {
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.7;
   color: #667e95;
   border-left: 1px solid #253746;
@@ -1388,7 +1388,7 @@ html {
   margin-left: auto;
 }
 .space-footer-top > div > a {
-  font-size: 8px;
+  font-size: 10px;
   color: #93a9bf;
   display: flex;
   align-items: center;
@@ -1401,18 +1401,18 @@ html {
   gap: 20px;
   border-top: 1px solid #1d2b37;
   padding-top: 22px;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 0.8px;
   color: #4f687e;
 }
 .space-footer-bottom > div {
   display: flex;
   gap: 18px;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 0;
 }
 .imagery-credit {
-  font-size: 6px;
+  font-size: 10px;
   line-height: 1.8;
   color: #4d657b;
   margin-top: 14px;
@@ -1450,7 +1450,7 @@ html {
   z-index: 3;
 }
 .login-visual-copy > .space-eyebrow {
-  font-size: 6px;
+  font-size: 10px;
   color: #7c92a9;
   letter-spacing: 2px;
 }
@@ -1481,7 +1481,7 @@ html {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 9px;
+  font-size: 10px;
   color: #7b91a6;
   position: absolute;
   top: 42px;
@@ -1491,7 +1491,7 @@ html {
   margin-bottom: 33px;
 }
 .login-form-heading .space-eyebrow {
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 2px;
 }
 .login-form-heading h1 {
@@ -1567,7 +1567,7 @@ html {
   align-items: center;
   gap: 15px;
   color: #506b83;
-  font-size: 8px;
+  font-size: 10px;
   margin: 26px 0;
 }
 .login-divider > span {
@@ -1580,7 +1580,7 @@ html {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.8;
   color: #6a849a;
   margin-top: 24px;
@@ -1588,7 +1588,7 @@ html {
 .login-footer {
   position: absolute;
   bottom: 30px;
-  font-size: 5.5px;
+  font-size: 10px;
   letter-spacing: 1.9px;
   color: #3e586e;
   left: 0;
@@ -2132,7 +2132,7 @@ html {
   justify-content: space-between;
   align-items: center;
   color: #4f718e;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 1.4px;
   margin: 3px 0 16px;
 }
@@ -2179,7 +2179,7 @@ html {
   margin: 16px 0 22px;
 }
 .mission-welcome .primary-button {
-  font-size: 9px;
+  font-size: 10px;
 }
 .welcome-globes {
   position: absolute;
@@ -2200,7 +2200,7 @@ html {
   border-left: 1px solid #2a4055;
 }
 .mission-summary > div > span {
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.2px;
   color: #5d809e;
 }
@@ -2217,7 +2217,7 @@ html {
 }
 .mission-summary strong > small {
   font-family: "DM Sans", sans-serif;
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0;
   color: #557b9b;
 }
@@ -2238,11 +2238,11 @@ html {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 8px;
+  font-size: 10px;
   color: #a7bf8b;
 }
 .mission-section-head > span {
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 0.7px;
   color: #456c8c;
 }
@@ -2292,7 +2292,7 @@ html {
   min-width: 0;
 }
 .mission-world-info > .space-eyebrow {
-  font-size: 5px;
+  font-size: 10px;
   letter-spacing: 1px;
   color: #698ba5;
 }
@@ -2312,7 +2312,7 @@ html {
   color: #8aa475;
 }
 .mission-world-info > p {
-  font-size: 7px;
+  font-size: 10px;
   color: #6d8ca8;
   line-height: 1.8;
 }
@@ -2321,7 +2321,7 @@ html {
   gap: 28px;
   margin-top: 21px;
   color: #537a9b;
-  font-size: 6px;
+  font-size: 10px;
 }
 .mission-world-info strong {
   display: block;
@@ -2335,7 +2335,7 @@ html {
 }
 .mission-world-info strong > small {
   font-family: "DM Sans", sans-serif;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0;
   margin-left: 4px;
   color: #6c8ea9;
@@ -2357,7 +2357,7 @@ html {
   color: #789ab6;
 }
 .mission-prompt > span {
-  font-size: 6px;
+  font-size: 10px;
   font-family: var(--space-ui);
   color: #466c8a;
 }
@@ -2396,7 +2396,7 @@ html {
   margin-top: 15px;
 }
 .mission-activity-empty p {
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.8;
   color: #527895;
   max-width: 230px;
@@ -2420,7 +2420,7 @@ html {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 400;
   line-height: 1.7;
   color: #88aac5;
@@ -2443,7 +2443,7 @@ html {
   color: #5d806e;
 }
 .mission-source-note p {
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.8;
   color: #52788f;
 }
@@ -2475,7 +2475,7 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.1px;
   color: #486c8c;
   z-index: 4;
@@ -2495,7 +2495,7 @@ html {
   pointer-events: none;
 }
 .explorer-place-label > span {
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.6px;
   color: #456d8c;
 }
@@ -2508,7 +2508,7 @@ html {
   margin: 9px 0 7px;
 }
 .explorer-place-label > p {
-  font-size: 8px;
+  font-size: 10px;
   color: #49708d;
 }
 .globe-controls {
@@ -2526,7 +2526,7 @@ html {
   gap: 6px;
   align-items: center;
   margin-right: auto;
-  font-size: 7px;
+  font-size: 10px;
   color: #7394ae;
 }
 .globe-controls > button {
@@ -2552,12 +2552,12 @@ html {
   flex-direction: column;
 }
 .explorer-panel > .space-eyebrow {
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1px;
   color: #6689a6;
 }
 .explorer-panel > label:not(.explorer-layer) {
-  font-size: 8px;
+  font-size: 10px;
   color: #7193ad;
   margin: 25px 0 9px;
 }
@@ -2572,7 +2572,7 @@ html {
   outline: none;
 }
 .explorer-panel > h3 {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 500;
   color: #9bb5c9;
   margin: 25px 0 10px;
@@ -2583,7 +2583,7 @@ html {
   justify-content: space-between;
   border-bottom: 1px solid #233b51;
   padding: 12px 0;
-  font-size: 8px;
+  font-size: 10px;
   color: #7a9db9;
   gap: 10px;
 }
@@ -2612,12 +2612,12 @@ html {
   color: #88a16f;
 }
 .explorer-data-note > p {
-  font-size: 7px;
+  font-size: 10px;
   line-height: 1.8;
   color: #81966f;
 }
 .explorer-panel > dl {
-  font-size: 8px;
+  font-size: 10px;
   margin: 0 0 25px;
 }
 .explorer-panel > dl > div {
@@ -2635,12 +2635,12 @@ html {
 }
 .explorer-panel > .primary-button {
   margin-top: auto;
-  font-size: 9px;
+  font-size: 10px;
   gap: 7px;
 }
 .explorer-panel > .text-button {
   margin: 17px auto 0;
-  font-size: 8px;
+  font-size: 10px;
 }
 .explorer-limits {
   margin-top: 20px;
@@ -2650,12 +2650,12 @@ html {
   padding: 20px 23px;
 }
 .explorer-limits > span {
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.4px;
   color: #91ab7a;
 }
 .explorer-limits p {
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.8;
   color: #6e96b3;
   margin-top: 10px;
@@ -2676,7 +2676,7 @@ html {
   color: #a5bd8e;
 }
 .catalog-notice p {
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.8;
   color: #77976b;
   margin-top: 6px;
@@ -2707,7 +2707,7 @@ html {
   background: none;
   box-shadow: none;
   padding: 9px 0;
-  font-size: 9px;
+  font-size: 10px;
   min-width: 0;
 }
 .catalog-filters > select {
@@ -2715,18 +2715,18 @@ html {
   border: 1px solid #2c475e;
   border-radius: 4px;
   padding: 9px 10px;
-  font-size: 8px;
+  font-size: 10px;
   color: #8baeca;
   max-width: 145px;
 }
 .catalog-filters > .filter-tabs > button {
-  font-size: 8px;
+  font-size: 10px;
   padding: 8px 9px;
 }
 .catalog-results-label {
   display: flex;
   justify-content: space-between;
-  font-size: 6px;
+  font-size: 10px;
   letter-spacing: 1.2px;
   color: #527b9b;
   margin: 25px 0 14px;
@@ -2781,17 +2781,17 @@ html {
 }
 .dataset-row small {
   display: block;
-  font-size: 7px;
+  font-size: 10px;
   color: #4d7c9e;
   margin-top: 5px;
 }
 .dataset-resolution {
-  font-size: 8px;
+  font-size: 10px;
   color: #5b8caf;
   min-width: 170px;
 }
 .dataset-status {
-  font-size: 7px;
+  font-size: 10px;
   background: #203446;
   border: 1px solid #2e4d64;
   color: #7c9eb8;
@@ -2882,7 +2882,7 @@ html {
     margin-top: 35px;
   }
   .space-hero-content .space-eyebrow {
-    font-size: 9px;
+    font-size: 10px;
   }
   .space-section-heading h2 {
     font-size: 72px;
@@ -2919,7 +2919,7 @@ html {
     font-size: 11px;
   }
   .space-hero .hero-small-note {
-    font-size: 8px;
+    font-size: 10px;
   }
 }
 @media (max-width: 1200px) {
@@ -2933,7 +2933,7 @@ html {
   }
   .space-nav > nav {
     gap: 21px;
-    font-size: 9px;
+    font-size: 10px;
   }
   .space-nav-actions {
     gap: 17px;
@@ -2956,13 +2956,13 @@ html {
     top: 16%;
   }
   .hero-visual-label {
-    font-size: 5px;
+    font-size: 10px;
   }
   .space-capability-strip {
     gap: 25px;
   }
   .space-capability-strip > span {
-    font-size: 8px;
+    font-size: 10px;
     gap: 8px;
   }
   .space-section {
@@ -2994,13 +2994,13 @@ html {
     font-size: 23px;
   }
   .world-card-bottom > span {
-    font-size: 4.5px;
+    font-size: 10px;
   }
   .world-card-bottom > a {
-    font-size: 7px;
+    font-size: 10px;
   }
   .world-card-content > p {
-    font-size: 9px;
+    font-size: 10px;
   }
   .coverage-metrics {
     gap: 17px;
@@ -3012,16 +3012,16 @@ html {
     font-size: 47px;
   }
   .coverage-metrics p {
-    font-size: 7px;
+    font-size: 10px;
   }
   .coverage-metrics h3 {
-    font-size: 9px;
+    font-size: 10px;
   }
   .coverage-integrity > button {
-    font-size: 6px;
+    font-size: 10px;
   }
   .coverage-integrity p {
-    font-size: 7px;
+    font-size: 10px;
   }
   .lunar-feature-grid {
     gap: 29px 18px;
@@ -3033,7 +3033,7 @@ html {
     font-size: 14px;
   }
   .feature-copy p {
-    font-size: 8px;
+    font-size: 10px;
   }
   .sozo-section {
     gap: 50px;
@@ -3049,10 +3049,10 @@ html {
     font-size: 18px;
   }
   .preview-top > span:first-child {
-    font-size: 5px;
+    font-size: 10px;
   }
   .preview-pill {
-    font-size: 4px;
+    font-size: 10px;
   }
   .developer-landing {
     padding: 75px 7%;
@@ -3065,7 +3065,7 @@ html {
     font-size: 10px;
   }
   .landing-code pre {
-    font-size: 9px;
+    font-size: 10px;
     padding: 23px 20px;
   }
   .space-footer {
@@ -3076,14 +3076,14 @@ html {
     gap: 19px;
   }
   .space-footer-top > div > a {
-    font-size: 7px;
+    font-size: 10px;
   }
   .mission-summary strong {
     font-size: 27px;
     gap: 9px;
   }
   .mission-summary strong > small {
-    font-size: 7px;
+    font-size: 10px;
   }
   .mission-summary {
     padding: 20px;
@@ -3111,17 +3111,17 @@ html {
     padding: 19px;
   }
   .explorer-panel .primary-button {
-    font-size: 8px;
+    font-size: 10px;
   }
   .dataset-resolution {
     min-width: 130px;
-    font-size: 7px;
+    font-size: 10px;
   }
 }
 @media (max-width: 950px) {
   .space-nav > nav {
     gap: 17px;
-    font-size: 8px;
+    font-size: 10px;
   }
   .space-nav > nav > a:nth-child(4) {
     display: none;
@@ -3136,12 +3136,12 @@ html {
     gap: 14px;
   }
   .space-button.compact {
-    font-size: 8px;
+    font-size: 10px;
     gap: 9px;
     padding: 10px;
   }
   .nav-signin {
-    font-size: 9px;
+    font-size: 10px;
   }
   .space-hero h1 {
     font-size: 90px;
@@ -3164,17 +3164,17 @@ html {
     gap: 16px;
   }
   .hero-caption {
-    font-size: 6px;
+    font-size: 10px;
   }
   .hero-small-note {
-    font-size: 6px;
+    font-size: 10px;
   }
   .space-capability-strip {
     gap: 18px;
     padding: 20px;
   }
   .space-capability-strip > span {
-    font-size: 7px;
+    font-size: 10px;
     gap: 5px;
   }
   .space-capability-strip > i {
@@ -3191,7 +3191,7 @@ html {
   }
   .space-section-heading > p {
     max-width: 230px;
-    font-size: 9px;
+    font-size: 10px;
   }
   .world-card-grid {
     gap: 17px;
@@ -3204,11 +3204,11 @@ html {
     font-size: 20px;
   }
   .world-card-stats strong > small {
-    font-size: 8px;
+    font-size: 10px;
     margin-left: 3px;
   }
   .world-card-stats > span > small {
-    font-size: 6px;
+    font-size: 10px;
   }
   .world-card-bottom > span {
     display: none;
@@ -3217,7 +3217,7 @@ html {
     justify-content: flex-end;
   }
   .world-card-bottom > a {
-    font-size: 8px;
+    font-size: 10px;
   }
   .coverage-metrics {
     grid-template-columns: 1fr 1fr;
@@ -3238,7 +3238,7 @@ html {
     font-size: 11px;
   }
   .coverage-metrics p {
-    font-size: 8px;
+    font-size: 10px;
   }
   .coverage-integrity {
     align-items: flex-start;
@@ -3246,7 +3246,7 @@ html {
     gap: 20px;
   }
   .coverage-integrity > button {
-    font-size: 8px;
+    font-size: 10px;
     margin-left: 44px;
   }
   .lunar-feature-grid {
@@ -3257,20 +3257,20 @@ html {
     height: 170px;
   }
   .feature-copy p {
-    font-size: 9px;
+    font-size: 10px;
   }
   .feature-copy h3 {
     font-size: 16px;
   }
   .feature-kicker {
-    font-size: 8px;
+    font-size: 10px;
   }
   .capability-section .space-section-heading {
     align-items: flex-start;
   }
   .capability-section .space-section-heading > div:last-child > p {
     max-width: 210px;
-    font-size: 9px;
+    font-size: 10px;
   }
   .sozo-section {
     gap: 30px;
@@ -3287,7 +3287,7 @@ html {
     padding: 19px;
   }
   .preview-top > span:first-child {
-    font-size: 4px;
+    font-size: 10px;
     gap: 5px;
   }
   .preview-pill {
@@ -3300,16 +3300,16 @@ html {
     gap: 10px;
   }
   .preview-path strong {
-    font-size: 8px;
+    font-size: 10px;
   }
   .preview-path p {
-    font-size: 7px;
+    font-size: 10px;
   }
   .preview-source-row > span {
-    font-size: 5px;
+    font-size: 10px;
   }
   .preview-bottom-link {
-    font-size: 7px;
+    font-size: 10px;
   }
   .developer-landing {
     gap: 30px;
@@ -3320,7 +3320,7 @@ html {
     font-size: 48px;
   }
   .landing-code pre {
-    font-size: 8px;
+    font-size: 10px;
     padding: 20px 16px;
   }
   .space-footer-top {
@@ -3331,21 +3331,21 @@ html {
     gap: 22px;
   }
   .space-footer-top > p {
-    font-size: 7px;
+    font-size: 10px;
     padding-left: 20px;
   }
   .space-footer-top > div > a {
-    font-size: 6px;
+    font-size: 10px;
   }
   .space-footer-bottom {
     align-items: flex-start;
-    font-size: 5px;
+    font-size: 10px;
     gap: 20px;
   }
   .space-footer-bottom > div {
     flex-direction: column;
     gap: 8px;
-    font-size: 5px;
+    font-size: 10px;
   }
   .login-form-panel {
     padding-left: 35px;
@@ -3361,10 +3361,10 @@ html {
     font-size: 55px;
   }
   .login-visual-copy p {
-    font-size: 9px;
+    font-size: 10px;
   }
   .login-visual-copy > .space-eyebrow {
-    font-size: 5px;
+    font-size: 10px;
   }
   .space-login {
     grid-template-columns: 1fr 1.1fr;
@@ -3388,7 +3388,7 @@ html {
   }
   .mission-welcome p {
     max-width: 290px;
-    font-size: 9px;
+    font-size: 10px;
     line-height: 1.8;
   }
   .welcome-globes {
@@ -3418,13 +3418,13 @@ html {
     font-size: 24px;
   }
   .mission-world-info > p {
-    font-size: 9px;
+    font-size: 10px;
   }
   .mission-world-info > .space-eyebrow {
-    font-size: 6px;
+    font-size: 10px;
   }
   .mission-world-info > div > span {
-    font-size: 7px;
+    font-size: 10px;
   }
   .mission-research-layout {
     grid-template-columns: 1fr;
@@ -3480,17 +3480,17 @@ html {
   .dataset-resolution {
     min-width: 0;
     max-width: 100px;
-    font-size: 6px;
+    font-size: 10px;
   }
   .dataset-row {
     gap: 13px;
     padding: 15px;
   }
   .dataset-row strong {
-    font-size: 9px;
+    font-size: 10px;
   }
   .mission-page-label > span:last-child {
-    font-size: 5px;
+    font-size: 10px;
   }
 }
 @media (max-height: 920px) {
@@ -3556,7 +3556,7 @@ html {
     gap: 15px;
   }
   .space-button.compact {
-    font-size: 7px;
+    font-size: 10px;
     padding: 9px 10px;
     gap: 9px;
     min-height: 30px;
@@ -3566,7 +3566,7 @@ html {
     padding: 50px 26px 60px;
   }
   .space-hero-content .space-eyebrow {
-    font-size: 6px;
+    font-size: 10px;
     letter-spacing: 1.55px;
   }
   .space-hero h1 {
@@ -3590,17 +3590,17 @@ html {
     margin-top: 26px;
   }
   .space-hero .space-button {
-    font-size: 9px;
+    font-size: 10px;
     min-height: 42px;
     padding: 12px 15px;
     gap: 14px;
   }
   .space-hero-buttons > .space-button.text {
-    font-size: 8px;
+    font-size: 10px;
     gap: 9px;
   }
   .hero-small-note {
-    font-size: 6px;
+    font-size: 10px;
     margin-top: 21px;
     color: #8395a7;
   }
@@ -3613,11 +3613,11 @@ html {
     opacity: 1;
   }
   .planet-caption {
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 1.3px;
   }
   .planet-caption > span {
-    font-size: 4px;
+    font-size: 10px;
     margin-top: 6px;
     letter-spacing: 1px;
   }
@@ -3636,7 +3636,7 @@ html {
   .hero-visual-label {
     right: 12%;
     bottom: 8%;
-    font-size: 4px;
+    font-size: 10px;
     letter-spacing: 0.7px;
   }
   .hero-orbit {
@@ -3647,7 +3647,7 @@ html {
     height: 350px;
   }
   .hero-scroll {
-    font-size: 5px;
+    font-size: 10px;
     left: 25px;
     bottom: 22px;
     gap: 10px;
@@ -3658,7 +3658,7 @@ html {
   .hero-bottom-coordinate {
     bottom: 22px;
     right: 25px;
-    font-size: 5px;
+    font-size: 10px;
   }
   .hero-bottom-coordinate > span {
     display: none;
@@ -3670,7 +3670,7 @@ html {
     justify-content: center;
   }
   .space-capability-strip > span {
-    font-size: 7px;
+    font-size: 10px;
     gap: 7px;
   }
   .space-capability-strip > i {
@@ -3688,7 +3688,7 @@ html {
   }
   .space-section-heading > .space-eyebrow,
   .space-section-heading .space-eyebrow {
-    font-size: 6px;
+    font-size: 10px;
     letter-spacing: 1.6px;
   }
   .space-section-heading h2 {
@@ -3723,7 +3723,7 @@ html {
     font-size: 42px;
   }
   .world-title-row h3 > span {
-    font-size: 8px;
+    font-size: 10px;
     margin-top: 9px;
   }
   .world-title-row > a {
@@ -3746,11 +3746,11 @@ html {
     font-size: 25px;
   }
   .world-card-stats strong > small {
-    font-size: 9px;
+    font-size: 10px;
     margin-left: 4px;
   }
   .world-card-stats > span > small {
-    font-size: 6px;
+    font-size: 10px;
     line-height: 1.7;
   }
   .world-card-bottom {
@@ -3759,15 +3759,15 @@ html {
   }
   .world-card-bottom > span {
     display: flex;
-    font-size: 4.5px;
+    font-size: 10px;
     letter-spacing: 0.7px;
   }
   .world-card-bottom > a {
-    font-size: 7px;
+    font-size: 10px;
     gap: 6px;
   }
   .worlds-footnote {
-    font-size: 7px;
+    font-size: 10px;
     line-height: 1.9;
     flex-wrap: wrap;
     gap: 8px;
@@ -3778,7 +3778,7 @@ html {
   }
   .worlds-footnote > a {
     margin-left: 21px;
-    font-size: 7px;
+    font-size: 10px;
   }
   .coverage-section {
     padding: 60px 23px 36px;
@@ -3788,19 +3788,19 @@ html {
     margin-top: 27px;
   }
   .coverage-tabs > button {
-    font-size: 9px;
+    font-size: 10px;
     padding: 10px 14px;
     gap: 30px;
   }
   .coverage-meta {
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 0.6px;
     padding-bottom: 17px;
     gap: 12px;
     line-height: 1.8;
   }
   .coverage-meta > span:last-child {
-    font-size: 4px;
+    font-size: 10px;
     white-space: nowrap;
   }
   .coverage-metrics {
@@ -3821,12 +3821,12 @@ html {
     margin-left: 5px;
   }
   .coverage-metrics h3 {
-    font-size: 9px;
+    font-size: 10px;
     margin-top: 13px;
     line-height: 1.6;
   }
   .coverage-metrics p {
-    font-size: 7px;
+    font-size: 10px;
     line-height: 1.8;
     max-width: 142px;
     margin-top: 5px;
@@ -3847,12 +3847,12 @@ html {
     display: block;
   }
   .coverage-integrity p {
-    font-size: 8px;
+    font-size: 10px;
     line-height: 1.9;
     margin-top: 8px;
   }
   .coverage-integrity > button {
-    font-size: 8px;
+    font-size: 10px;
     margin-left: 38px;
     gap: 10px;
   }
@@ -3860,18 +3860,18 @@ html {
     padding: 16px;
   }
   .coverage-method > p {
-    font-size: 9px;
+    font-size: 10px;
   }
   .dataset-ribbon {
     gap: 6px;
     padding-top: 20px;
   }
   .dataset-ribbon > a {
-    font-size: 6px;
+    font-size: 10px;
     padding: 6px 7px;
   }
   .prototype-note {
-    font-size: 6px;
+    font-size: 10px;
     margin-top: 15px;
   }
   .lunar-feature-grid {
@@ -3890,7 +3890,7 @@ html {
     margin-top: 7px;
   }
   .feature-kicker {
-    font-size: 8px;
+    font-size: 10px;
   }
   .feature-copy p {
     font-size: 10px;
@@ -3907,13 +3907,13 @@ html {
     margin-top: 32px;
   }
   .prototype-links > p {
-    font-size: 9px;
+    font-size: 10px;
     max-width: none;
     width: 100%;
     margin: 0;
   }
   .prototype-links .space-button {
-    font-size: 8px;
+    font-size: 10px;
     min-height: 39px;
     padding: 12px 14px;
     gap: 10px;
@@ -3928,7 +3928,7 @@ html {
     padding: 62px 25px;
   }
   .sozo-intelligence .space-eyebrow {
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 1.5px;
   }
   .sozo-intelligence h2 {
@@ -3948,14 +3948,14 @@ html {
     font-size: 25px;
   }
   .sozo-acronym > div {
-    font-size: 6px;
+    font-size: 10px;
   }
   .sozo-intelligence > .space-button {
     font-size: 10px;
     gap: 20px;
   }
   .sozo-mode {
-    font-size: 7px;
+    font-size: 10px;
     line-height: 1.9;
     margin-top: 18px;
   }
@@ -3963,12 +3963,12 @@ html {
     padding: 21px 20px;
   }
   .preview-top > span:first-child {
-    font-size: 5px;
+    font-size: 10px;
     gap: 7px;
   }
   .preview-pill {
     display: block;
-    font-size: 4px;
+    font-size: 10px;
   }
   .preview-question {
     font-size: 20px;
@@ -3979,16 +3979,16 @@ html {
     margin: 22px 0;
   }
   .preview-path strong {
-    font-size: 9px;
+    font-size: 10px;
   }
   .preview-path p {
-    font-size: 8px;
+    font-size: 10px;
   }
   .preview-bottom-link {
-    font-size: 8px;
+    font-size: 10px;
   }
   .preview-source-row > span {
-    font-size: 6px;
+    font-size: 10px;
   }
   .developer-landing {
     grid-template-columns: 1fr;
@@ -3996,7 +3996,7 @@ html {
     padding: 60px 25px;
   }
   .developer-landing .space-eyebrow {
-    font-size: 6px;
+    font-size: 10px;
   }
   .developer-landing h2 {
     font-size: 55px;
@@ -4007,27 +4007,27 @@ html {
     line-height: 1.9;
   }
   .developer-landing .space-button {
-    font-size: 9px;
+    font-size: 10px;
     gap: 15px;
     margin-top: 25px;
   }
   .landing-code pre {
-    font-size: 8px;
+    font-size: 10px;
     line-height: 2.1;
     padding: 25px 17px;
   }
   .landing-code > a {
-    font-size: 7px;
+    font-size: 10px;
     padding: 14px 17px;
   }
   .landing-code > div > small {
-    font-size: 5px;
+    font-size: 10px;
   }
   .space-final-cta {
     padding: 64px 23px 62px;
   }
   .space-final-cta > .space-eyebrow {
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 1.4px;
     line-height: 1.8;
   }
@@ -4048,7 +4048,7 @@ html {
     gap: 20px;
   }
   .space-final-cta > p {
-    font-size: 7px;
+    font-size: 10px;
     line-height: 1.8;
     max-width: 265px;
     margin-top: 18px;
@@ -4060,7 +4060,7 @@ html {
     gap: 20px;
   }
   .space-footer-top > p {
-    font-size: 7px;
+    font-size: 10px;
     padding-left: 20px;
   }
   .space-footer-top > div {
@@ -4070,21 +4070,21 @@ html {
     width: 100%;
   }
   .space-footer-top > div > a {
-    font-size: 7px;
+    font-size: 10px;
     gap: 4px;
   }
   .space-footer-bottom {
     flex-direction: column;
     gap: 16px;
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 0.7px;
   }
   .space-footer-bottom > div {
     gap: 7px;
-    font-size: 6px;
+    font-size: 10px;
   }
   .imagery-credit {
-    font-size: 6px;
+    font-size: 10px;
     line-height: 1.8;
     margin-top: 14px;
     max-width: 330px;
@@ -4114,7 +4114,7 @@ html {
   .back-link {
     left: 24px;
     top: 22px;
-    font-size: 8px;
+    font-size: 10px;
   }
   .login-form-heading {
     margin: 26px 0 10px;
@@ -4144,11 +4144,11 @@ html {
     font-size: 10px;
   }
   .login-private {
-    font-size: 7px;
+    font-size: 10px;
   }
   .login-footer {
     bottom: 17px;
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 1.4px;
   }
   .app-shell .main-content {
@@ -4167,7 +4167,7 @@ html {
     font-size: 34px;
   }
   .mission-page-label {
-    font-size: 6px;
+    font-size: 10px;
     letter-spacing: 1.1px;
     align-items: flex-start;
   }
@@ -4188,14 +4188,14 @@ html {
     padding-top: 12px;
   }
   .mission-welcome p {
-    font-size: 8px;
+    font-size: 10px;
     line-height: 1.8;
     max-width: 210px;
     margin-top: 14px;
     margin-bottom: 20px;
   }
   .mission-welcome .primary-button {
-    font-size: 8px;
+    font-size: 10px;
     gap: 8px;
     padding: 9px 11px;
     min-height: 34px;
@@ -4212,7 +4212,7 @@ html {
     gap: 16px;
   }
   .mission-summary > div > span {
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 1px;
   }
   .mission-summary > div:not(:first-child) {
@@ -4228,7 +4228,7 @@ html {
     margin-top: 8px;
   }
   .mission-summary strong > small {
-    font-size: 6px;
+    font-size: 10px;
     line-height: 1.7;
     max-width: 75px;
   }
@@ -4244,7 +4244,7 @@ html {
     font-size: 14px;
   }
   .mission-section-head > button {
-    font-size: 6px;
+    font-size: 10px;
     gap: 5px;
   }
   .mission-section-head > button > svg {
@@ -4270,7 +4270,7 @@ html {
     box-shadow: inset -50px -15px 55px #000;
   }
   .mission-world-info > .space-eyebrow {
-    font-size: 4.5px;
+    font-size: 10px;
     letter-spacing: 0.6px;
   }
   .mission-world-info h3 {
@@ -4281,7 +4281,7 @@ html {
     width: 17px;
   }
   .mission-world-info > p {
-    font-size: 7px;
+    font-size: 10px;
     line-height: 1.9;
     max-width: 180px;
   }
@@ -4293,10 +4293,10 @@ html {
     font-size: 21px;
   }
   .mission-world-info > div > span {
-    font-size: 5.5px;
+    font-size: 10px;
   }
   .mission-world-info strong > small {
-    font-size: 6px;
+    font-size: 10px;
   }
   .mission-research-layout {
     gap: 25px;
@@ -4306,14 +4306,14 @@ html {
     padding: 15px 0;
   }
   .mission-prompt > p {
-    font-size: 9px;
+    font-size: 10px;
     line-height: 1.8;
   }
   .mission-section-head > span {
-    font-size: 5px;
+    font-size: 10px;
   }
   .mission-source-note p {
-    font-size: 7px;
+    font-size: 10px;
     line-height: 1.9;
   }
   .explorer-layout {
@@ -4329,45 +4329,45 @@ html {
     left: 16px;
     right: 16px;
     top: 18px;
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 0.7px;
   }
   .explorer-stage-top > span:last-child {
-    font-size: 4.5px;
+    font-size: 10px;
   }
   .explorer-place-label {
     left: 19px;
     bottom: 58px;
   }
   .explorer-place-label > span {
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 1.2px;
   }
   .explorer-place-label > h2 {
     font-size: 31px;
   }
   .explorer-place-label > p {
-    font-size: 7px;
+    font-size: 10px;
   }
   .explorer-panel {
     padding: 19px 17px;
     gap: 7px 17px;
   }
   .explorer-panel > .space-eyebrow {
-    font-size: 6px;
+    font-size: 10px;
   }
   .explorer-panel > label:not(.explorer-layer) {
-    font-size: 7px;
+    font-size: 10px;
   }
   .explorer-panel > select {
-    font-size: 8px;
+    font-size: 10px;
     padding: 9px 7px;
   }
   .explorer-panel > h3 {
-    font-size: 8px;
+    font-size: 10px;
   }
   .explorer-layer {
-    font-size: 7px;
+    font-size: 10px;
     gap: 6px;
     padding: 12px 0;
   }
@@ -4389,15 +4389,15 @@ html {
     width: 12px;
   }
   .explorer-data-note > p {
-    font-size: 6px;
+    font-size: 10px;
     line-height: 1.9;
   }
   .explorer-panel > dl {
-    font-size: 7px;
+    font-size: 10px;
     margin-bottom: 10px;
   }
   .explorer-panel > .primary-button {
-    font-size: 7px;
+    font-size: 10px;
     padding: 8px 6px;
     gap: 4px;
   }
@@ -4405,7 +4405,7 @@ html {
     width: 11px;
   }
   .explorer-panel > .text-button {
-    font-size: 6px;
+    font-size: 10px;
     gap: 4px;
     white-space: normal;
     margin-top: 10px;
@@ -4414,11 +4414,11 @@ html {
     padding: 17px;
   }
   .explorer-limits > span {
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 0.9px;
   }
   .explorer-limits p {
-    font-size: 8px;
+    font-size: 10px;
     line-height: 1.9;
   }
   .catalog-notice {
@@ -4429,10 +4429,10 @@ html {
     width: 15px;
   }
   .catalog-notice strong {
-    font-size: 9px;
+    font-size: 10px;
   }
   .catalog-notice p {
-    font-size: 8px;
+    font-size: 10px;
     line-height: 1.9;
     margin-top: 6px;
   }
@@ -4448,11 +4448,11 @@ html {
   .catalog-filters > select {
     max-width: none;
     width: calc(50% - 5px);
-    font-size: 8px;
+    font-size: 10px;
     padding: 9px;
   }
   .catalog-results-label {
-    font-size: 5px;
+    font-size: 10px;
     letter-spacing: 0.7px;
   }
   .dataset-row {
@@ -4471,14 +4471,14 @@ html {
     min-width: 170px;
   }
   .dataset-row strong {
-    font-size: 9px;
+    font-size: 10px;
   }
   .dataset-row small {
-    font-size: 6px;
+    font-size: 10px;
     line-height: 1.8;
   }
   .dataset-status {
-    font-size: 6px;
+    font-size: 10px;
     padding: 4px 5px;
     min-width: 53px;
   }
@@ -4493,14 +4493,14 @@ html {
   }
   .dataset-details > div {
     gap: 20px;
-    font-size: 9px;
+    font-size: 10px;
     line-height: 1.8;
   }
   .dataset-details dd {
     max-width: 53%;
   }
   .dataset-detail-tags > .outline-tag {
-    font-size: 7px;
+    font-size: 10px;
   }
   .app-shell .sidebar-bottom {
     padding-top: 20px;
@@ -4615,7 +4615,7 @@ html {
   }
   .space-eyebrow,
   .space-section-heading .space-eyebrow {
-    font-size: 9px;
+    font-size: 10px;
   }
   .world-title-row h3 > span {
     font-size: 11px;
@@ -4625,7 +4625,7 @@ html {
     font-size: 10px;
   }
   .world-card-bottom > span {
-    font-size: 7px;
+    font-size: 10px;
   }
   .world-card-bottom > a {
     font-size: 11px;
@@ -4738,7 +4738,7 @@ html {
   }
   .dataset-results-label,
   .catalog-results-label {
-    font-size: 9px;
+    font-size: 10px;
   }
   .globe-controls button {
     min-height: 40px;

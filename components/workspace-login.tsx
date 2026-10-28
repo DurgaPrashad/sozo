@@ -9,7 +9,11 @@ import {
   LockKeyhole,
 } from "lucide-react";
 import PlanetScene from "./planet-scene";
-export default function WorkspaceLogin() {
+export default function WorkspaceLogin({
+  chatGPT = false,
+}: {
+  chatGPT?: boolean;
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -127,19 +131,23 @@ export default function WorkspaceLogin() {
             )}
           </button>
         </form>
-        <div className="login-divider">
-          <span />
-          or
-          <span />
-        </div>
-        <a
-          className="space-button secondary"
-          href="/signin-with-chatgpt?return_to=%2Fdashboard"
-          target="_top"
-        >
-          Continue with ChatGPT
-          <ArrowUpRight size={15} />
-        </a>
+        {chatGPT && (
+          <>
+            <div className="login-divider">
+              <span />
+              or
+              <span />
+            </div>
+            <a
+              className="space-button secondary"
+              href="/signin-with-chatgpt?return_to=%2Fdashboard"
+              target="_top"
+            >
+              Continue with ChatGPT
+              <ArrowUpRight size={15} />
+            </a>
+          </>
+        )}
         <p className="login-private">
           <LockKeyhole size={12} />
           Your research. Your private workspace.

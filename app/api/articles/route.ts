@@ -1,6 +1,6 @@
 import { discoverArticles } from '../../../lib/science/retrieval';
 import { cachedArticles } from '../../../lib/science/article-cache';
-import { env } from 'cloudflare:workers';
+import { env } from "@/lib/platform";
 export const dynamic='force-dynamic';
 export async function GET(request:Request){
  const url=new URL(request.url),body=url.searchParams.get('body')||'all',q=url.searchParams.get('q')||'',limit=Number(url.searchParams.get('limit')||12);

@@ -48,20 +48,10 @@ export default function SpaceLanding() {
           SOZO
         </a>
         <nav aria-label="Main navigation" className={menu ? "open" : ""}>
-          <a
-            href={lunar.url}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="MOMAR Moon planner"
-          >
+          <a href="#moon" onClick={() => setMenu(false)}>
             The Moon
           </a>
-          <a
-            href={mars.url}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="MOMAR Mars planner"
-          >
+          <a href="#mars" onClick={() => setMenu(false)}>
             Mars
           </a>
           <a href="#intelligence" onClick={() => setMenu(false)}>
@@ -91,41 +81,6 @@ export default function SpaceLanding() {
       </header>
       <main>
         <MissionFilm />
-        <section className="companion-section premium-section" id="companion">
-          <div className="companion-copy">
-            <span className="premium-eyebrow">SOZO / THE COMPANION</span>
-            <h2>
-              Curiosity,
-              <br />
-              <span>in good company.</span>
-            </h2>
-            <p>
-              A familiar face for the next frontier. Keep the human, the
-              question, and the evidence connected.
-            </p>
-            <div className="companion-palette">
-              <span>
-                <i className="silver" />
-                Silver
-              </span>
-              <span>
-                <i className="graphite" />
-                Graphite
-              </span>
-              <span>
-                <i className="signal" />
-                Signal green
-              </span>
-            </div>
-            <a href="/dashboard?view=companion" className="premium-text-link">
-              Talk with SOZO
-              <ArrowRight size={17} />
-            </a>
-            <span className="companion-concept">3D COMPANION · SARVAM VOICE</span>
-          </div>
-          <RobotCompanion />
-        </section>
-        <section id="articles"><ScientificArticles compact /></section>
         <section className="frontier-intro premium-section" id="frontiers">
           <div className="frontier-intro-copy">
             <span className="premium-eyebrow">
@@ -289,6 +244,40 @@ export default function SpaceLanding() {
             </span>
           </div>
         </section>
+        <section className="companion-section premium-section" id="companion">
+          <div className="companion-copy">
+            <span className="premium-eyebrow">SOZO / THE COMPANION</span>
+            <h2>
+              Curiosity,
+              <br />
+              <span>in good company.</span>
+            </h2>
+            <p>
+              A familiar face for the next frontier. Keep the human, the
+              question, and the evidence connected.
+            </p>
+            <div className="companion-palette">
+              <span>
+                <i className="silver" />
+                Silver
+              </span>
+              <span>
+                <i className="graphite" />
+                Graphite
+              </span>
+              <span>
+                <i className="signal" />
+                Signal green
+              </span>
+            </div>
+            <a href="/dashboard?view=companion" className="premium-text-link">
+              Talk with SOZO
+              <ArrowRight size={17} />
+            </a>
+            <span className="companion-concept">3D COMPANION · SARVAM VOICE</span>
+          </div>
+          <RobotCompanion />
+        </section>
         <section
           className="intelligence-section premium-section"
           id="intelligence"
@@ -374,6 +363,7 @@ export default function SpaceLanding() {
             </div>
           </div>
         </section>
+        <ScientificArticles compact />
         <section className="evidence-section premium-section" id="evidence">
           <div className="evidence-heading">
             <div>

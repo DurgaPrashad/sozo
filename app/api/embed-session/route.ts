@@ -1,4 +1,4 @@
-import { env } from 'cloudflare:workers';
+import { env } from "@/lib/platform";
 import { getIdentity } from '../../../lib/auth/identity';
 import { D1CompanionStore } from '../../../lib/companion/security';
 export const dynamic='force-dynamic';

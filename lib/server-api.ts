@@ -11,7 +11,7 @@ import {
 } from "../db/schema";
 import { getIdentity } from "./auth/identity";
 import { z } from "zod";
-import { env } from "cloudflare:workers";
+import { env } from "@/lib/platform";
 import { D1CompanionStore } from "./companion/security";
 import { generateReply } from "./companion/provider";
 import { retrieveEvidence } from "./science/retrieval";
