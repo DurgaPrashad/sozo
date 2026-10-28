@@ -46,7 +46,7 @@ export class D1CompanionStore implements CompanionStore {
     await this.prepare();
     const bucket = Math.floor(Date.now() / windowMs), expires = new Date((bucket + 1) * windowMs).toISOString();
     const key = await hashSecret(`${ownerId}|${kind}|${bucket}`);
-    const row = await this.db.prepare("INSERT INTO sozo_companion_limits (key, count, expires_at) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET count=count+1 RETURNING count").bind(key, expires).first<{ count: number }>();
+    const row = await this.db.prepare("INSERT INTO sozo_companion_limits (key, count, expires_at) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET count=sozo_companion_limits.count+1 RETURNING count").bind(key, expires).first<{ count: number }>();
     // Bounded, owner-wide usage counters, with opportunistic expiry cleanup.
     await this.db.batch([this.db.prepare("DELETE FROM sozo_companion_limits WHERE expires_at < ?").bind(new Date().toISOString()), this.db.prepare("DELETE FROM sozo_widget_sessions WHERE expires_at < ?").bind(new Date().toISOString())]);
     return Boolean(row && row.count <= maximum);

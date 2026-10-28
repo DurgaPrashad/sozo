@@ -10,7 +10,7 @@ mkdirSync(".sites-runtime/tests", { recursive: true });
 writeFileSync(".sites-runtime/tests/package.json", '{"type":"commonjs"}');
 const result = spawnSync(
   process.execPath,
-  ["--test", ".sites-runtime/tests/tests/core.test.js", ".sites-runtime/tests/tests/relevance.test.js", ".sites-runtime/tests/tests/companion.test.js", ".sites-runtime/tests/tests/claim-checks.test.js", ".sites-runtime/tests/tests/article-cache.test.js", "tests/cli.test.mjs"],
+  ["--test", ".sites-runtime/tests/tests/core.test.js", ".sites-runtime/tests/tests/relevance.test.js", ".sites-runtime/tests/tests/companion.test.js", ".sites-runtime/tests/tests/claim-checks.test.js", ".sites-runtime/tests/tests/article-cache.test.js", ".sites-runtime/tests/tests/facebook.test.js", ".sites-runtime/tests/tests/supabase.test.js", "tests/cli.test.mjs", "tests/postgres.test.mjs"],
   { stdio: "inherit" },
 );
 process.exit(result.status ?? 1);

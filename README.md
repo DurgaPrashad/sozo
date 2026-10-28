@@ -36,9 +36,12 @@ Import the repository in Vercel; `vercel.json` selects Next.js and runs `npm run
 
 | Variable | Purpose |
 | --- | --- |
-| `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | Turso (libSQL) database, replacing Cloudflare D1. Production builds apply the migrations. |
-| `SOZO_WORKSPACE_EMAIL`, `SOZO_WORKSPACE_PASSWORD_HASH` | Workspace sign-in (PBKDF2 verifier as described above). |
+| `DATABASE_URL` | Supabase PostgreSQL **transaction pooler** URI, replacing Cloudflare D1. Production builds apply the migrations. (`TURSO_DATABASE_URL`/`TURSO_AUTH_TOKEN` is the alternative.) |
+| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `GOOGLE_CLIENT_ID` | "Continue with Google" through Supabase Auth; the client ID keeps the supabase.co address hidden. See [Google sign-in](docs/operations.md#google-sign-in-supabase-auth). |
+| `SOZO_ALLOWED_EMAILS`, `SOZO_OPEN_SIGNUP` | Who may sign in with Google or Facebook besides the owner. |
+| `SOZO_WORKSPACE_EMAIL`, `SOZO_WORKSPACE_PASSWORD_HASH` | Workspace owner; the hash enables the optional password form (PBKDF2 verifier as described above). |
 | `SARVAM_API_KEY` | Conversation, voice and synthesis. Optional. |
+| `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET` | Optional "Continue with Facebook". Access rules and Meta app setup: [Facebook login](docs/operations.md#facebook-login). |
 
 Fill the git-ignored `.env.vercel` (template in `.env.example`) and paste it into Vercel. Generate the password verifier with `npm run auth:hash-password`. Production: https://sozo.momar.si.
 

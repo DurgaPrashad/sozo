@@ -4745,3 +4745,54 @@ html {
     min-width: 40px;
   }
 }
+.login-facebook {
+  gap: 10px;
+}
+.login-facebook svg {
+  color: #4a8dff;
+  flex: none;
+}
+.login-form-panel .space-button.secondary + .space-button.secondary {
+  margin-top: 10px;
+}
+.data-deletion {
+  min-height: 100vh;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+  color: #d1dce5;
+  line-height: 1.7;
+}
+.data-deletion h1 {
+  font-size: 34px;
+  margin: 28px 0 18px;
+  color: #f1f6ff;
+}
+.data-deletion h2 {
+  font-size: 18px;
+  margin: 32px 0 8px;
+  color: #e6eef7;
+}
+.data-deletion-status {
+  border: 1px solid #2e5a46;
+  background: #10241c;
+  padding: 14px 16px;
+  border-radius: 8px;
+}
+.data-deletion a {
+  color: #a6dcff;
+}
+.login-google {
+  gap: 10px;
+}
+.login-google svg {
+  flex: none;
+}
+.login-google-slot {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+.login-form-panel .login-google-slot + .space-button.secondary {
+  margin-top: 10px;
+}

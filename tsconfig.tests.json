@@ -21,6 +21,13 @@
     "lib/companion/*.ts",
     "lib/auth/crypto.ts",
     "tests/claim-checks.test.ts",
-    "tests/article-cache.test.ts"
+    "tests/article-cache.test.ts",
+    "tests/facebook.test.ts",
+    "lib/auth/facebook.ts",
+    "lib/platform/postgres-d1.ts",
+    "db/schema.ts",
+    "lib/auth/social.ts",
+    "lib/auth/supabase.ts",
+    "tests/supabase.test.ts"
   ]
 }
