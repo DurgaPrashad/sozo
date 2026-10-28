@@ -6,6 +6,8 @@ import { D1CompanionStore } from "../../../../lib/companion/security";
 import { retrieveEvidence } from "../../../../lib/science/retrieval";
 
 export const dynamic = "force-dynamic";
+// Vercel: Sarvam requests time out at 45 s; keep the function alive past that.
+export const maxDuration = 60;
 const store = new D1CompanionStore(env.DB!);
 function handler(request: Request) {
   return createCompanionHandler({

@@ -283,7 +283,10 @@ const spec = {
     description:
       "Scientific literature discovery and live NASA archive search with source provenance. Sarvam supports grounded conversation, speech and explicitly shared screenshots. Live MOMAR route computation, MCP, OAuth, and arbitrary code execution are not configured. Browser identity uses an HttpOnly SOZO session or optional Sites sign-in. API clients use a SOZO bearer key; the current landing page is public.",
   },
-  servers: [{ url: "/" }],
+  servers: [
+    { url: "/" },
+    { url: "https://sozo.momar.si", description: "Production" },
+  ],
   security: [{ SozoKey: [] }, { SozoSession: [] }],
   paths,
   components: {
@@ -331,5 +334,41 @@ for (const [path,method,summary] of [
 ]) {
  (paths[path]??={})[method]={summary,operationId:method+path.replace(/[^a-zA-Z0-9]/g,"_"),security:path.endsWith("status")||path==="/api/articles"?[]:[{SozoKey:[]}],responses:{200:{description:"Success; see companion integration guide for exact payloads"},400:{$ref:"#/components/responses/Error"},401:{$ref:"#/components/responses/Error"}},externalDocs:{url:"/docs/companion-integration.md"}};
 }
+// Mirrors chatSchema in lib/companion/context.ts.
+const fraction = { type: "number", minimum: 0, maximum: 1 };
+const lineString = object({
+  type: { type: "string", enum: ["LineString"] },
+  coordinates: { type: "array", minItems: 2, maxItems: 2000, description: "[longitude, latitude] degrees", items: { type: "array", minItems: 2, maxItems: 2, items: { type: "number" } } },
+}, ["type", "coordinates"]);
+const routeMetrics = { ...object({
+  maxSlopeDeg: { type: "number", minimum: 0, maximum: 90 },
+  meanSlopeDeg: { type: "number", minimum: 0, maximum: 90 },
+  shadowFraction: fraction,
+  sunlitFraction: fraction,
+  earthVisibilityFraction: fraction,
+  terrainResolutionM: { type: "number", exclusiveMinimum: 0 },
+  distanceKm: { type: "number", minimum: 0 },
+  durationHours: { type: "number", minimum: 0 },
+  energyWh: { type: "number", minimum: 0 },
+  batteryWh: { type: "number", minimum: 0 },
+}), additionalProperties: false };
+paths["/api/companion/chat"].post.requestBody = {
+  required: true,
+  content: { "application/json": { schema: { ...object({
+    message: { type: "string", minLength: 1, maxLength: 3000 },
+    retrieve: { type: "boolean", default: false, description: "Retrieve Crossref and Europe PMC records and cite them as [n]." },
+    history: { type: "array", maxItems: 10, items: object({ role: { type: "string", enum: ["user", "assistant"] }, content: { type: "string", maxLength: 4000 } }, ["role", "content"]) },
+    context: { ...object({
+      body: { type: "string", enum: ["moon", "mars"] },
+      mapLabel: { type: "string", maxLength: 300 },
+      notes: { type: "string", maxLength: 6000 },
+      route: lineString,
+      metrics: routeMetrics,
+      alternatives: { type: "array", maxItems: 4, items: { ...object({ label: { type: "string", maxLength: 120 }, route: lineString, metrics: routeMetrics }, ["label", "route"]), additionalProperties: false } },
+      facts: { type: "object", maxProperties: 40, description: "Other planner facts; keys up to 64 characters.", additionalProperties: { oneOf: [{ type: "number" }, { type: "string", maxLength: 300 }, { type: "boolean" }] } },
+      screenshot: { type: "string", description: "data:image/(jpeg|png|webp);base64 URL under 2 MB" },
+    }), additionalProperties: false },
+  }, ["message"]), additionalProperties: false } } },
+};
 writeFileSync("public/openapi.json", JSON.stringify(spec, null, 2) + "\n");
 copyFileSync("cli/sozo.mjs", "public/cli/sozo.mjs");

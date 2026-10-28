@@ -3,3 +3,5 @@
 // headers are trusted (the platform strips client-supplied copies).
 export { env } from "cloudflare:workers";
 export const trustsHostIdentity = true;
+export const clientAddress = (request: Request) =>
+  request.headers.get("cf-connecting-ip");

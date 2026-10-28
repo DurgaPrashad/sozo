@@ -37,6 +37,27 @@ test("polyline length uses the declared planetary radius and handles wraparound"
   assert.ok(Math.abs(mars!.distanceKm! - 3389.5 * 2 * Math.PI / 180) < 0.000001);
   assert.equal(analyseRoute({ route: { type: "LineString", coordinates: [[0, 0], [1, 0]] } })!.distanceKm, null);
 });
+test("alternative routes are measured and their geometry stays out of the model prompt", () => {
+  const route = { type: "LineString" as const, coordinates: [[0, 0], [1, 0]] as [number, number][] };
+  const context = { body: "moon" as const, route, alternatives: [{ label: "Ridge", route: { type: "LineString" as const, coordinates: [[0, 0], [2, 0]] as [number, number][] }, metrics: { durationHours: 1.8, sunlitFraction: 0.57 } }], facts: { missionTime: "1.8 h", earthInSight: 0.57 } };
+  assert.equal(contextSchema.safeParse(context).success, true);
+  const analysis = analyseRoute(context)!;
+  assert.ok(Math.abs(analysis.alternatives![0].distanceKm - 2 * 1737.4 * Math.PI / 180) < 0.000001);
+  assert.equal(analysis.alternatives![0].suppliedMetrics.durationHours, 1.8);
+  assert.deepEqual(Object.keys(analysis.comparison!), ["polylineKm"]);
+  const compared = analyseRoute({ ...context, metrics: { durationHours: 1.2, maxSlopeDeg: 14.7 } })!.comparison!;
+  assert.deepEqual(compared.durationHours, { "Primary route": 1.2, Ridge: 1.8 });
+  assert.equal(compared.maxSlopeDeg, undefined);
+  assert.ok(!evidenceMessage({ alternatives: [{ label: "Ridge", route: { type: "LineString", coordinates: [[12.345678, -89.5], [12.4, -89.6]] } }] }, []).includes("12.345678"));
+  assert.equal(analyseRoute({ body: "mars", alternatives: context.alternatives })!.distanceKm, null);
+});
+test("planner facts and alternatives are bounded", () => {
+  const route = { type: "LineString", coordinates: [[0, 0], [1, 0]] };
+  assert.equal(contextSchema.safeParse({ facts: Object.fromEntries(Array.from({ length: 41 }, (_, i) => [`f${i}`, i])) }).success, false);
+  assert.equal(contextSchema.safeParse({ facts: { nested: { command: "x" } } }).success, false);
+  assert.equal(contextSchema.safeParse({ alternatives: Array.from({ length: 5 }, (_, i) => ({ label: `R${i}`, route })) }).success, false);
+  assert.equal(contextSchema.safeParse({ metrics: { sunlitFraction: 1.2 } }).success, false);
+});
 test("context rejects hidden commands as fields and bounds metrics/coordinates", () => {
   assert.equal(contextSchema.safeParse({ route: { type: "LineString", coordinates: [[0, 91], [1, 0]] } }).success, false);
   assert.equal(contextSchema.safeParse({ metrics: { shadowFraction: 2 } }).success, false);

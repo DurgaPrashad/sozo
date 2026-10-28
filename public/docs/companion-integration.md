@@ -60,6 +60,10 @@ const result = await response.json();
 
 The response contains `reply`, `model`, actual retrieved `citations`, `analysis`, `limitations` and `contextUsed`. `analysis.distanceKm` is a great-circle segment sum using mean spherical radii (Moon 1,737.4 km; Mars 3,389.5 km). It excludes terrain relief, hazards and vehicle dynamics. It is not route optimization or a safety certificate. Input metrics are labeled supplied. Citation numbers refer only to retrieved source records; the system flags unsupported numerical citation markers. Model statements still require scientific review.
 
+To compare candidate routes, send up to four `context.alternatives` (`{ label, route, metrics }`). `analysis.alternatives` returns each polyline length, and `analysis.comparison` lists, per metric reported by at least two routes, each route's value (`"Primary route"` for `context.route`). The model reads values from that table rather than recalling them. `metrics` accepts `distanceKm`, `durationHours`, `maxSlopeDeg`, `meanSlopeDeg`, `shadowFraction`, `sunlitFraction`, `earthVisibilityFraction` (fractions 0–1), `terrainResolutionM`, `energyWh` and `batteryWh`. Anything else the planner knows goes in `context.facts`: up to 40 entries, keys up to 64 characters, values that are numbers, booleans or strings up to 300 characters. All of it is labelled planner-supplied and unverified.
+
+MOMAR can use the ready-made [MOMAR integration prompt](MOMAR-INTEGRATION-PROMPT.md) (also served at `/docs/momar-integration-prompt.md`).
+
 Optional `context.screenshot` accepts a JPEG, PNG or WebP inline data URL under 2 MB. The request switches from `sarvam-105b-conversations` to the documented image-capable `gemma4` model at Sarvam's V2 endpoint. Actual access depends on provider credentials, credits and model availability. Do not claim image analysis if this request fails. Screenshots cannot reveal hidden map layers, source resolutions or measurements absent from visible pixels.
 
 Load `/embed/sozo-context.js` to use `window.SozoContext.captureScreen()` from a user's explicit button click. It opens the browser's native selection dialog, captures one image and immediately stops all media tracks. It sends nothing. Show a local preview, allow Remove, and obtain an explicit Send action before including that image in a chat request. Alternatively let the user upload a map image. Never scrape unrelated browser tabs, capture silently, or continually transmit the desktop. Prefer structured map layers/route metadata over screenshots when available.
@@ -90,9 +94,9 @@ Literature retrieval uses Crossref and Europe PMC through the same relevance pip
 Load the classic-script bundle, then add the component. Use your exact live origin (or `http://localhost:5173` locally):
 
 ```html
-<script src="https://sozo-research-lab.durgaprashadreddy996.chatgpt.site/embed/sozo-widget.js"></script>
+<script src="https://sozo.momar.si/embed/sozo-widget.js"></script>
 <sozo-companion
-  api-base="https://sozo-research-lab.durgaprashadreddy996.chatgpt.site"
+  api-base="https://sozo.momar.si"
   session-endpoint="/api/sozo/session">
 </sozo-companion>
 ```

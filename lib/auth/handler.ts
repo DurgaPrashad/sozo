@@ -12,6 +12,7 @@ import {
   SESSION_LIFETIME_MS,
 } from "./crypto";
 import { getIdentity } from "./identity";
+import { clientAddress } from "@/lib/platform";
 const credentials = z.object({
   email: z.string().email().max(254),
   password: z.string().min(1).max(256),
@@ -97,7 +98,7 @@ export async function handleAuth(request: Request) {
         503,
       );
     const now = new Date();
-    const ip = request.headers.get("cf-connecting-ip") || "local";
+    const ip = clientAddress(request) || "local";
     const bucket = Math.floor(now.getTime() / 600000);
     const limitKey = await hashSecret(`${ip}|${bucket}`);
     const [limit] = await db

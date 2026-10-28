@@ -8,6 +8,10 @@
   "servers": [
     {
       "url": "/"
+    },
+    {
+      "url": "https://sozo.momar.si",
+      "description": "Production"
     }
   ],
   "security": [
@@ -1471,6 +1475,281 @@
         },
         "externalDocs": {
           "url": "/docs/companion-integration.md"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 3000
+                  },
+                  "retrieve": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Retrieve Crossref and Europe PMC records and cite them as [n]."
+                  },
+                  "history": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "user",
+                            "assistant"
+                          ]
+                        },
+                        "content": {
+                          "type": "string",
+                          "maxLength": 4000
+                        }
+                      },
+                      "required": [
+                        "role",
+                        "content"
+                      ]
+                    }
+                  },
+                  "context": {
+                    "type": "object",
+                    "properties": {
+                      "body": {
+                        "type": "string",
+                        "enum": [
+                          "moon",
+                          "mars"
+                        ]
+                      },
+                      "mapLabel": {
+                        "type": "string",
+                        "maxLength": 300
+                      },
+                      "notes": {
+                        "type": "string",
+                        "maxLength": 6000
+                      },
+                      "route": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "LineString"
+                            ]
+                          },
+                          "coordinates": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2000,
+                            "description": "[longitude, latitude] degrees",
+                            "items": {
+                              "type": "array",
+                              "minItems": 2,
+                              "maxItems": 2,
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "coordinates"
+                        ]
+                      },
+                      "metrics": {
+                        "type": "object",
+                        "properties": {
+                          "maxSlopeDeg": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 90
+                          },
+                          "meanSlopeDeg": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 90
+                          },
+                          "shadowFraction": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "sunlitFraction": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "earthVisibilityFraction": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "terrainResolutionM": {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "distanceKm": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "durationHours": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "energyWh": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "batteryWh": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [],
+                        "additionalProperties": false
+                      },
+                      "alternatives": {
+                        "type": "array",
+                        "maxItems": 4,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "label": {
+                              "type": "string",
+                              "maxLength": 120
+                            },
+                            "route": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "enum": [
+                                    "LineString"
+                                  ]
+                                },
+                                "coordinates": {
+                                  "type": "array",
+                                  "minItems": 2,
+                                  "maxItems": 2000,
+                                  "description": "[longitude, latitude] degrees",
+                                  "items": {
+                                    "type": "array",
+                                    "minItems": 2,
+                                    "maxItems": 2,
+                                    "items": {
+                                      "type": "number"
+                                    }
+                                  }
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "coordinates"
+                              ]
+                            },
+                            "metrics": {
+                              "type": "object",
+                              "properties": {
+                                "maxSlopeDeg": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 90
+                                },
+                                "meanSlopeDeg": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 90
+                                },
+                                "shadowFraction": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1
+                                },
+                                "sunlitFraction": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1
+                                },
+                                "earthVisibilityFraction": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1
+                                },
+                                "terrainResolutionM": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "distanceKm": {
+                                  "type": "number",
+                                  "minimum": 0
+                                },
+                                "durationHours": {
+                                  "type": "number",
+                                  "minimum": 0
+                                },
+                                "energyWh": {
+                                  "type": "number",
+                                  "minimum": 0
+                                },
+                                "batteryWh": {
+                                  "type": "number",
+                                  "minimum": 0
+                                }
+                              },
+                              "required": [],
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": [
+                            "label",
+                            "route"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "facts": {
+                        "type": "object",
+                        "maxProperties": 40,
+                        "description": "Other planner facts; keys up to 64 characters.",
+                        "additionalProperties": {
+                          "oneOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string",
+                              "maxLength": 300
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        }
+                      },
+                      "screenshot": {
+                        "type": "string",
+                        "description": "data:image/(jpeg|png|webp);base64 URL under 2 MB"
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
         }
       }
     },

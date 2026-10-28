@@ -2,8 +2,8 @@
 
 **Status:** implementation plan, not a claim that the proposed services are connected.  
 **Baseline:** SOZO v0.3, 27 October 2026.  
-**Public application:** https://sozo-research-lab.sharpscarf8.chatgpt.site/  
-**API entry point:** `https://sozo-research-lab.sharpscarf8.chatgpt.site/api/v1`
+**Public application:** https://sozo.momar.si/  
+**API entry point:** `https://sozo.momar.si/api/v1`
 
 ## 1. The outcome
 

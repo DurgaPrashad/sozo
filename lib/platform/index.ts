@@ -8,6 +8,16 @@ import { libsqlD1 } from "./libsql-d1";
 // Anywhere else a client could forge them, so they are never trusted here.
 export const trustsHostIdentity = false;
 
+// Vercel sets x-real-ip and overwrites x-forwarded-for, so clients cannot
+// choose the address used for sign-in throttling.
+export function clientAddress(request: Request) {
+  return (
+    request.headers.get("x-real-ip") ||
+    request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+    null
+  );
+}
+
 let database: D1Database | undefined;
 
 export const env: { readonly DB?: D1Database } = {

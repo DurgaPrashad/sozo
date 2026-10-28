@@ -40,7 +40,13 @@ Import the repository in Vercel; `vercel.json` selects Next.js and runs `npm run
 | `SOZO_WORKSPACE_EMAIL`, `SOZO_WORKSPACE_PASSWORD_HASH` | Workspace sign-in (PBKDF2 verifier as described above). |
 | `SARVAM_API_KEY` | Conversation, voice and synthesis. Optional. |
 
+Fill the git-ignored `.env.vercel` (template in `.env.example`) and paste it into Vercel. Generate the password verifier with `npm run auth:hash-password`. Production: https://sozo.momar.si.
+
 ChatGPT sign-in is only available on Sites hosting. See [Deployment and troubleshooting](docs/operations.md#vercel).
+
+## Connect other platforms
+
+External platforms call SOZO from their backend with a workspace API key (`Authorization: Bearer sozo_…`), or from the browser with ten-minute origin-bound sessions. `POST /api/companion/chat` accepts a route, up to four alternative routes, metrics and planner facts, and returns a cited answer with a deterministic route comparison. `POST /api/v1/research` runs longer cited research. See the [companion API guide](docs/COMPANION-INTEGRATION.md), the [OpenAPI contract](public/openapi.json), and the paste-ready [MOMAR integration prompt](docs/MOMAR-INTEGRATION-PROMPT.md).
 
 ## Use SOZO
 
