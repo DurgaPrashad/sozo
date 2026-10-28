@@ -150,4 +150,18 @@ async function main() {
   console.log("Database schema is up to date.");
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) await main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  try {
+    await main();
+  } catch (error) {
+    // During a deploy (--if-configured), an unreachable or misconfigured
+    // database must not block the site; sign-in reports it at runtime.
+    if (!process.argv.includes("--if-configured")) throw error;
+    console.warn(
+      `::warning:: Database migration skipped: ${error?.code ?? ""} ${error?.message ?? error}`.trim(),
+    );
+    console.warn(
+      "Check DATABASE_URL: use Supabase's Transaction pooler URI (port 6543) and URL-encode the password, then redeploy.",
+    );
+  }
+}
