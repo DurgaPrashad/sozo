@@ -48,6 +48,9 @@ import {
   LogOut,
 } from "lucide-react";
 import SpaceArchive from "./space-archive";
+import CompanionConsole from "./companion-console";
+import ScientificArticles from "./scientific-articles";
+import ScientificText from "./scientific-text";
 import type { ResearchRun, Source, Project, Note } from "../lib/science/types";
 import { api, download, date } from "../lib/client";
 import {
@@ -71,6 +74,8 @@ import {
   type Connector,
 } from "./sozo-panels";
 type View =
+  | "companion"
+  | "articles"
   | "overview"
   | "archive"
   | "scientist"
@@ -117,37 +122,39 @@ const starters = [
     tag: "From the Moon to Mars",
   },
   {
-    domain: "Life sciences",
-    title: "Understand life.",
-    question: "What is next for CRISPR and the future of gene editing?",
-    prompt: "CRISPR gene editing therapeutic applications",
+    domain: "Planetary science",
+    title: "Follow the light.",
+    question: "What evidence supports ice stability near the lunar south pole?",
+    prompt: "lunar south pole ice stability Diviner",
     Icon: Dna,
     color: "green",
-    tag: "From cells to systems",
+    tag: "The permanently shadowed regions",
   },
   {
-    domain: "Climate & Earth",
-    title: "A changing planet.",
-    question: "How do ocean currents shape our changing climate?",
-    prompt: "Ocean circulation climate change",
+    domain: "Planetary science",
+    title: "Read the terrain.",
+    question: "How do LOLA elevation and slope data affect lunar route planning?",
+    prompt: "LOLA lunar terrain slope resolution",
     Icon: Globe2,
     color: "blue",
-    tag: "Our shared home",
+    tag: "The lunar surface",
   },
   {
     domain: "Physics & materials",
-    title: "Small things. Big leaps.",
-    question: "What makes solid-state batteries a promising alternative?",
-    prompt: "Solid state battery materials ionic conductivity",
+    title: "Energy for the journey.",
+    question: "How do Mars rover power systems constrain route planning?",
+    prompt: "Mars rover battery energy route planning",
     Icon: Atom,
     color: "purple",
-    tag: "The building blocks of everything",
+    tag: "Rover constraints, made explicit",
   },
 ];
 const nav = [
   { view: "overview", label: "Mission overview", Icon: LayoutDashboard },
   { view: "moon", label: "Moon explorer", Icon: Orbit },
   { view: "mars", label: "Mars explorer", Icon: Globe2 },
+  { view: "companion", label: "Talk with SOZO", Icon: Sparkles },
+  { view: "articles", label: "Scientific articles", Icon: BookOpen },
   { view: "scientist", label: "SOZO scientist", Icon: Sparkles },
   { view: "catalog", label: "Data catalog", Icon: Layers3 },
   { view: "archive", label: "NASA space archive", Icon: Globe2 },
@@ -209,7 +216,7 @@ export default function SozoWorkspace() {
       setView(requested as View);
     const body = params.get("body");
     if (body === "moon" || body === "mars") setCatalogBody(body);
-    const q = params.get("question");
+    const q = params.get("question") || params.get("q");
     if (q) {
       setQuestion(q.slice(0, 1500));
       setView("scientist");
@@ -615,6 +622,8 @@ export default function SozoWorkspace() {
             />
           )}
           {view === "archive" && <SpaceArchive />}
+          {view === "companion" && <CompanionConsole />}
+          {view === "articles" && <ScientificArticles />}
           {view === "catalog" && (
             <PlanetaryCatalog initialBody={catalogBody} key={catalogBody} />
           )}
@@ -725,11 +734,11 @@ export default function SozoWorkspace() {
                       <ArrowUpRight size={12} />
                     </button>
                     <button onClick={() => starter(1)}>
-                      Understand CRISPR
+                      Lunar ice evidence
                       <ArrowUpRight size={12} />
                     </button>
                     <button onClick={() => starter(2)}>
-                      Follow the climate
+                      Lunar terrain
                       <ArrowUpRight size={12} />
                     </button>
                   </div>
@@ -1294,7 +1303,7 @@ export default function SozoWorkspace() {
                       <FlaskConical size={16} />
                     </span>
                     <h2>A starting point for understanding.</h2>
-                    <p>{run.result.answer}</p>
+                    <ScientificText text={run.result.answer} sources={run.result.citations} />
                     <div className="provider-results">
                       {run.result.providerStatus.map((p) => (
                         <span key={p.name} className={p.ok ? "ok" : "bad"}>
@@ -1310,7 +1319,7 @@ export default function SozoWorkspace() {
                     </div>
                   </article>
                   <h3 className="subsection-heading">
-                    Start with the sources<span>Database-ranked results</span>
+                    Start with the sources<span>Metadata relevance rules</span>
                   </h3>
                   {sourceCards(run.result.citations.slice(0, 4))}
                   {run.result.citations.length > 4 && (
@@ -1705,8 +1714,7 @@ export default function SozoWorkspace() {
           <div className="info-callout">
             <CircleHelp size={18} />
             <p>
-              This release uses literature discovery. AI synthesis, arbitrary
-              code execution, and live MOMAR access are not configured.
+              SOZO connects publication discovery with Sarvam research, voice and explicit image context. Direct MOMAR routing and arbitrary code execution are not configured.
             </p>
           </div>
           <div className="modal-actions">

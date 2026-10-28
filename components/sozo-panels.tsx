@@ -630,6 +630,8 @@ export function Developers({ notify }: { notify: (v: string) => void }) {
             "Terminal",
             `export SOZO_BASE_URL="${base}"\nexport SOZO_API_KEY="<your-key>"\n\nnode cli/sozo.mjs research run --question "Mars rover terrain planning"\nnode cli/sozo.mjs research status <research-run-id>\nnode cli/sozo.mjs connect list`,
           )}
+          <a className="text-button" href="/embed/demo.html" target="_blank" rel="noreferrer">Open companion integration demo ↗</a>
+          <a className="text-button" href="/docs/companion-integration.md" target="_blank" rel="noreferrer">Companion API & embed guide ↗</a>
           <a className="text-button" href="/cli/sozo.mjs" download>
             <Download size={14} />
             Download the SOZO CLI
@@ -637,12 +639,9 @@ export function Developers({ notify }: { notify: (v: string) => void }) {
           <div className="info-callout">
             <LockKeyhole size={19} />
             <div>
-              <strong>Private workspace access</strong>
+              <strong>One API. Local and live.</strong>
               <p>
-                External clients also need a Sites service-access token in
-                OAI-Sites-Authorization, configured as SOZO_SITE_ACCESS_TOKEN
-                for the CLI. An application key does not bypass the private
-                hosting gate.
+                The landing page is public. A SOZO API key protects your workspace and works with both the local server and the live API. Keep long-lived keys in your backend. Issue a short-lived origin-bound session for an embedded companion.
               </p>
             </div>
           </div>

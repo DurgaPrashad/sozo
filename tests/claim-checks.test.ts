@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {inconsistentEqualComparison} from '../lib/science/claim-checks';
+test('rejects the observed equal-resolution comparison, including equivalent units',()=>{assert.equal(inconsistentEqualComparison('The 5 m resolution is finer than the 5 m/pixel terrain model.'),true);assert.equal(inconsistentEqualComparison('A 1 km path is longer than a 1000 m route.'),true);});
+test('does not label genuinely different values or equality statements as inconsistent',()=>{assert.equal(inconsistentEqualComparison('The 5 m resolution is finer than the 20 m terrain model.'),false);assert.equal(inconsistentEqualComparison('Both datasets have 5 m resolution.'),false);});

@@ -7,8 +7,19 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
-    "types": ["node"],
+    "types": [
+      "node",
+      "@cloudflare/workers-types"
+    ],
     "noEmit": false
   },
-  "include": ["tests/core.test.ts", "lib/science/*.ts"]
+  "include": [
+    "tests/core.test.ts",
+    "lib/science/*.ts",
+    "tests/relevance.test.ts",
+    "tests/companion.test.ts",
+    "lib/companion/*.ts",
+    "lib/auth/crypto.ts",
+    "tests/claim-checks.test.ts"
+  ]
 }

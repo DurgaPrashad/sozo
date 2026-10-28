@@ -4,7 +4,7 @@ import type { ConnectorBinding } from "../lib/connector-contract.mjs";
 import { runWithExecutionContext } from '../lib/execution-context';
 
 const worker = {
-  fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>) {
+  async fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>) {
     let binding = ctx.props?.CONNECTORS;
     // Local preview emulates the same request-scoped capability. This branch and
     // the auxiliary service binding are absent from production builds.
@@ -24,7 +24,13 @@ const worker = {
         },
       };
     }
-    return runWithExecutionContext(ctx, () => runWithConnectorBinding(binding, () => handler.fetch(request, env, ctx)));
+    const response = await runWithExecutionContext(ctx, () => runWithConnectorBinding(binding, () => handler.fetch(request, env, ctx)));
+    if (/^\/(embed|models|audio|fonts)\//.test(new URL(request.url).pathname)) {
+      const headers = new Headers(response.headers);
+      headers.set("Access-Control-Allow-Origin", "*");
+      return new Response(response.body, { status: response.status, headers });
+    }
+    return response;
   },
 };
 

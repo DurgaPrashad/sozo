@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Plus, Minus, RotateCcw, Pause, Play, Move } from "lucide-react";
+import { RotateCcw, Pause, Play, Move } from "lucide-react";
 import type { PlanetaryBody } from "../lib/planetary/manifest";
 export default function PlanetScene({
   body = "mars",
@@ -15,7 +15,6 @@ export default function PlanetScene({
 }) {
   const host = useRef<HTMLDivElement>(null);
   const state = useRef<{
-    zoom: (factor: number) => void;
     reset: () => void;
     rotate: (n: number) => void;
   } | null>(null);
@@ -55,11 +54,15 @@ export default function PlanetScene({
         const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
         camera.position.set(0, 0, duo ? 9.5 : 7);
         const controls = new OrbitControls(camera, renderer.domElement);
+        renderer.domElement.style.touchAction = "pan-y";
         controls.enablePan = false;
-        controls.enableZoom = interactive;
+        controls.enableZoom = false;
+        controls.minPolarAngle = Math.PI / 2;
+        controls.maxPolarAngle = Math.PI / 2;
+        controls.touches.TWO = null;
         controls.enabled = interactive;
-        controls.minDistance = 4;
-        controls.maxDistance = 10;
+        controls.minDistance = camera.position.length();
+        controls.maxDistance = camera.position.length();
         controls.enableDamping = true;
         scene.add(new THREE.AmbientLight(0x9da9c2, 0.55));
         const sun = new THREE.DirectionalLight(0xfff0db, 4);
@@ -167,10 +170,6 @@ export default function PlanetScene({
         };
         frame = requestAnimationFrame(animate);
         state.current = {
-          zoom: (factor) => {
-            camera.position.multiplyScalar(factor);
-            camera.position.clampLength(4, 10);
-          },
           reset: () => {
             controls.reset();
             camera.position.set(0, 0, duo ? 9.5 : 7);
@@ -226,7 +225,7 @@ export default function PlanetScene({
         tabIndex={interactive ? 0 : undefined}
         aria-label={
           interactive
-            ? `Interactive ${body} globe. Use arrow keys to rotate, plus and minus buttons to zoom.`
+            ? `Interactive ${body} globe. Drag left or right, or use left and right arrow keys. Vertical rotation and zoom are locked.`
             : undefined
         }
         onKeyDown={(e) => {
@@ -240,17 +239,8 @@ export default function PlanetScene({
         <div className="globe-controls">
           <span>
             <Move size={13} />
-            Drag to orbit
+            Drag left or right
           </span>
-          <button aria-label="Zoom in" onClick={() => state.current?.zoom(0.9)}>
-            <Plus size={16} />
-          </button>
-          <button
-            aria-label="Zoom out"
-            onClick={() => state.current?.zoom(1.1)}
-          >
-            <Minus size={16} />
-          </button>
           <button
             aria-label="Reset globe view"
             onClick={() => state.current?.reset()}

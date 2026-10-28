@@ -3,10 +3,7 @@ import { useState } from "react";
 import {
   ArrowUpRight,
   ArrowRight,
-  Menu,
-  X,
   ArrowDown,
-  Orbit,
   Route,
   Database,
   Sparkles,
@@ -17,6 +14,8 @@ import {
 } from "lucide-react";
 import PlanetScene from "./planet-scene";
 import MissionFilm from "./mission-film";
+import RobotCompanion from "./robot-companion";
+import ScientificArticles from "./scientific-articles";
 import {
   planetaryMetrics,
   lunarCapabilities,
@@ -45,7 +44,9 @@ export default function SpaceLanding() {
         Skip to content
       </a>
       <header className="premium-nav">
-        <Brand />
+        <a href="/" className="nav-wordmark" aria-label="SOZO home">
+          SOZO
+        </a>
         <nav aria-label="Main navigation" className={menu ? "open" : ""}>
           <a
             href={lunar.url}
@@ -54,7 +55,6 @@ export default function SpaceLanding() {
             aria-label="MOMAR Moon planner"
           >
             The Moon
-            <ArrowUpRight size={12} />
           </a>
           <a
             href={mars.url}
@@ -63,11 +63,11 @@ export default function SpaceLanding() {
             aria-label="MOMAR Mars planner"
           >
             Mars
-            <ArrowUpRight size={12} />
           </a>
           <a href="#intelligence" onClick={() => setMenu(false)}>
             SOZO agent
           </a>
+          <a href="#articles" onClick={() => setMenu(false)}>Articles</a>
           <a href="#evidence" onClick={() => setMenu(false)}>
             The evidence
           </a>
@@ -76,9 +76,8 @@ export default function SpaceLanding() {
           <a className="premium-signin" href="/login">
             Sign in
           </a>
-          <a href="/dashboard" className="premium-button light">
+          <a href="/dashboard" className="nav-workspace-link">
             Open SOZO
-            <ArrowUpRight size={16} />
           </a>
           <button
             className="premium-menu"
@@ -86,12 +85,47 @@ export default function SpaceLanding() {
             aria-expanded={menu}
             onClick={() => setMenu((value) => !value)}
           >
-            {menu ? <X size={22} /> : <Menu size={22} />}
+            {menu ? "Close" : "Menu"}
           </button>
         </div>
       </header>
       <main>
         <MissionFilm />
+        <section className="companion-section premium-section" id="companion">
+          <div className="companion-copy">
+            <span className="premium-eyebrow">SOZO / THE COMPANION</span>
+            <h2>
+              Curiosity,
+              <br />
+              <span>in good company.</span>
+            </h2>
+            <p>
+              A familiar face for the next frontier. Keep the human, the
+              question, and the evidence connected.
+            </p>
+            <div className="companion-palette">
+              <span>
+                <i className="silver" />
+                Silver
+              </span>
+              <span>
+                <i className="graphite" />
+                Graphite
+              </span>
+              <span>
+                <i className="signal" />
+                Signal green
+              </span>
+            </div>
+            <a href="/dashboard?view=companion" className="premium-text-link">
+              Talk with SOZO
+              <ArrowRight size={17} />
+            </a>
+            <span className="companion-concept">3D COMPANION · SARVAM VOICE</span>
+          </div>
+          <RobotCompanion />
+        </section>
+        <section id="articles"><ScientificArticles compact /></section>
         <section className="frontier-intro premium-section" id="frontiers">
           <div className="frontier-intro-copy">
             <span className="premium-eyebrow">
@@ -331,10 +365,11 @@ export default function SpaceLanding() {
               </a>
             </div>
             <div className="agent-development">
-              <span className="premium-status planned">IN DEVELOPMENT</span>
+              <span className="premium-status planned">CONNECTED SCIENCE · ROUTING ADAPTER PLANNED</span>
               <p>
-                Model-powered synthesis and direct MOMAR route tools. SOZO does
-                not yet compute a terrain route or control mission hardware.
+                Sarvam research and voice are available in your workspace. Direct
+                MOMAR route computation needs its backend API; SOZO does not
+                control mission hardware.
               </p>
             </div>
           </div>

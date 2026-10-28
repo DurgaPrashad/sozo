@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./space.css";
 import "./premium.css";
+import "./companion.css";
 
 export const metadata: Metadata = {
   title: "SOZO — Intelligence for life beyond Earth.",
@@ -20,6 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head><link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous"/></head>
       <body className="antialiased">{children}</body>
     </html>
   );

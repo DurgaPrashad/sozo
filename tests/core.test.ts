@@ -284,6 +284,7 @@ test("Crossref preserves provenance and distinguishes preprints", async () => {
             DOI: "10.1/mars",
             author: [{ given: "A", family: "Scientist" }],
             type: "posted-content",
+            subtype: "preprint",
             published: { "date-parts": [[2024]] },
             abstract: "<p>Observed evidence.</p>",
           },

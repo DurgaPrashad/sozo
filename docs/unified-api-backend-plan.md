@@ -19,13 +19,13 @@ The goal of helping astronauts explore, build, and work is a product direction. 
 | --------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | Identity              | Server-side workspace login, eight-hour opaque sessions, optional Sites identity | Browser sessions are HttpOnly; credentials remain server-side                |
 | External API access   | Hashed, revocable `sozo_` bearer keys                                            | Current keys inherit the owner's access; granular scopes are not implemented |
-| Scientific discovery  | Crossref and Europe PMC retrieval, saved runs and source exports                 | Publication metadata and supplied abstracts; no model synthesis              |
+| Scientific discovery  | Crossref and Europe PMC retrieval, saved runs and source exports                 | Publication metadata and supplied abstracts, with optional cited Sarvam synthesis              |
 | Space records         | Authenticated NASA Image and Video Library search                                | Original historical archive media and captions; not live telemetry           |
 | Research organization | Projects, notes, sources, descriptive statistics, audit events                   | Owner-filtered D1 records                                                    |
 | Tools                 | Versioned API, OpenAPI specification, CLI, bounded public-GET connector registry | Arbitrary private services and arbitrary code execution are not supported    |
 | Planetary context     | Moon/Mars image globes and project-reported MOMAR inventory                      | Visualization and catalog; native terrain grids are not ingested into SOZO   |
 | MOMAR planning        | Links to the external Moon and Mars prototypes                                   | No supplied routing API or accessible backend repository                     |
-| Mission agent         | Product direction and source-discovery workflow                                  | A model provider and MOMAR tool integration remain to be added               |
+| Mission agent         | Grounded Sarvam companion and source-discovery workflow                                  | Sarvam conversation, voice and explicit screenshot vision are configured; the MOMAR routing adapter still needs its API               |
 
 Keep existing working endpoints compatible during the rebuild. Preserve each owner's current research and credentials; do not replace D1 or reset records just to change the UI or introduce a gateway.
 

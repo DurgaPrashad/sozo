@@ -11,6 +11,9 @@ import {
 } from "../db/schema";
 import { getIdentity } from "./auth/identity";
 import { z } from "zod";
+import { env } from "cloudflare:workers";
+import { D1CompanionStore } from "./companion/security";
+import { generateReply } from "./companion/provider";
 import { retrieveEvidence } from "./science/retrieval";
 import {
   allowedURL,
@@ -116,6 +119,21 @@ async function executeRun(
       })
       .where(condition);
     const result = await retrieveEvidence(question, sources, mode);
+    if (process.env.SARVAM_API_KEY && result.citations.length && env.DB && await new D1CompanionStore(env.DB).rateLimit(ownerId, "hour", 240, 3600000)) {
+      const synthesisStart = Date.now();
+      await db.update(runs).set({progress:[{label:"Source discovery finished",at:now()},{label:"Synthesizing retrieved evidence with Sarvam",at:now()}]}).where(condition);
+      try {
+        const generated = await generateReply(process.env.SARVAM_API_KEY, {
+          message: `Answer this research question from the supplied publication records: ${question}\nUse short sections only where useful: Research summary, Key evidence, Interpretation, Limits, Implications for exploration. Cite numbered records. Do not imply abstract metadata is full-text validation.`, history: []
+        }, result.citations);
+        const invalid = [...generated.reply.matchAll(/\[(\d+)\]/g)].some(match => Number(match[1]) < 1 || Number(match[1]) > result.citations.length);
+        if (invalid) throw new Error("Unsupported citation marker");
+        result.answer = generated.reply;
+        result.usage.model = generated.model;
+        result.limitations.push("AI synthesis uses the retrieved metadata and available abstract excerpts. Verify every scientific claim against the original publication; citation markers are range-checked, not proof of claim support.");
+      } catch { result.limitations.push("Model synthesis was unavailable or failed citation checks. The publication discovery record is retained."); }
+      result.usage.durationMs += Date.now() - synthesisStart;
+    }
     const status = result.providerStatus.every((p) => !p.ok)
       ? "failed"
       : result.providerStatus.some((p) => !p.ok)
@@ -135,7 +153,7 @@ async function executeRun(
           { label: "Research question saved", at: now() },
           { label: "Source discovery finished", at: now() },
           {
-            label: `${result.citations.length} unique publications indexed`,
+            label: `${result.citations.length} unique publication records retrieved`,
             at: now(),
           },
           { label: "Research record saved", at: now() },
@@ -176,8 +194,8 @@ export async function handleAPI(request: Request) {
     if (method === "GET" && resource === "health")
       return json({
         status: "ok",
-        version: "0.3.0",
-        mode: "literature-discovery",
+        version: "0.4.0",
+        mode: process.env.SARVAM_API_KEY ? "grounded-research-and-voice" : "literature-discovery",
       });
     const identity = await user(request);
     const ownerId = identity.id;

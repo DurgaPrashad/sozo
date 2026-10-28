@@ -279,9 +279,9 @@ const spec = {
   openapi: "3.0.3",
   info: {
     title: "SOZO Research API",
-    version: "0.3.0",
+    version: "0.4.0",
     description:
-      "Scientific literature discovery and live NASA archive search with source provenance. No LLM synthesis, live MOMAR, MCP, OAuth, or arbitrary code execution is configured. Browser identity uses an HttpOnly SOZO session or optional Sites sign-in. API clients use a SOZO bearer key; the current landing page is public.",
+      "Scientific literature discovery and live NASA archive search with source provenance. Sarvam supports grounded conversation, speech and explicitly shared screenshots. Live MOMAR route computation, MCP, OAuth, and arbitrary code execution are not configured. Browser identity uses an HttpOnly SOZO session or optional Sites sign-in. API clients use a SOZO bearer key; the current landing page is public.",
   },
   servers: [{ url: "/" }],
   security: [{ SozoKey: [] }, { SozoSession: [] }],
@@ -320,5 +320,16 @@ const spec = {
     },
   },
 };
+for (const [path,method,summary] of [
+ ["/api/companion/status","get","Companion configuration, without credentials"],
+ ["/api/companion/sessions","post","Issue a 10-minute origin-bound companion session"],
+ ["/api/companion/sessions","delete","Revoke an owned companion session"],
+ ["/api/companion/chat","post","Grounded conversation with optional explicit screen snapshot"],
+ ["/api/companion/text-to-speech","post","Sarvam spoken audio"],
+ ["/api/companion/speech-to-text","post","Transcribe an explicit microphone recording"],
+ ["/api/articles","get","Relevant Moon and Mars publication metadata"]
+]) {
+ (paths[path]??={})[method]={summary,operationId:method+path.replace(/[^a-zA-Z0-9]/g,"_"),security:path.endsWith("status")||path==="/api/articles"?[]:[{SozoKey:[]}],responses:{200:{description:"Success; see companion integration guide for exact payloads"},400:{$ref:"#/components/responses/Error"},401:{$ref:"#/components/responses/Error"}},externalDocs:{url:"/docs/companion-integration.md"}};
+}
 writeFileSync("public/openapi.json", JSON.stringify(spec, null, 2) + "\n");
 copyFileSync("cli/sozo.mjs", "public/cli/sozo.mjs");

@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SOZO Research API",
-    "version": "0.3.0",
-    "description": "Scientific literature discovery and live NASA archive search with source provenance. No LLM synthesis, live MOMAR, MCP, OAuth, or arbitrary code execution is configured. Browser identity uses an HttpOnly SOZO session or optional Sites sign-in. API clients use a SOZO bearer key; the current landing page is public."
+    "version": "0.4.0",
+    "description": "Scientific literature discovery and live NASA archive search with source provenance. Sarvam supports grounded conversation, speech and explicitly shared screenshots. Live MOMAR route computation, MCP, OAuth, and arbitrary code execution are not configured. Browser identity uses an HttpOnly SOZO session or optional Sites sign-in. API clients use a SOZO bearer key; the current landing page is public."
   },
   "servers": [
     {
@@ -1377,6 +1377,171 @@
           "200": {
             "description": "Reported metrics and source catalog, without user data"
           }
+        }
+      }
+    },
+    "/api/companion/status": {
+      "get": {
+        "summary": "Companion configuration, without credentials",
+        "operationId": "get_api_companion_status",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      }
+    },
+    "/api/companion/sessions": {
+      "post": {
+        "summary": "Issue a 10-minute origin-bound companion session",
+        "operationId": "post_api_companion_sessions",
+        "security": [
+          {
+            "SozoKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      },
+      "delete": {
+        "summary": "Revoke an owned companion session",
+        "operationId": "delete_api_companion_sessions",
+        "security": [
+          {
+            "SozoKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      }
+    },
+    "/api/companion/chat": {
+      "post": {
+        "summary": "Grounded conversation with optional explicit screen snapshot",
+        "operationId": "post_api_companion_chat",
+        "security": [
+          {
+            "SozoKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      }
+    },
+    "/api/companion/text-to-speech": {
+      "post": {
+        "summary": "Sarvam spoken audio",
+        "operationId": "post_api_companion_text_to_speech",
+        "security": [
+          {
+            "SozoKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      }
+    },
+    "/api/companion/speech-to-text": {
+      "post": {
+        "summary": "Transcribe an explicit microphone recording",
+        "operationId": "post_api_companion_speech_to_text",
+        "security": [
+          {
+            "SozoKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      }
+    },
+    "/api/articles": {
+      "get": {
+        "summary": "Relevant Moon and Mars publication metadata",
+        "operationId": "get_api_articles",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
         }
       }
     }

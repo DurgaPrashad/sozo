@@ -19,7 +19,7 @@ export type ResearchResult = {
     durationMs: number;
     sourcesRetrieved: number;
     requests: number;
-    model: null;
+    model: string | null;
   };
   findings: { text: string; sourceId: string }[];
   providerStatus: {
