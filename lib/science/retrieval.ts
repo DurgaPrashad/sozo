@@ -67,12 +67,14 @@ export async function getJSON(url: string) {
     redirect: "manual",
     signal: AbortSignal.timeout(12000),
   });
-  if (!response.ok)
+  if (!response.ok) {
+    await response.body?.cancel();
     throw new Error(
       response.status === 429
         ? "Source rate limit reached. Try again shortly."
         : `Source returned HTTP ${response.status}.`,
     );
+  }
   const reader = response.body?.getReader();
   if (!reader) throw new Error("Source returned an empty response.");
   let size = 0;

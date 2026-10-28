@@ -90,9 +90,9 @@ Literature retrieval uses Crossref and Europe PMC through the same relevance pip
 Load the classic-script bundle, then add the component. Use your exact live origin (or `http://localhost:5173` locally):
 
 ```html
-<script src="https://sozo-research-lab.sharpscarf8.chatgpt.site/embed/sozo-widget.js"></script>
+<script src="https://sozo-research-lab.durgaprashadreddy996.chatgpt.site/embed/sozo-widget.js"></script>
 <sozo-companion
-  api-base="https://sozo-research-lab.sharpscarf8.chatgpt.site"
+  api-base="https://sozo-research-lab.durgaprashadreddy996.chatgpt.site"
   session-endpoint="/api/sozo/session">
 </sozo-companion>
 ```
