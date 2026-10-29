@@ -114,7 +114,9 @@ async function main() {
   const optional = process.argv.includes("--if-configured");
   // Template values such as libsql://<database>-<org>.turso.io count as unset.
   const configured = (value) => (value?.trim() && !/[<>]/.test(value) ? value.trim() : undefined);
-  const postgresUrl = configured(process.env.DATABASE_URL) || configured(process.env.POSTGRES_URL);
+  const postgresUrl = ["DATABASE_URL", "POSTGRES_URL", "POSTGRES_PRISMA_URL", "SUPABASE_DB_URL", "SUPABASE_DATABASE_URL", "POSTGRES_URL_NON_POOLING"]
+    .map((name) => configured(process.env[name]))
+    .find(Boolean);
   const tursoUrl = configured(process.env.TURSO_DATABASE_URL);
   if (!postgresUrl && !tursoUrl) {
     if (optional) {

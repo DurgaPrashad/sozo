@@ -57,6 +57,24 @@ export function configuredValue(value: string | undefined) {
   return trimmed && !/[<>]/.test(trimmed) ? trimmed : undefined;
 }
 
+// DATABASE_URL first; then names Supabase's and Vercel's integrations use.
+// POSTGRES_URL_NON_POOLING is the direct host, so it comes last.
+const POSTGRES_SETTINGS = [
+  "DATABASE_URL",
+  "POSTGRES_URL",
+  "POSTGRES_PRISMA_URL",
+  "SUPABASE_DB_URL",
+  "SUPABASE_DATABASE_URL",
+  "POSTGRES_URL_NON_POOLING",
+] as const;
+const postgresSetting = () => {
+  for (const name of POSTGRES_SETTINGS) {
+    const value = configuredValue(process.env[name]);
+    if (value) return { name, value };
+  }
+  return null;
+};
+
 let database: D1Database | undefined;
 let databaseError = false;
 
@@ -66,9 +84,8 @@ export const env: { readonly DB?: D1Database } = {
   get DB() {
     if (database || databaseError) return database;
     try {
-      const postgresUrl =
-        configuredValue(process.env.DATABASE_URL) || configuredValue(process.env.POSTGRES_URL);
-      if (postgresUrl) return (database = postgresD1(postgresRunner(postgresUrl)));
+      const postgres = postgresSetting();
+      if (postgres) return (database = postgresD1(postgresRunner(postgres.value)));
       const url = configuredValue(process.env.TURSO_DATABASE_URL);
       if (url)
         return (database = libsqlD1(
@@ -94,20 +111,19 @@ const describeSetting = (value: string | undefined) =>
 // Public health detail: which settings exist (never their values), how the
 // Postgres URL is shaped, and whether a trivial query succeeds.
 export async function databaseDiagnostics() {
-  const settings = {
-    DATABASE_URL: describeSetting(process.env.DATABASE_URL),
-    POSTGRES_URL: describeSetting(process.env.POSTGRES_URL),
-    TURSO_DATABASE_URL: describeSetting(process.env.TURSO_DATABASE_URL),
-  };
-  const postgresUrl =
-    configuredValue(process.env.DATABASE_URL) || configuredValue(process.env.POSTGRES_URL);
-  let target: { driver: string; host?: string; port?: string } = { driver: "none" };
+  const settings = Object.fromEntries(
+    [...POSTGRES_SETTINGS, "TURSO_DATABASE_URL"].map((name) => [name, describeSetting(process.env[name])]),
+  );
+  const postgres = postgresSetting();
+  const postgresUrl = postgres?.value;
+  let target: { driver: string; using?: string; host?: string; port?: string } = { driver: "none" };
   let check: DatabaseCheck;
   if (postgresUrl) {
     try {
       const url = new URL(postgresUrl);
       target = {
         driver: "postgres",
+        using: postgres!.name,
         host: /\.pooler\.supabase\.com$/.test(url.hostname)
           ? "supabase_pooler"
           : /^db\.[a-z0-9]+\.supabase\.co$/.test(url.hostname)
