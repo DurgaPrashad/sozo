@@ -28,6 +28,8 @@
     "db/schema.ts",
     "lib/auth/social.ts",
     "lib/auth/supabase.ts",
-    "tests/supabase.test.ts"
+    "tests/supabase.test.ts",
+    "lib/platform/diagnostics.ts",
+    "tests/diagnostics.test.ts"
   ]
 }

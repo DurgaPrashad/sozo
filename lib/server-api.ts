@@ -11,7 +11,7 @@ import {
 } from "../db/schema";
 import { getIdentity } from "./auth/identity";
 import { z } from "zod";
-import { env } from "@/lib/platform";
+import { databaseDiagnostics, env } from "@/lib/platform";
 import { D1CompanionStore } from "./companion/security";
 import { generateReply } from "./companion/provider";
 import { retrieveEvidence } from "./science/retrieval";
@@ -196,6 +196,7 @@ export async function handleAPI(request: Request) {
         status: "ok",
         version: "0.4.0",
         mode: process.env.SARVAM_API_KEY ? "grounded-research-and-voice" : "literature-discovery",
+        database: await databaseDiagnostics(),
       });
     const identity = await user(request);
     const ownerId = identity.id;

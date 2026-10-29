@@ -2,6 +2,7 @@ import { createClient } from "@libsql/client/web";
 import postgres from "postgres";
 import { libsqlD1 } from "./libsql-d1";
 import { postgresD1, type PostgresRunner } from "./postgres-d1";
+import { checkDatabase, type DatabaseCheck } from "./diagnostics";
 
 // Node.js hosts (Vercel, `next build`/`next start`). The Cloudflare/Sites
 // build aliases this module to ./cloudflare.ts in vite.config.ts.
@@ -86,3 +87,49 @@ export const env: { readonly DB?: D1Database } = {
     return undefined;
   },
 };
+
+const describeSetting = (value: string | undefined) =>
+  !value?.trim() ? "missing" : configuredValue(value) ? "set" : "placeholder";
+
+// Public health detail: which settings exist (never their values), how the
+// Postgres URL is shaped, and whether a trivial query succeeds.
+export async function databaseDiagnostics() {
+  const settings = {
+    DATABASE_URL: describeSetting(process.env.DATABASE_URL),
+    POSTGRES_URL: describeSetting(process.env.POSTGRES_URL),
+    TURSO_DATABASE_URL: describeSetting(process.env.TURSO_DATABASE_URL),
+  };
+  const postgresUrl =
+    configuredValue(process.env.DATABASE_URL) || configuredValue(process.env.POSTGRES_URL);
+  let target: { driver: string; host?: string; port?: string } = { driver: "none" };
+  let check: DatabaseCheck;
+  if (postgresUrl) {
+    try {
+      const url = new URL(postgresUrl);
+      target = {
+        driver: "postgres",
+        host: /\.pooler\.supabase\.com$/.test(url.hostname)
+          ? "supabase_pooler"
+          : /^db\.[a-z0-9]+\.supabase\.co$/.test(url.hostname)
+            ? "supabase_direct (IPv6-only; unreachable from Vercel)"
+            : "other",
+        port: url.port || "5432",
+      };
+      check = await checkDatabase(env.DB);
+    } catch {
+      check = {
+        state: "invalid_url",
+        hint: "DATABASE_URL is not a valid URL. URL-encode special characters in the password (@ → %40, # → %23, / → %2F).",
+      };
+    }
+  } else if (configuredValue(process.env.TURSO_DATABASE_URL)) {
+    target = { driver: "libsql" };
+    check = await checkDatabase(env.DB);
+  } else {
+    check = {
+      state: "not_configured",
+      hint: "Set DATABASE_URL in Vercel (Production) to Supabase's Transaction pooler URI, then redeploy.",
+    };
+  }
+  return { ...check, ...target, settings };
+}

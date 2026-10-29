@@ -1,6 +1,6 @@
 import { eq, lt, sql } from "drizzle-orm";
 import { z } from "zod";
-import { getDb } from "../../db";
+import { getDb, isStorageError } from "../../db";
 import {
   sessions,
   loginLimits,
@@ -46,6 +46,9 @@ const credentials = z.object({
   password: z.string().min(1).max(256),
   returnTo: z.string().max(500).optional(),
 });
+const STORAGE_MESSAGE =
+  "Sign-in reached SOZO, but its database is unavailable, so the session could not be saved. The workspace owner can see the cause at /api/v1/health.";
+
 const workspaceOwnerId = async (email: string) =>
   "workspace_" + (await hashSecret(email.trim().toLowerCase())).slice(0, 24);
 
@@ -145,7 +148,8 @@ async function handleFacebook(
     flowCookie(FACEBOOK_STATE_COOKIE, "/api/auth/facebook", value, secure, maxAge);
   const redirect = (location: string, cookies: string[] = []) =>
     redirectResponse(url.origin, location, requestId, cookies);
-  const fail = (code: string) => redirect(`/login?error=${code}`, [stateCookie("", 0)]);
+  const fail = (code: string, reason?: string) =>
+    redirect(`/login?error=${code}${reason ? `&reason=${encodeURIComponent(reason)}` : ""}`, [stateCookie("", 0)]);
 
   if (step === "data-deletion") {
     if (request.method !== "POST")
@@ -209,7 +213,8 @@ async function handleFacebook(
         code: error instanceof FacebookError ? `FACEBOOK_${error.code}` : "FACEBOOK_ERROR",
       }),
     );
-    return fail("facebook_failed");
+    if (error instanceof FacebookError) return fail("facebook_failed", error.code);
+    return fail(isStorageError(error) ? "storage_unavailable" : "facebook_failed");
   }
 }
 
@@ -229,7 +234,8 @@ async function handleSupabase(
     flowCookie(SUPABASE_PKCE_COOKIE, "/api/auth/supabase", value, secure, maxAge);
   const redirect = (location: string, cookies: string[] = []) =>
     redirectResponse(url.origin, location, requestId, cookies);
-  const fail = (code: string) => redirect(`/login?error=${code}`, [pkceCookie("", 0)]);
+  const fail = (code: string, reason?: string) =>
+    redirect(`/login?error=${code}${reason ? `&reason=${encodeURIComponent(reason)}` : ""}`, [pkceCookie("", 0)]);
 
   if (request.method !== "GET")
     return Response.json({ error: { message: "Method not allowed." } }, { status: 405 });
@@ -247,7 +253,10 @@ async function handleSupabase(
 
   const [verifier, returnTo] = readCookie(request, SUPABASE_PKCE_COOKIE)?.split(".") ?? [];
   const error = url.searchParams.get("error");
-  if (error) return fail(error === "access_denied" ? "google_cancelled" : "google_failed");
+  if (error)
+    return error === "access_denied"
+      ? fail("google_cancelled")
+      : fail("google_failed", url.searchParams.get("error_code") || error);
   if (!verifier || !/^[a-f0-9]{64}$/.test(verifier)) return fail("google_expired");
   const code = url.searchParams.get("code");
   if (!code || code.length > 2048) return fail("google_failed");
@@ -266,7 +275,8 @@ async function handleSupabase(
         code: error instanceof SupabaseAuthError ? `SUPABASE_${error.code}` : "SUPABASE_ERROR",
       }),
     );
-    return fail("google_failed");
+    if (error instanceof SupabaseAuthError) return fail("google_failed", error.code);
+    return fail(isStorageError(error) ? "storage_unavailable" : "google_failed");
   }
 }
 
@@ -324,7 +334,12 @@ async function handleGoogle(request: Request, secure: boolean, requestId: string
         code: error instanceof SupabaseAuthError ? `SUPABASE_${error.code}` : "SUPABASE_ERROR",
       }),
     );
-    return reply({ error: { message: "Google sign-in could not complete. Please try again." } }, 502);
+    if (!(error instanceof SupabaseAuthError) && isStorageError(error))
+      return reply({ error: { message: STORAGE_MESSAGE } }, 503);
+    return reply(
+      { error: { message: `Google sign-in could not complete${error instanceof SupabaseAuthError ? ` (${error.code})` : ""}. Please try again.` } },
+      502,
+    );
   }
 }
 
@@ -509,7 +524,8 @@ export async function handleAuth(request: Request) {
         { error: { message: "Enter a valid email address and password." } },
         400,
       );
-    console.error(JSON.stringify({ requestId, code: "AUTH_ERROR" }));
+    console.error(JSON.stringify({ requestId, code: isStorageError(error) ? "AUTH_STORAGE_ERROR" : "AUTH_ERROR" }));
+    if (isStorageError(error)) return response({ error: { message: STORAGE_MESSAGE } }, 503);
     return response(
       { error: { message: "Sign-in could not complete. Please try again." } },
       500,
