@@ -67,12 +67,18 @@ const POSTGRES_SETTINGS = [
   "SUPABASE_DATABASE_URL",
   "POSTGRES_URL_NON_POOLING",
 ] as const;
+const isPostgresUrl = (value: string) => /^postgres(ql)?:\/\//i.test(value);
+// A PostgreSQL URL pasted into TURSO_DATABASE_URL is still a PostgreSQL URL.
 const postgresSetting = () => {
-  for (const name of POSTGRES_SETTINGS) {
+  for (const name of [...POSTGRES_SETTINGS, "TURSO_DATABASE_URL"]) {
     const value = configuredValue(process.env[name]);
-    if (value) return { name, value };
+    if (value && (name !== "TURSO_DATABASE_URL" || isPostgresUrl(value))) return { name, value };
   }
   return null;
+};
+const libsqlSetting = () => {
+  const value = configuredValue(process.env.TURSO_DATABASE_URL);
+  return value && !isPostgresUrl(value) ? value : undefined;
 };
 
 let database: D1Database | undefined;
@@ -86,7 +92,7 @@ export const env: { readonly DB?: D1Database } = {
     try {
       const postgres = postgresSetting();
       if (postgres) return (database = postgresD1(postgresRunner(postgres.value)));
-      const url = configuredValue(process.env.TURSO_DATABASE_URL);
+      const url = libsqlSetting();
       if (url)
         return (database = libsqlD1(
           createClient({ url, authToken: configuredValue(process.env.TURSO_AUTH_TOKEN) }),
@@ -105,8 +111,15 @@ export const env: { readonly DB?: D1Database } = {
   },
 };
 
-const describeSetting = (value: string | undefined) =>
-  !value?.trim() ? "missing" : configuredValue(value) ? "set" : "placeholder";
+// Reports only the kind of value, never the value itself.
+const describeSetting = (value: string | undefined) => {
+  const configured = configuredValue(value);
+  if (!value?.trim()) return "missing";
+  if (!configured) return "placeholder";
+  if (isPostgresUrl(configured)) return "set (postgres URL)";
+  if (/^(libsql|https?|wss?):\/\//i.test(configured)) return "set (libsql URL)";
+  return "set (unrecognised value)";
+};
 
 // Public health detail: which settings exist (never their values), how the
 // Postgres URL is shaped, and whether a trivial query succeeds.
@@ -138,9 +151,14 @@ export async function databaseDiagnostics() {
         hint: "DATABASE_URL is not a valid URL. URL-encode special characters in the password (@ → %40, # → %23, / → %2F).",
       };
     }
-  } else if (configuredValue(process.env.TURSO_DATABASE_URL)) {
-    target = { driver: "libsql" };
-    check = await checkDatabase(env.DB);
+  } else if (libsqlSetting()) {
+    target = { driver: "libsql", using: "TURSO_DATABASE_URL" };
+    check = env.DB
+      ? await checkDatabase(env.DB)
+      : {
+          state: "invalid_url",
+          hint: "TURSO_DATABASE_URL is not a usable libSQL URL. For Supabase, delete it and set DATABASE_URL to the Transaction pooler URI.",
+        };
   } else {
     check = {
       state: "not_configured",

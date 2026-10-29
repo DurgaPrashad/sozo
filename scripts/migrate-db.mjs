@@ -114,10 +114,14 @@ async function main() {
   const optional = process.argv.includes("--if-configured");
   // Template values such as libsql://<database>-<org>.turso.io count as unset.
   const configured = (value) => (value?.trim() && !/[<>]/.test(value) ? value.trim() : undefined);
-  const postgresUrl = ["DATABASE_URL", "POSTGRES_URL", "POSTGRES_PRISMA_URL", "SUPABASE_DB_URL", "SUPABASE_DATABASE_URL", "POSTGRES_URL_NON_POOLING"]
-    .map((name) => configured(process.env[name]))
-    .find(Boolean);
-  const tursoUrl = configured(process.env.TURSO_DATABASE_URL);
+  const isPostgres = (value) => /^postgres(ql)?:\/\//i.test(value ?? "");
+  const turso = configured(process.env.TURSO_DATABASE_URL);
+  // A PostgreSQL URL pasted into TURSO_DATABASE_URL is still a PostgreSQL URL.
+  const postgresUrl =
+    ["DATABASE_URL", "POSTGRES_URL", "POSTGRES_PRISMA_URL", "SUPABASE_DB_URL", "SUPABASE_DATABASE_URL", "POSTGRES_URL_NON_POOLING"]
+      .map((name) => configured(process.env[name]))
+      .find(Boolean) || (isPostgres(turso) ? turso : undefined);
+  const tursoUrl = isPostgres(turso) ? undefined : turso;
   if (!postgresUrl && !tursoUrl) {
     if (optional) {
       console.log("No database is configured; skipping database migrations.");
