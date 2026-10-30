@@ -169,6 +169,60 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         const columns = 40, rows = 20;
         // Each column's falling stream has its own speed and phase.
         const streams = Array.from({ length: columns }, (_, i) => ({ speed: 0.6 + ((i * 37) % 11) / 9, phase: (i * 53) % rows }));
+        // Research lines shown while SOZO is thinking, generated from a seed so
+        // each line stays the same while it types out.
+        const topics = ["lunar south pole ice", "Jezero delta", "LOLA slope 5 m", "PSR illumination", "Gale crater", "regolith thermal", "Shackleton rim", "Mars subsurface ice"];
+        const datasets = ["LOLA", "LROC NAC", "Diviner", "HiRISE", "CTX", "MOLA", "ShadowCam"];
+        const researchLine = (index: number) => {
+          // 32-bit integer maths; plain multiplication loses the low bits.
+          let seed = Math.imul(index + 1, 2654435761) >>> 0;
+          const pick = (range: number) => {
+            seed = (Math.imul(seed ^ (seed >>> 15), 2246822519) + 0x9e3779b9) >>> 0;
+            return (seed >>> 8) % range;
+          };
+          const hex = () => pick(0xffff).toString(16).toUpperCase().padStart(4, "0");
+          switch (pick(6)) {
+            case 0: return `> QUERY crossref "${topics[pick(topics.length)]}"`;
+            case 1: return `  RANK 0.${10 + pick(89)}  DOI 10.${1000 + pick(8999)}/${hex()}`;
+            case 2: return `> SCAN ${datasets[pick(datasets.length)]} ${[5, 20, 60, 240][pick(4)]} m  ${40 + pick(60)}%`;
+            case 3: return `  PARSE abstract ${1 + pick(8)}/8  OK`;
+            case 4: return `> CROSSCHECK [${1 + pick(4)}] [${5 + pick(4)}]  ${hex()}`;
+            default: return `  ${hex()} ${hex()} ${hex()} ${hex()}`;
+          }
+        };
+        const drawResearch = (time: number) => {
+          ctx.fillStyle = "rgba(1,4,12,0.78)";
+          ctx.fillRect(0, 0, 768, 480);
+          ctx.textAlign = "start";
+          ctx.font = "15px monospace";
+          ctx.fillStyle = "#5ea9e6";
+          ctx.fillText("SOZO · RESEARCHING", 56, 52);
+          ctx.fillStyle = "rgba(94,169,230,0.35)";
+          ctx.fillRect(56, 64, 656, 2);
+          const lineMs = reduced ? 1 : 420;
+          const count = reduced ? 9 : Math.floor(time / lineMs);
+          const typed = reduced ? 1 : (time % lineMs) / lineMs;
+          ctx.font = "bold 21px monospace";
+          for (let row = 0; row < 9; row++) {
+            const index = count - 8 + row;
+            if (index < 0) continue;
+            let text = researchLine(index);
+            const current = row === 8;
+            if (current) text = text.slice(0, Math.max(1, Math.ceil(text.length * Math.min(1, typed * 1.6))));
+            ctx.globalAlpha = current ? 1 : 0.35 + 0.08 * row;
+            ctx.fillStyle = current ? "#cfe8ff" : text.startsWith(">") ? "#6cbcff" : "#3d8ee0";
+            ctx.shadowColor = "#2f8bff";
+            ctx.shadowBlur = current ? 12 : 0;
+            ctx.fillText(text, 56, 104 + row * 36);
+            if (current && Math.floor(time / 300) % 2 === 0) ctx.fillRect(56 + ctx.measureText(text).width + 6, 88 + row * 36, 12, 20);
+          }
+          ctx.globalAlpha = 1;
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = "rgba(94,169,230,0.22)";
+          ctx.fillRect(56, 432, 656, 6);
+          ctx.fillStyle = "#4aa8ff";
+          ctx.fillRect(56, 432, 656 * (reduced ? 0.6 : (time % 2600) / 2600), 6);
+        };
         let faceFrame = -1;
         const drawFace = (time: number) => {
           const tick = reduced ? 0 : Math.floor(time / 70);
@@ -198,6 +252,11 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
           vignette.addColorStop(1, "rgba(1,4,12,0.15)");
           ctx.fillStyle = vignette;
           ctx.fillRect(0, 0, 768, 480);
+          if (state === "thinking") {
+            drawResearch(time);
+            faceTexture.needsUpdate = true;
+            return;
+          }
           const blink = !reduced && (tick % 54 === 0 || tick % 54 === 1);
           const pulse = state === "listening" ? 1 + 0.08 * Math.sin(time / 160) : 1;
           const drift = reduced ? 0 : 5 * Math.sin(time / 1900);
@@ -227,15 +286,6 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
             ctx.beginPath();
             ctx.arc(0, 0, 62 * pulse, 0, Math.PI * 2);
             ctx.stroke();
-            if (state === "thinking") {
-              ctx.shadowBlur = 18;
-              ctx.strokeStyle = "#9fd4ff";
-              ctx.lineWidth = 6;
-              ctx.beginPath();
-              const turn = time / 260;
-              ctx.arc(0, 0, 88, turn, turn + 1.1);
-              ctx.stroke();
-            }
             ctx.restore();
           }
           ctx.shadowBlur = 0;
@@ -255,7 +305,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
           }
           ctx.font = "15px monospace";
           ctx.fillStyle = "#5ea9e6";
-          ctx.fillText(state === "speaking" ? "SOZO · SPEAKING" : state === "thinking" ? "SOZO · ANALYSING" : state === "listening" ? "SOZO · LISTENING" : "SOZO · READY", 384, 436);
+          ctx.fillText(state === "speaking" ? "SOZO · SPEAKING" : state === "listening" ? "SOZO · LISTENING" : "SOZO · READY", 384, 436);
           ctx.textAlign = "start";
           faceTexture.needsUpdate = true;
         };
@@ -293,22 +343,25 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         const glowTexture = new THREE.CanvasTexture(glowCanvas);
         const lensSprite = new THREE.SpriteMaterial({ map: glowTexture, color: 0x6cbcff, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
         const ledMaterial = new THREE.MeshBasicMaterial({ color: 0x4aa8ff, toneMapped: false });
-        // Holographic scan beam: a grid that fans out from the lens, fades with
-        // distance and sweeps a bright band outward.
+        // Holographic scanner: a level grid beam from the lens with a laser
+        // sheet that sweeps from top to bottom. uScan runs 1 (top) to -1.
+        const beamTall = Math.tan(0.2);
         const beamMaterial = new THREE.ShaderMaterial({
-          uniforms: { uTime: { value: 0 }, uIntensity: { value: 1 }, uColor: { value: new THREE.Color(0x3d9bff) } },
-          vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
-          fragmentShader: `uniform float uTime; uniform float uIntensity; uniform vec3 uColor; varying vec2 vUv;
+          uniforms: { uScan: { value: 0 }, uIntensity: { value: 1 }, uColor: { value: new THREE.Color(0x3d9bff) } },
+          vertexShader: "varying vec2 vUv; varying vec3 vLocal; void main(){ vUv = uv; vLocal = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+          fragmentShader: `uniform float uScan; uniform float uIntensity; uniform vec3 uColor; varying vec2 vUv; varying vec3 vLocal;
             void main(){
               float along = vUv.y;
               float across = (vUv.x - 0.5) / max(along, 0.001) + 0.5;
+              float height = vLocal.y / max(vLocal.x * ${beamTall.toFixed(4)}, 0.0001);
               float gridU = 1.0 - smoothstep(0.0, 0.04, abs(fract(across * 8.0 + 0.5) - 0.5));
-              float gridV = 1.0 - smoothstep(0.0, 0.07, abs(fract(along * 11.0 - uTime * 0.35 + 0.5) - 0.5));
+              float gridV = 1.0 - smoothstep(0.0, 0.07, abs(fract(along * 11.0 + 0.5) - 0.5));
               float edge = 1.0 - smoothstep(0.0, 0.035, min(across, 1.0 - across));
-              float scan = exp(-pow((along - fract(uTime * 0.22)) * 9.0, 2.0));
-              float fade = smoothstep(0.0, 0.05, along) * pow(1.0 - along, 1.7);
-              float alpha = (0.08 + 0.3 * max(gridU, gridV) + 0.5 * edge + 0.4 * scan) * fade * uIntensity;
-              gl_FragColor = vec4(uColor * (0.7 + 0.9 * (edge + scan)), alpha);
+              float scan = exp(-pow((height - uScan) * 7.0, 2.0));
+              float swept = smoothstep(uScan - 0.02, uScan + 0.6, height) * 0.35;
+              float fade = smoothstep(0.0, 0.05, along) * pow(1.0 - along, 1.6);
+              float alpha = (0.07 + 0.26 * max(gridU, gridV) + 0.45 * edge + 0.9 * scan + swept * 0.3) * fade * uIntensity;
+              gl_FragColor = vec4(uColor * (0.7 + 0.8 * edge + 1.2 * scan), alpha);
             }`,
           transparent: true,
           depthWrite: false,
@@ -316,7 +369,24 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
           blending: THREE.AdditiveBlending,
           toneMapped: false,
         });
-        drawFace(0);
+        const sheetMaterial = new THREE.ShaderMaterial({
+          uniforms: { uIntensity: { value: 1 } },
+          vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+          fragmentShader: `uniform float uIntensity; varying vec2 vUv;
+            void main(){
+              float along = vUv.y;
+              float across = (vUv.x - 0.5) / max(along, 0.001) + 0.5;
+              float edge = smoothstep(0.0, 0.08, across) * smoothstep(0.0, 0.08, 1.0 - across);
+              float fade = smoothstep(0.0, 0.04, along) * pow(1.0 - along, 1.5);
+              float far = smoothstep(0.55, 0.98, along) * (1.0 - smoothstep(0.98, 1.0, along));
+              gl_FragColor = vec4(vec3(0.45, 0.78, 1.0), (0.22 + 0.5 * far) * edge * fade * uIntensity);
+            }`,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending,
+          toneMapped: false,
+        });
         const materials: import("three").Material[] = [
           silver,
           screen,
@@ -324,6 +394,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
           lensSprite,
           ledMaterial,
           beamMaterial,
+          sheetMaterial,
         ];
         const originals = new Set<import("three").Material>();
         let root: import("three").Group | null = null;
@@ -374,6 +445,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         controls.addEventListener("start", markInteraction);
         let idle: import("three").Group | null = null;
         let beam: import("three").Group | null = null;
+        let sheet: import("three").Mesh | null = null;
         let led: import("three").Mesh | null = null;
         const render = (time: number) => {
           if (disposed) return;
@@ -389,10 +461,17 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
             const resting = time - lastInteraction > 4000;
             idle.rotation.y += ((resting ? 0.16 * Math.sin(time / 3200) : 0) - idle.rotation.y) * 0.04;
           }
-          if (beam) {
-            beamMaterial.uniforms.uTime.value = reduced ? 0 : time / 1000;
-            beamMaterial.uniforms.uIntensity.value = state === "idle" ? 0.85 : 1.25;
-            if (!reduced) beam.rotation.y = 0.14 * Math.sin(time / 2300);
+          if (beam && sheet) {
+            // Top-to-bottom sweep, eased, faster while SOZO is working.
+            const period = state === "thinking" ? 1500 : 2600;
+            const progress = reduced ? 0.5 : (time % period) / period;
+            const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+            const scanHeight = 1 - 2 * eased;
+            const intensity = state === "idle" ? 0.9 : 1.3;
+            beamMaterial.uniforms.uScan.value = scanHeight;
+            beamMaterial.uniforms.uIntensity.value = intensity;
+            sheetMaterial.uniforms.uIntensity.value = intensity * (reduced ? 0.8 : Math.min(1, Math.min(progress, 1 - progress) * 12));
+            sheet.rotation.z = Math.atan(scanHeight * beamTall);
           }
           if (led) ledMaterial.color.setHSL(0.585, 1, (state === "speaking" ? 0.55 : 0.5) + (reduced ? 0 : 0.08 * Math.sin(time / (state === "speaking" ? 140 : 700))));
           controls.update();
@@ -490,7 +569,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         lensFlare.position.copy(lens);
         lensFlare.scale.setScalar(0.2);
         gltf.scene.add(lensFlare);
-        const length = 1.55, wide = Math.tan(0.4) * length, tall = Math.tan(0.24) * length;
+        const length = 1.55, wide = Math.tan(0.4) * length, tall = beamTall * length;
         const corners = [
           new THREE.Vector3(length, tall, wide),
           new THREE.Vector3(length, tall, -wide),
@@ -508,11 +587,19 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         beamGeometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
         const beamMesh = new THREE.Mesh(beamGeometry, beamMaterial);
         beamMesh.renderOrder = 2;
-        // Aim to the robot's left (screen right), slightly forward and up.
-        beamMesh.rotation.set(0, -0.62, -0.04);
+        const sheetGeometry = new THREE.BufferGeometry();
+        sheetGeometry.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, length, 0, wide, length, 0, -wide], 3));
+        sheetGeometry.setAttribute("uv", new THREE.Float32BufferAttribute([0.5, 0, 0, 1, 1, 1], 2));
+        sheet = new THREE.Mesh(sheetGeometry, sheetMaterial);
+        sheet.renderOrder = 3;
+        // Straight and level: aimed to the robot's left (screen right) and
+        // slightly towards the viewer, with no tilt.
+        const aim = new THREE.Group();
+        aim.rotation.set(0, -0.62, 0);
+        aim.add(beamMesh, sheet);
         beam = new THREE.Group();
         beam.position.copy(lens);
-        beam.add(beamMesh);
+        beam.add(aim);
         gltf.scene.add(beam);
 
         // Blue light strip on the front-left bezel, placed on the actual surface.

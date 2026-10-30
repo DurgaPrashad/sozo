@@ -1036,6 +1036,13 @@
   }
 }
 
+/* Status dots follow the blue signal colour too. */
+.companion-live-label i,
+.app-shell .tiny-green-dot {
+  background: #4aa8ff;
+  box-shadow: 0 0 10px #2f8bff;
+}
+
 /* Companion palette: ceramic white, graphite and the blue signal colour. */
 .companion-palette i.silver {
   background: linear-gradient(130deg, #ffffff, #c9d1da);
