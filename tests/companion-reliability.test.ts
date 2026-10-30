@@ -1,7 +1,7 @@
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { createCompanionHandler } from "../lib/companion/handler";
-import { budgetFrom, chatProviders, generateReply, providerHealth, ProviderError } from "../lib/companion/provider";
+import { budgetFrom, chatProviders, cleanSecret, describeKey, generateReply, providerHealth, ProviderError } from "../lib/companion/provider";
 import { effectiveStyle, styleInstruction } from "../lib/companion/context";
 import type { CompanionStore, WidgetSession } from "../lib/companion/security";
 
@@ -199,4 +199,36 @@ test("every error uses one shape with a request ID", async () => {
   assert.equal(body.error.code, "not_found");
   assert.equal(body.error.retryable, false);
   assert.equal(body.error.requestId, response.headers.get("x-request-id"));
+});
+
+test("pasted API keys are cleaned, and unusable ones are reported without revealing them", async () => {
+  assert.deepEqual(cleanSecret("  sk_live\u200b123 ").value, "sk_live123");
+  assert.equal(cleanSecret('"sk_live123"').value, "sk_live123");
+  assert.equal(cleanSecret("\u201csk_live123\u201d").value, "sk_live123");
+  assert.equal(cleanSecret("SARVAM_API_KEY=sk_live123").value, "sk_live123");
+  assert.equal(cleanSecret("Bearer sk_live123").value, "sk_live123");
+  assert.equal(cleanSecret("<sarvam-api-subscription-key>").value, undefined);
+  assert.equal(cleanSecret("sk_live\n123").invalid, true);
+  const described = describeKey("'sk_live123'", "sk_");
+  assert.deepEqual(described, { set: true, usable: true, length: 10, expectedPrefix: true, cleaned: ["removed surrounding quotes"] });
+  assert.ok(!JSON.stringify(describeKey("sk_secret value", "sk_")).includes("secret"));
+  assert.equal(chatProviders({ SARVAM_API_KEY: '"sk_live123"' })[0].headers["api-subscription-key"], "sk_live123");
+
+  let sent = "";
+  globalThis.fetch = (async (_url: string, init: RequestInit) => { sent = new Headers(init.headers).get("api-subscription-key") ?? ""; return completion("ok"); }) as typeof fetch;
+  await generateReply(chatProviders({ SARVAM_API_KEY: " sk_live123\u00a0" }), { message: "hi", history: [] }, [], { budget: budgetFrom(Date.now() + 10000) });
+  assert.equal(sent, "sk_live123");
+
+  const broken = createCompanionHandler({
+    key: "sk_live\n123", store: new MemoryStore(), identity: async () => ({ id: "owner" }),
+    retrieve: async () => [], model: async () => new Response(glb),
+  });
+  const response = await broken(new Request("https://sozo.example/api/companion/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: "hi" }) }));
+  const body = await response.json() as { error: { code: string; message: string } };
+  assert.equal(body.error.code, "provider_key_invalid");
+  assert.match(body.error.message, /invalid characters/);
+  const health = await providerHealth({ SARVAM_API_KEY: "sk_live\n123" });
+  assert.equal(health.chat.code, "provider_key_invalid");
+  assert.equal(health.speech.code, "provider_key_invalid");
+  assert.equal(health.keys.SARVAM_API_KEY.problem, "contains spaces, line breaks or non-ASCII characters inside the key");
 });

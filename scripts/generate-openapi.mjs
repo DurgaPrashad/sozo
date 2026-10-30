@@ -329,7 +329,7 @@ const companionErrorCodes = [
   "session_invalid", "session_forbidden", "rate_limited", "not_found", "method_not_allowed", "model_unavailable",
   "storage_unconfigured", "internal_error",
   "provider_unconfigured", "provider_timeout", "provider_unreachable", "provider_auth", "provider_credits",
-  "provider_rate_limited", "provider_error", "provider_rejected", "provider_bad_response",
+  "provider_rate_limited", "provider_error", "provider_rejected", "provider_bad_response", "provider_key_invalid",
 ];
 spec.components.schemas = {
   CompanionError: object({

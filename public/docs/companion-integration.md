@@ -98,6 +98,7 @@ Load `/embed/sozo-context.js` to use `window.SozoContext.captureScreen()` from a
 | `provider_unreachable` | 502 | yes | DNS, TLS or connection failure to the provider (already retried once). |
 | `provider_error` / `provider_bad_response` | 502 | yes | Provider 5xx or unreadable reply. |
 | `provider_auth` | 502 | no | The provider rejected SOZO's key or model access: fix the server key. |
+| `provider_key_invalid` | 502 | no | The server's provider key contains spaces, line breaks or non-ASCII characters. SOZO already strips hidden characters, surrounding quotes and `NAME=`/`Bearer` prefixes; re-enter the key if this persists. `/api/companion/health` → `keys` describes the key's format (never its value). |
 | `provider_credits` | 503 | no | The provider account needs credits. |
 | `provider_rejected` | 502 | no | The provider refused this specific request. |
 | `provider_unconfigured` / `storage_unconfigured` | 503 | no | A server setting is missing. |
@@ -108,7 +109,7 @@ Messages name the service that failed: "SOZO's conversation model", "SOZO's voic
 **Models.** Sarvam (`sarvam-105b-conversations`) answers first. Transient failures are retried once with jitter when at least 15 s remain. If Meta Llama is configured (`META_LLAMA_API_KEY`, optional `META_LLAMA_MODEL`, default `Llama-4-Maverick-17B-128E-Instruct-FP8`, and `META_LLAMA_BASE_URL`, default `https://api.llama.com/compat/v1`; any OpenAI-compatible Llama host works), it answers when Sarvam fails, with fewer tokens. `SOZO_CHAT_PROVIDER=meta` makes Meta Llama primary. `model` and `provider` in the response say which answered.
 
 **Health and identity.**
-- `GET /api/companion/health` (public, cached 60 s) makes the cheapest real provider calls: a one-token chat per configured model, a two-word voice clip and a silent transcription. It returns `{chat, chatProviders, speech, transcription, checkedAt}`, each `{status: "ok" | "degraded" | "down" | "unconfigured", latencyMs?, code?}`. `GET /api/companion/status` only reports configuration.
+- `GET /api/companion/health` (public, cached 60 s) makes the cheapest real provider calls: a one-token chat per configured model, a two-word voice clip and a silent transcription. It returns `{chat, chatProviders, speech, transcription, keys, checkedAt}`, each `{status: "ok" | "degraded" | "down" | "unconfigured", latencyMs?, code?}`. `GET /api/companion/status` only reports configuration.
 - `GET /api/companion/whoami` (key or session) returns `{method, workspace: {name}, key?: {label}, quotas: {minute: {limit, remaining}, hour: {limit, remaining}}}` without using quota.
 
 ## Speech

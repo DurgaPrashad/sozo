@@ -1394,7 +1394,7 @@
             "description": "Success; see companion integration guide for exact payloads"
           },
           "400": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1404,7 +1404,7 @@
             }
           },
           "401": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1414,7 +1414,7 @@
             }
           },
           "429": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1424,7 +1424,7 @@
             }
           },
           "502": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1434,7 +1434,7 @@
             }
           },
           "503": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1444,7 +1444,7 @@
             }
           },
           "504": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1469,7 +1469,7 @@
             "description": "Success; see companion integration guide for exact payloads"
           },
           "400": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1479,7 +1479,7 @@
             }
           },
           "401": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1489,7 +1489,7 @@
             }
           },
           "429": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1499,7 +1499,7 @@
             }
           },
           "502": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1509,7 +1509,7 @@
             }
           },
           "503": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1519,7 +1519,7 @@
             }
           },
           "504": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1548,7 +1548,7 @@
             "description": "Success; see companion integration guide for exact payloads"
           },
           "400": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1558,7 +1558,7 @@
             }
           },
           "401": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1568,7 +1568,7 @@
             }
           },
           "429": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1578,7 +1578,7 @@
             }
           },
           "502": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1588,7 +1588,7 @@
             }
           },
           "503": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1598,7 +1598,7 @@
             }
           },
           "504": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1623,7 +1623,7 @@
             "description": "Success; see companion integration guide for exact payloads"
           },
           "400": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1633,7 +1633,7 @@
             }
           },
           "401": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1643,7 +1643,7 @@
             }
           },
           "429": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1653,7 +1653,7 @@
             }
           },
           "502": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1663,7 +1663,7 @@
             }
           },
           "503": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1673,7 +1673,7 @@
             }
           },
           "504": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1702,7 +1702,7 @@
             "description": "Success; see companion integration guide for exact payloads"
           },
           "400": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1712,7 +1712,7 @@
             }
           },
           "401": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1722,7 +1722,7 @@
             }
           },
           "429": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1732,7 +1732,7 @@
             }
           },
           "502": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1742,7 +1742,7 @@
             }
           },
           "503": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1752,7 +1752,7 @@
             }
           },
           "504": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1779,7 +1779,7 @@
             "description": "Success; see companion integration guide for exact payloads"
           },
           "400": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1789,7 +1789,7 @@
             }
           },
           "401": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1799,7 +1799,7 @@
             }
           },
           "429": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1809,7 +1809,7 @@
             }
           },
           "502": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1819,7 +1819,7 @@
             }
           },
           "503": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1829,7 +1829,7 @@
             }
           },
           "504": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1950,7 +1950,7 @@
             }
           },
           "400": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1960,7 +1960,7 @@
             }
           },
           "401": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1970,7 +1970,7 @@
             }
           },
           "429": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1980,7 +1980,7 @@
             }
           },
           "502": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -1990,7 +1990,7 @@
             }
           },
           "503": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2000,7 +2000,7 @@
             }
           },
           "504": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2314,7 +2314,7 @@
             "description": "Success; see companion integration guide for exact payloads"
           },
           "400": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2324,7 +2324,7 @@
             }
           },
           "401": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2334,7 +2334,7 @@
             }
           },
           "429": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2344,7 +2344,7 @@
             }
           },
           "502": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2354,7 +2354,7 @@
             }
           },
           "503": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2364,7 +2364,7 @@
             }
           },
           "504": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2393,7 +2393,7 @@
             "description": "Success; see companion integration guide for exact payloads"
           },
           "400": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2403,7 +2403,7 @@
             }
           },
           "401": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2413,7 +2413,7 @@
             }
           },
           "429": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2423,7 +2423,7 @@
             }
           },
           "502": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2433,7 +2433,7 @@
             }
           },
           "503": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2443,7 +2443,7 @@
             }
           },
           "504": {
-            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response",
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
             "content": {
               "application/json": {
                 "schema": {
@@ -2561,7 +2561,8 @@
                   "provider_rate_limited",
                   "provider_error",
                   "provider_rejected",
-                  "provider_bad_response"
+                  "provider_bad_response",
+                  "provider_key_invalid"
                 ]
               },
               "message": {

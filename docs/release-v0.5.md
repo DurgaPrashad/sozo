@@ -9,6 +9,7 @@
 - `style: brief | standard | detailed`; `timings` and `requestId` in every answer; `facts` up to 60.
 - Exact astrodynamics calculator (orbits, escape velocity, Hohmann and planet-to-planet transfers, rocket equation, surface gravity) used as a model tool for numeric questions.
 - `GET /api/companion/health` (real provider checks) and `GET /api/companion/whoami` (key label and remaining quota).
+- Provider keys pasted with hidden characters, quotes or a `NAME=`/`Bearer` prefix are cleaned before use; a key that is still unusable reports `provider_key_invalid` (previously every such failure read "the speech provider could not be reached"). `/api/companion/health` describes each key's format without revealing it.
 - `GET /api/companion/model` no longer forwards a `Content-Encoding` the body does not have (fixes `ERR_CONTENT_DECODING_FAILED`).
 - The 3D companion's scanner runs while SOZO researches and occasionally at random, in any direction.
 

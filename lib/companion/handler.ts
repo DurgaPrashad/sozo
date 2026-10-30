@@ -3,6 +3,7 @@ import { analyseRoute, chatSchema, effectiveStyle } from "./context";
 import {
   budgetFrom,
   chatProviders,
+  cleanSecret,
   generateReply,
   ProviderError,
   providerHealth,
@@ -112,6 +113,7 @@ function errorBody(error: unknown, requestId: string): { status: number; error: 
 let cachedHealth: { at: number; value: Promise<unknown> } | null = null;
 
 export function createCompanionHandler(deps: Dependencies) {
+  const key = cleanSecret(deps.key).invalid ? undefined : cleanSecret(deps.key).value;
   const providers = deps.providers ?? chatProviders(process.env, deps.key);
   const health = deps.health ?? (() => providerHealth({ ...process.env, SARVAM_API_KEY: deps.key }));
   const chatBudget = deps.budgetMs ?? CHAT_BUDGET_MS;
@@ -131,7 +133,7 @@ export function createCompanionHandler(deps: Dependencies) {
     try {
       if (action === "status" && request.method === "GET") {
         headers["Access-Control-Allow-Origin"] = "*";
-        const keyed = Boolean(deps.key?.trim());
+        const keyed = Boolean(key);
         return reply({
           configured: providers.length > 0,
           visionConfigured: keyed,
@@ -243,7 +245,10 @@ export function createCompanionHandler(deps: Dependencies) {
           if (!(bytes.startsWith("\xff\xd8\xff") || bytes.startsWith("\x89PNG\r\n\x1a\n") || (bytes.startsWith("RIFF") && bytes.slice(8, 12) === "WEBP")))
             throw new RequestError(400, "invalid_request", "The shared image format is invalid.");
         }
-        if (!providers.length) throw new ProviderError(503, "provider_unconfigured", "SOZO's conversation model is not configured on this server.");
+        if (!providers.length)
+          throw cleanSecret(deps.key).invalid
+            ? new ProviderError(502, "provider_key_invalid", "SOZO's conversation model's API key on this server contains invalid characters. Re-enter it without spaces, quotes or line breaks.")
+            : new ProviderError(503, "provider_unconfigured", "SOZO's conversation model is not configured on this server.");
         const wantsStream = request.headers.get("accept")?.includes("text/event-stream");
 
         const retrieveLiterature = async () => {
@@ -346,7 +351,7 @@ export function createCompanionHandler(deps: Dependencies) {
       }
       if (action === "text-to-speech") {
         const data = z.object({ text: z.string().trim().min(1).max(2500), language: z.enum(languages).default("en-IN") }).strict().parse(await json(request));
-        return reply({ ...(await synthesizeSpeech(deps.key, data.text, data.language, request.signal)), requestId });
+        return reply({ ...(await synthesizeSpeech(key, data.text, data.language, request.signal)), requestId });
       }
       if (!request.headers.get("content-type")?.startsWith("multipart/form-data")) throw new RequestError(415, "unsupported_media_type", "Send multipart/form-data with an audio file.");
       const body = await boundedBody(request, 4 * 1024 * 1024);
@@ -354,7 +359,7 @@ export function createCompanionHandler(deps: Dependencies) {
       const file = form.get("file");
       if (!(file instanceof File) || !file.size || file.size > 3 * 1024 * 1024 || !/^(audio\/|video\/(webm|mp4))/.test(file.type))
         throw new RequestError(400, "invalid_request", "Provide an audio recording under 3 MB and 30 seconds.");
-      return reply({ ...(await transcribeSpeech(deps.key, file, request.signal)), requestId });
+      return reply({ ...(await transcribeSpeech(key, file, request.signal)), requestId });
     } catch (error) {
       return fail(error);
     }

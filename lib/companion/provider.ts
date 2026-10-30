@@ -28,7 +28,56 @@ export class ProviderError extends Error {
 }
 
 type Env = Record<string, string | undefined>;
-const configured = (value?: string) => (value?.trim() && !/[<>]/.test(value) ? value.trim() : undefined);
+
+// API keys pasted into hosting dashboards often carry hidden characters,
+// quotes or a NAME= / Bearer prefix. Any of them makes fetch() reject the
+// header instantly, which used to surface as "could not be reached".
+export function cleanSecret(raw?: string) {
+  const notes: string[] = [];
+  if (!raw?.trim() || /[<>]/.test(raw)) return { value: undefined, notes, invalid: false };
+  let value = raw;
+  if (/[\u200B-\u200D\u2060\uFEFF\u00A0]/.test(value)) {
+    value = value.replace(/[\u200B-\u200D\u2060\uFEFF\u00A0]/g, "");
+    notes.push("removed hidden characters");
+  }
+  value = value.trim();
+  const prefix = value.match(/^[A-Z][A-Z0-9_]*\s*=\s*/);
+  if (prefix) { value = value.slice(prefix[0].length); notes.push("removed a NAME= prefix"); }
+  if (/^Bearer\s+/i.test(value)) { value = value.replace(/^Bearer\s+/i, ""); notes.push("removed a Bearer prefix"); }
+  const quoted = value.match(/^(["'`\u201C\u2018])([\s\S]*)(["'`\u201D\u2019])$/);
+  if (quoted) { value = quoted[2].trim(); notes.push("removed surrounding quotes"); }
+  return { value: value || undefined, notes, invalid: /[^\x21-\x7E]/.test(value) };
+}
+const configured = (value?: string) => {
+  const secret = cleanSecret(value);
+  return secret.invalid ? undefined : secret.value;
+};
+
+// Safe description of a key for the health check: never the value itself.
+export type KeyDescription = { set: boolean; usable?: boolean; length?: number; expectedPrefix?: boolean; cleaned?: string[]; problem?: string };
+export function describeKey(raw?: string, expectedPrefix?: string): KeyDescription {
+  const secret = cleanSecret(raw);
+  if (!raw?.trim()) return { set: false };
+  return {
+    set: true,
+    usable: Boolean(secret.value) && !secret.invalid,
+    length: secret.value?.length ?? 0,
+    ...(expectedPrefix ? { expectedPrefix: secret.value?.startsWith(expectedPrefix) ?? false } : {}),
+    ...(secret.notes.length ? { cleaned: secret.notes } : {}),
+    ...(secret.invalid ? { problem: "contains spaces, line breaks or non-ASCII characters inside the key" } : {}),
+  };
+}
+
+// AbortSignal.any is missing on some runtimes; combine signals by hand there.
+function anySignal(signals: AbortSignal[]) {
+  if (typeof AbortSignal.any === "function") return AbortSignal.any(signals);
+  const controller = new AbortController();
+  for (const signal of signals) {
+    if (signal.aborted) { controller.abort(signal.reason); break; }
+    signal.addEventListener("abort", () => controller.abort(signal.reason), { once: true });
+  }
+  return controller.signal;
+}
 
 export type ChatProvider = {
   id: "sarvam" | "meta";
@@ -89,11 +138,14 @@ export async function providerFetch(
   const timeout = AbortSignal.timeout(Math.max(1000, timeoutMs));
   let response: Response;
   try {
-    response = await fetch(url, { ...init, redirect: "manual", signal: signal ? AbortSignal.any([timeout, signal]) : timeout });
+    response = await fetch(url, { ...init, redirect: "manual", signal: signal ? anySignal([timeout, signal]) : timeout });
   } catch (error) {
     if (signal?.aborted) throw error;
     if (timeout.aborted || (error as Error)?.name === "TimeoutError")
       throw new ProviderError(504, "provider_timeout", `${SUBJECT[operation]} took too long to answer. Please retry.`, true, 5);
+    const detail = `${(error as Error)?.message ?? ""} ${((error as { cause?: Error })?.cause?.message) ?? ""}`;
+    if (/ByteString|invalid header|Headers\.(append|set)/i.test(detail))
+      throw new ProviderError(502, "provider_key_invalid", `${SUBJECT[operation]}'s API key on this server contains invalid characters. Re-enter it without spaces, quotes or line breaks.`);
     throw new ProviderError(502, "provider_unreachable", `${SUBJECT[operation]} could not be reached. Please retry.`, true, 3);
   }
   if (!response.ok) {
@@ -137,10 +189,12 @@ export async function sarvamRequest(
   body: unknown,
   { operation, timeoutMs = 30000, signal, multipart = false }: { operation: Operation; timeoutMs?: number; signal?: AbortSignal; multipart?: boolean },
 ) {
-  if (!configured(key)) throw new ProviderError(503, "provider_unconfigured", `${SUBJECT[operation]} is not configured on this server.`);
+  const secret = cleanSecret(key);
+  if (secret.invalid) throw new ProviderError(502, "provider_key_invalid", `${SUBJECT[operation]}'s API key on this server contains invalid characters. Re-enter it without spaces, quotes or line breaks.`);
+  if (!secret.value) throw new ProviderError(503, "provider_unconfigured", `${SUBJECT[operation]} is not configured on this server.`);
   const response = await providerFetch(operation, `https://api.sarvam.ai${path}`, {
     method: "POST",
-    headers: { "api-subscription-key": configured(key)!, ...(multipart ? {} : { "Content-Type": "application/json" }) },
+    headers: { "api-subscription-key": secret.value, ...(multipart ? {} : { "Content-Type": "application/json" }) },
     body: multipart ? (body as FormData) : JSON.stringify(body),
   }, { timeoutMs, signal });
   return providerJSON(response, operation);
@@ -462,7 +516,8 @@ async function probe(run: () => Promise<unknown>, slowMs: number): Promise<Servi
 // Real, minimal provider calls: a one-token chat, a two-word voice clip and
 // a silent transcription.
 export async function providerHealth(env: Env = process.env) {
-  const key = configured(env.SARVAM_API_KEY);
+  // The raw value: sarvamRequest cleans it and reports an unusable key.
+  const key = env.SARVAM_API_KEY;
   const providers = chatProviders(env);
   const chatChecks = await Promise.all(providers.map(async (provider) => ({
     ...(await probe(() => completeOnce(provider, [{ role: "user", content: "ping" }], 1, 10000), 6000)),
@@ -475,6 +530,14 @@ export async function providerHealth(env: Env = process.env) {
       return transcribeSpeech(key, new File([wav.buffer as ArrayBuffer], "probe.wav", { type: "audio/wav" }));
     }, 6000),
   ]);
-  const chat: ServiceHealth = chatChecks.find((c) => c.status === "ok") ?? chatChecks.find((c) => c.status === "degraded") ?? chatChecks[0] ?? { status: "unconfigured" };
-  return { chat, chatProviders: chatChecks, speech, transcription, checkedAt: new Date().toISOString() };
+  const fallback: ServiceHealth = cleanSecret(env.SARVAM_API_KEY).invalid ? { status: "down", code: "provider_key_invalid" } : { status: "unconfigured" };
+  const chat: ServiceHealth = chatChecks.find((c) => c.status === "ok") ?? chatChecks.find((c) => c.status === "degraded") ?? chatChecks[0] ?? fallback;
+  return {
+    chat,
+    chatProviders: chatChecks,
+    speech,
+    transcription,
+    keys: { SARVAM_API_KEY: describeKey(env.SARVAM_API_KEY, "sk_"), META_LLAMA_API_KEY: describeKey(env.META_LLAMA_API_KEY ?? env.LLAMA_API_KEY) },
+    checkedAt: new Date().toISOString(),
+  };
 }
