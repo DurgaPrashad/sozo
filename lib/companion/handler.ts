@@ -13,7 +13,8 @@ import {
   type ChatProvider,
   type ChatResult,
 } from "./provider";
-import { normalizeOrigin, permitsWidget, type CompanionStore } from "./security";
+import { modelCatalog } from "./models";
+import { normalizeOrigin, permitsWidget, PUBLISHABLE_KEY, type CompanionStore } from "./security";
 
 type Citation = { id: string; title: string; url: string; abstract: string; doi?: string; provider?: string; year?: string };
 type Retrieved = Citation[] | { citations: Citation[]; unavailable?: string[] };
@@ -36,6 +37,9 @@ type Dependencies = {
 export const CHAT_BUDGET_MS = 50000;
 export const RETRIEVAL_BUDGET_MS = 8000;
 const QUOTAS = { minute: { limit: 30, windowMs: 60000 }, hour: { limit: 240, windowMs: 3600000 } };
+// New sessions a publishable key can buy per minute (chat quotas still apply).
+const PUBLISHABLE_SESSIONS_PER_MINUTE = 60;
+const MAX_PUBLISHABLE_KEYS = 20;
 
 class RequestError extends Error {
   constructor(public status: number, public code: string, message: string, public retryAfterSeconds?: number) {
@@ -150,6 +154,12 @@ export function createCompanionHandler(deps: Dependencies) {
         if (!cachedHealth || Date.now() - cachedHealth.at > 60000) cachedHealth = { at: Date.now(), value: health() };
         return reply({ ...(await cachedHealth.value as object), requestId });
       }
+      if (action === "models" && request.method === "GET") {
+        headers["Access-Control-Allow-Origin"] = "*";
+        headers["Cache-Control"] = "public, max-age=60";
+        const meta = providers.find((provider) => provider.id === "meta");
+        return reply({ models: modelCatalog({ sarvam: providers.some((provider) => provider.id === "sarvam"), meta: Boolean(meta), metaModel: meta?.model }), requestId });
+      }
       if (action === "model" && request.method === "GET") {
         const asset = await deps.model(request);
         if (!asset.ok) throw new RequestError(502, "model_unavailable", "The companion model is unavailable.", 5);
@@ -175,18 +185,38 @@ export function createCompanionHandler(deps: Dependencies) {
         headers["Access-Control-Max-Age"] = "600";
         return new Response(null, { status: 204, headers });
       }
-      const actions: Record<string, string[]> = { sessions: ["POST", "DELETE"], chat: ["POST"], "text-to-speech": ["POST"], "speech-to-text": ["POST"], whoami: ["GET"] };
+      const actions: Record<string, string[]> = { sessions: ["POST", "DELETE"], chat: ["POST"], "text-to-speech": ["POST"], "speech-to-text": ["POST"], whoami: ["GET"], "publishable-keys": ["GET", "POST", "DELETE"] };
       if (!action || !actions[action]) throw new RequestError(404, "not_found", "Not found.");
       if (!actions[action].includes(request.method)) throw new RequestError(405, "method_not_allowed", "Method not allowed.");
 
       const authorization = request.headers.get("authorization");
+      // A website without a backend: its publishable key, sent from a listed
+      // origin, buys the same ten-minute session a host backend would issue.
+      const publishable = authorization?.match(/^Bearer (sozo_pk_\S*)$/)?.[1];
+      if (publishable) {
+        if (action !== "sessions" || request.method !== "POST")
+          throw new RequestError(401, "unauthorized", "A publishable key only exchanges for a companion session at POST /api/companion/sessions.");
+        const allowedOrigin = origin ? normalizeOrigin(origin) : null;
+        if (allowedOrigin) {
+          headers["Access-Control-Allow-Origin"] = allowedOrigin;
+          headers["Access-Control-Expose-Headers"] = "X-Request-ID, Retry-After";
+        }
+        const record = PUBLISHABLE_KEY.test(publishable) && deps.store.resolvePublishableKey ? await deps.store.resolvePublishableKey(publishable) : null;
+        if (!record) throw new RequestError(401, "unauthorized", "This publishable key is unknown or was revoked.");
+        if (!allowedOrigin || !record.origins.includes(allowedOrigin))
+          throw new RequestError(403, "forbidden_origin", "This publishable key is not enabled for this website. Add its origin to the key in SOZO's developer settings.");
+        if (!(await deps.store.rateLimit(record.ownerId, `publishable:${record.id}`, PUBLISHABLE_SESSIONS_PER_MINUTE, 60000)))
+          throw new RequestError(429, "rate_limited", "Too many new companion sessions for this website. Please retry shortly.", Math.ceil((60000 - (Date.now() % 60000)) / 1000));
+        const session = await deps.store.issue(record.ownerId, allowedOrigin);
+        return reply({ id: session.id, token: session.token, allowedOrigin: session.allowedOrigin, expiresAt: session.expiresAt, scopes: ["companion:chat", "companion:voice", "companion:vision"], requestId }, 201);
+      }
       const widgetToken = authorization?.match(/^Bearer (sozo_widget_[a-f0-9]{64})$/)?.[1];
       let ownerId: string;
       let identity: Identity | null = null;
       if (widgetToken) {
         const session = await deps.store.resolve(widgetToken);
         if (!permitsWidget(session, origin)) throw new RequestError(401, "session_invalid", "The companion session expired or does not allow this origin.");
-        if (action === "sessions") throw new RequestError(403, "session_forbidden", "Companion sessions cannot issue or revoke sessions.");
+        if (action === "sessions" || action === "publishable-keys") throw new RequestError(403, "session_forbidden", "Companion sessions cannot manage sessions or keys.");
         ownerId = session!.ownerId;
         headers["Access-Control-Allow-Origin"] = origin!;
         headers["Access-Control-Expose-Headers"] = "X-Request-ID, Retry-After";
@@ -212,6 +242,25 @@ export function createCompanionHandler(deps: Dependencies) {
             hour: { limit: QUOTAS.hour.limit, remaining: await remaining("hour") },
           },
         });
+      }
+
+      if (action === "publishable-keys") {
+        const store = deps.store;
+        if (!store.createPublishableKey || !store.listPublishableKeys || !store.revokePublishableKey)
+          throw new ProviderError(503, "storage_unconfigured", "Workspace storage is not configured on this server.");
+        if (request.method === "GET") return reply({ keys: await store.listPublishableKeys(ownerId), requestId });
+        if (request.method === "DELETE") {
+          const data = z.object({ id: z.string().uuid() }).strict().parse(await json(request));
+          await store.revokePublishableKey(ownerId, data.id);
+          return reply({ ok: true, requestId });
+        }
+        const data = z.object({ label: z.string().trim().min(1).max(100), origins: z.array(z.string().max(500)).min(1).max(10) }).strict().parse(await json(request));
+        const origins = [...new Set(data.origins.map((value) => normalizeOrigin(value.trim())))];
+        if (origins.includes(null))
+          throw new RequestError(400, "invalid_request", "List each website as an HTTPS origin such as https://planner.example (HTTP only for localhost), without a path.");
+        if ((await store.listPublishableKeys(ownerId)).length >= MAX_PUBLISHABLE_KEYS)
+          throw new RequestError(400, "invalid_request", `A workspace can have up to ${MAX_PUBLISHABLE_KEYS} publishable keys. Revoke one first.`);
+        return reply({ key: await store.createPublishableKey(ownerId, data.label, origins as string[]), requestId }, 201);
       }
 
       for (const kind of ["minute", "hour"] as const) {
@@ -249,6 +298,10 @@ export function createCompanionHandler(deps: Dependencies) {
           throw cleanSecret(deps.key).invalid
             ? new ProviderError(502, "provider_key_invalid", "SOZO's conversation model's API key on this server contains invalid characters. Re-enter it without spaces, quotes or line breaks.")
             : new ProviderError(503, "provider_unconfigured", "SOZO's conversation model is not configured on this server.");
+        // An explicit provider answers first; the others stay as fallbacks.
+        if (input.provider && !providers.some((provider) => provider.id === input.provider))
+          throw new ProviderError(503, "provider_unconfigured", input.provider === "meta" ? "Meta Llama is not configured on this server. Set META_LLAMA_API_KEY, or omit provider." : "SOZO's conversation model is not configured on this server.");
+        const ordered = input.provider ? [...providers].sort((a, b) => Number(b.id === input.provider) - Number(a.id === input.provider)) : providers;
         const wantsStream = request.headers.get("accept")?.includes("text/event-stream");
 
         const retrieveLiterature = async () => {
@@ -282,6 +335,7 @@ export function createCompanionHandler(deps: Dependencies) {
           route: Boolean(input.context?.route),
           alternatives: input.context?.alternatives?.length ?? 0,
           facts: Object.keys(input.context?.facts ?? {}).length,
+          scan: Boolean(input.context?.scan),
           literature,
         });
         const publicCitations = (citations: Citation[]) => citations.map(({ abstract: _abstract, ...source }) => source);
@@ -290,7 +344,7 @@ export function createCompanionHandler(deps: Dependencies) {
         if (!wantsStream) {
           const literature = await retrieveLiterature();
           const t1 = Date.now();
-          const generated = await generateReply(providers, chatInput, literature.citations, { budget, signal: request.signal });
+          const generated = await generateReply(ordered, chatInput, literature.citations, { budget, signal: request.signal });
           return reply({
             reply: generated.reply,
             calculations: generated.calculations,
@@ -320,7 +374,7 @@ export function createCompanionHandler(deps: Dependencies) {
               send("status", { stage: "answering" });
               const t1 = Date.now();
               let result: ChatResult | null = null;
-              for await (const part of streamReply(providers, chatInput, literature.citations, { budget, signal: request.signal })) {
+              for await (const part of streamReply(ordered, chatInput, literature.citations, { budget, signal: request.signal })) {
                 if ("delta" in part) send("delta", { text: part.delta });
                 else if ("calculations" in part) send("calculations", part.calculations);
                 else result = part.done;

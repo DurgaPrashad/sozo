@@ -1688,9 +1688,84 @@
         }
       }
     },
+    "/api/companion/models": {
+      "get": {
+        "summary": "SOZO's model catalog: space science, rockets and engines, orbital calculations, planetary zones, imagery and voice, with status and how to call each (public)",
+        "operationId": "get_api_companion_models",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      }
+    },
     "/api/companion/sessions": {
       "post": {
-        "summary": "Issue a 10-minute origin-bound companion session",
+        "summary": "Issue a 10-minute origin-bound companion session: from a host backend with a SOZO API key and {allowedOrigin}, or from a browser with a publishable key (Authorization: Bearer sozo_pk_...) on one of its listed origins",
         "operationId": "post_api_companion_sessions",
         "security": [
           {
@@ -1769,6 +1844,239 @@
       "delete": {
         "summary": "Revoke an owned companion session",
         "operationId": "delete_api_companion_sessions",
+        "security": [
+          {
+            "SozoKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      }
+    },
+    "/api/companion/publishable-keys": {
+      "get": {
+        "summary": "List this workspace's publishable website keys",
+        "operationId": "get_api_companion_publishable_keys",
+        "security": [
+          {
+            "SozoKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      },
+      "post": {
+        "summary": "Create a publishable key for up to 10 website origins: {label, origins}",
+        "operationId": "post_api_companion_publishable_keys",
+        "security": [
+          {
+            "SozoKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; see companion integration guide for exact payloads"
+          },
+          "400": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "CompanionError. Codes: invalid_request, payload_too_large, unsupported_media_type, unauthorized, forbidden_origin, session_invalid, session_forbidden, rate_limited, not_found, method_not_allowed, model_unavailable, storage_unconfigured, internal_error, provider_unconfigured, provider_timeout, provider_unreachable, provider_auth, provider_credits, provider_rate_limited, provider_error, provider_rejected, provider_bad_response, provider_key_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanionError"
+                }
+              }
+            }
+          }
+        },
+        "externalDocs": {
+          "url": "/docs/companion-integration.md"
+        }
+      },
+      "delete": {
+        "summary": "Revoke a publishable key: {id}",
+        "operationId": "delete_api_companion_publishable_keys",
         "security": [
           {
             "SozoKey": []
@@ -2040,6 +2348,14 @@
                     "default": "standard",
                     "description": "brief: two to four sentences with the key figures; grows to standard when the question asks for an explanation."
                   },
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "sarvam",
+                      "meta"
+                    ],
+                    "description": "Which conversation model answers first; the others stay as fallbacks. provider_unconfigured when that model has no key on this server."
+                  },
                   "history": {
                     "type": "array",
                     "maxItems": 10,
@@ -2280,6 +2596,33 @@
                             }
                           ]
                         }
+                      },
+                      "scan": {
+                        "type": "object",
+                        "properties": {
+                          "target": {
+                            "type": "string",
+                            "maxLength": 120
+                          },
+                          "title": {
+                            "type": "string",
+                            "maxLength": 200
+                          },
+                          "url": {
+                            "type": "string",
+                            "maxLength": 500
+                          },
+                          "text": {
+                            "type": "string",
+                            "maxLength": 4000,
+                            "description": "Visible text of the page area the user asked SOZO to scan (no images or form fields), redacted for emails, card numbers and secrets."
+                          }
+                        },
+                        "required": [
+                          "target",
+                          "text"
+                        ],
+                        "additionalProperties": false
                       },
                       "screenshot": {
                         "type": "string",

@@ -89,6 +89,15 @@ test("companion sessions, limits and the article cache use raw SQL on PostgreSQL
   assert.equal((await store.resolve(issued.token)).ownerId, "o1");
   await store.revoke("o1", issued.id);
   assert.equal(await store.resolve(issued.token), null);
+  const published = await store.createPublishableKey("o1", "MOMAR", ["https://www.momar.si"]);
+  assert.match(published.key, /^sozo_pk_[a-f0-9]{32}$/);
+  assert.deepEqual((await store.resolvePublishableKey(published.key)).origins, ["https://www.momar.si"]);
+  assert.equal((await store.listPublishableKeys("o1")).length, 1);
+  assert.equal((await store.listPublishableKeys("o2")).length, 0);
+  await store.revokePublishableKey("o2", published.id);
+  assert.ok(await store.resolvePublishableKey(published.key), "another owner cannot revoke it");
+  await store.revokePublishableKey("o1", published.id);
+  assert.equal(await store.resolvePublishableKey(published.key), null);
   let loads = 0;
   const load = async () => { loads++; return { records: [], diagnostics: [{ ok: true }], retrievedAt: new Date().toISOString() }; };
   await cachedArticles(d1, { body: "moon", query: "ice", limit: 4 }, load);

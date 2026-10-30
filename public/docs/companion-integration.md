@@ -106,7 +106,7 @@ Load `/embed/sozo-context.js` to use `window.SozoContext.captureScreen()` from a
 
 Messages name the service that failed: "SOZO's conversation model", "SOZO's voice", "SOZO's speech recognition" or "SOZO's image model".
 
-**Models.** Sarvam (`sarvam-105b-conversations`) answers first. Transient failures are retried once with jitter when at least 15 s remain. If Meta Llama is configured (`META_LLAMA_API_KEY`, optional `META_LLAMA_MODEL`, default `Llama-4-Maverick-17B-128E-Instruct-FP8`, and `META_LLAMA_BASE_URL`, default `https://api.llama.com/compat/v1`; any OpenAI-compatible Llama host works), it answers when Sarvam fails, with fewer tokens. `SOZO_CHAT_PROVIDER=meta` makes Meta Llama primary. `model` and `provider` in the response say which answered.
+**Models.** `GET /api/companion/models` (public) lists every SOZO model and engine: space science, rockets and engines, orbital calculations, planetary zones, imagery and voice, each with `status` (`live`, `ready`, `prototype`, `planned`), `configured` on this server, and `access` (the endpoint and field to use). Send `provider: "sarvam"` or `"meta"` in a chat request to choose which conversation model answers first; the other stays as the fallback, and a provider without a server key is `provider_unconfigured`. By default Sarvam (`sarvam-105b-conversations`) answers first. Transient failures are retried once with jitter when at least 15 s remain. If Meta Llama is configured (`META_LLAMA_API_KEY`, optional `META_LLAMA_MODEL`, default `Llama-4-Maverick-17B-128E-Instruct-FP8`, and `META_LLAMA_BASE_URL`, default `https://api.llama.com/compat/v1`; any OpenAI-compatible Llama host works), it answers when Sarvam fails, with fewer tokens. `SOZO_CHAT_PROVIDER=meta` makes Meta Llama primary. `model` and `provider` in the response say which answered.
 
 **Health and identity.**
 - `GET /api/companion/health` (public, cached 60 s) makes the cheapest real provider calls: a one-token chat per configured model, a two-word voice clip and a silent transcription. It returns `{chat, chatProviders, speech, transcription, keys, checkedAt}`, each `{status: "ok" | "degraded" | "down" | "unconfigured", latencyMs?, code?}`. `GET /api/companion/status` only reports configuration.
@@ -132,6 +132,27 @@ Literature retrieval uses Crossref and Europe PMC through the same relevance pip
 - [Sarvam text to speech](https://docs.sarvam.ai/api-reference/text-to-speech/convert)
 - [Sarvam speech to text](https://docs.sarvam.ai/api-reference/speech-to-text/transcribe)
 - [Authentication](https://docs.sarvam.ai/api-reference/authentication)
+
+## SOZO on any website: publishable keys
+
+A website without its own backend can still run the companion. Create a key under **API & developers → Website keys**, listing up to ten exact origins (HTTPS, or HTTP localhost). The key (`sozo_pk_…`) is public and goes in the page:
+
+```html
+<script src="https://sozo.momar.si/embed/sozo-widget.js"></script>
+<sozo-companion api-base="https://sozo.momar.si" publishable-key="sozo_pk_…"></sozo-companion>
+```
+
+The component sends `POST /api/companion/sessions` with `Authorization: Bearer sozo_pk_…`. SOZO checks the browser's `Origin` against the key's list and returns the same ten-minute, origin-locked session a host backend would issue (`403 forbidden_origin` otherwise). The key itself works on no other endpoint. Each key can open 60 sessions a minute, and every session shares the owner's quotas (30 requests a minute, 240 an hour). Because anyone can copy a public key and send a forged `Origin` from a non-browser client, those quotas are the real limit: use a backend session endpoint for signed-in or high-volume products. Manage keys with `GET`, `POST {label, origins}` and `DELETE {id}` on `/api/companion/publishable-keys` (owner sign-in or API key only).
+
+## Scanning a page
+
+Ask "scan the route", "scan this map" or just "scan", press the robot's **Scan** button, or call `companion.scan(target?, question?)`. The robot flies from its place to the target, draws a holographic frame over it, sweeps a laser top to bottom and then side to side, reads the area's visible text, flies home, and answers with that text as `context.scan` (`{target, title, url, text ≤ 4,000}`), labelled untrusted evidence. Targets, in order:
+
+1. A name registered with `companion.registerTarget(name, element, describe?)` and used in the message (`describe()` may return a string or object, added to the text).
+2. An element marked `data-sozo-target="name"`, named in the message.
+3. The registered `default` target, else the largest visible map (Leaflet, MapLibre, Mapbox, Cesium, OpenLayers or `[data-sozo-map]`), whose whole visible view is read.
+
+Scans read text only: never images, map pixels, or form fields, inputs and editable areas; anything under `data-sozo-ignore` or `aria-hidden` is skipped, and emails, card-like numbers and key-like strings are redacted before sending. With reduced motion the robot stays put and the frame appears without sweeping. With nothing to scan, the companion says so and sends no request.
 
 ## Ready-to-use 3D component
 

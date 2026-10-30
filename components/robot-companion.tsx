@@ -1,10 +1,31 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { RotateCcw, MoveHorizontal, Volume2 } from "lucide-react";
-export type RobotCompanionProps = { assetBase?: string; speaking?: boolean; signal?: "idle" | "listening" | "thinking" | "speaking"; greeting?: boolean };
-export default function RobotCompanion({ assetBase = "", speaking = false, signal = "idle", greeting = true }: RobotCompanionProps) {
+import { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { RotateCcw, MoveHorizontal, Volume2, ScanLine } from "lucide-react";
+import { createScanOverlay, visibleRect, type ScanOverlay, type ScanPhase } from "./scan-overlay";
+// scan() with a target flies the robot to that element and scans it; without
+// one the robot scans in place. Resolves when the sweep is complete; the robot
+// then flies home on its own.
+export type RobotControls = { scan(target?: Element | null, label?: string): Promise<void> };
+export type RobotCompanionProps = {
+  assetBase?: string;
+  speaking?: boolean;
+  signal?: "idle" | "listening" | "thinking" | "speaking";
+  greeting?: boolean;
+  controls?: { current: RobotControls | null };
+  // Replaces the Scan button's in-place scan, e.g. to scan the page and ask.
+  onScan?: () => void;
+};
+export default function RobotCompanion({ assetBase = "", speaking = false, signal = "idle", greeting = true, controls, onScan }: RobotCompanionProps) {
   const activity = useRef({ speaking, signal });
   activity.current = { speaking, signal };
+  const scanner = useRef<RobotControls["scan"] | null>(null);
+  const [scanning, setScanning] = useState(false);
+  const runScan = async (target?: Element | null, label?: string) => {
+    if (!scanner.current) return;
+    setScanning(true);
+    try { await scanner.current(target, label); } finally { setScanning(false); }
+  };
+  useImperativeHandle(controls, () => ({ scan: runScan }));
   const audio = useRef<HTMLAudioElement | null>(null);
   const [audioError, setAudioError] = useState("");
   const greet = () => {
@@ -157,6 +178,10 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         faceTexture.colorSpace = THREE.SRGBColorSpace;
         const screen = new THREE.MeshBasicMaterial({ map: faceTexture, toneMapped: false });
         const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        // The scan in progress, if any (see startScan). Milliseconds per stage.
+        const GLIDE = 600, TRAVEL = 800, SWEEP = 1300, HOLD = 300;
+        type Scan = { start: number; resolve: () => void; dir: 1 | -1; label: string; target?: Element; overlay?: ScanOverlay; flyer?: HTMLDivElement; home?: DOMRect; returning?: boolean };
+        let scan: Scan | null = null;
         const look = { x: 0, target: 0 };
         const onPointer = (event: PointerEvent) => {
           const rect = element.getBoundingClientRect();
@@ -226,7 +251,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         let faceFrame = -1;
         const drawFace = (time: number) => {
           const tick = reduced ? 0 : Math.floor(time / 70);
-          const state = activity.current.speaking ? "speaking" : activity.current.signal;
+          const state = scan ? "scanning" : activity.current.speaking ? "speaking" : activity.current.signal;
           if (tick === faceFrame && state === "idle" && Math.abs(look.x - look.target) < 0.01) return;
           faceFrame = tick;
           look.x += (look.target - look.x) * 0.18;
@@ -260,7 +285,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
           const blink = !reduced && (tick % 54 === 0 || tick % 54 === 1);
           const pulse = state === "listening" ? 1 + 0.08 * Math.sin(time / 160) : 1;
           const drift = reduced ? 0 : 5 * Math.sin(time / 1900);
-          const offset = look.x * 22 + drift;
+          const offset = (state === "scanning" ? (scan?.target ? scan.dir * 1.2 : 0) : look.x) * 22 + drift;
           for (const cx of [250, 518]) {
             const x = cx + offset, y = 220;
             ctx.save();
@@ -305,7 +330,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
           }
           ctx.font = "15px monospace";
           ctx.fillStyle = "#5ea9e6";
-          ctx.fillText(state === "speaking" ? "SOZO · SPEAKING" : state === "listening" ? "SOZO · LISTENING" : "SOZO · READY", 384, 436);
+          ctx.fillText(state === "scanning" ? "SOZO · SCANNING" : state === "speaking" ? "SOZO · SPEAKING" : state === "listening" ? "SOZO · LISTENING" : "SOZO · READY", 384, 436);
           ctx.textAlign = "start";
           faceTexture.needsUpdate = true;
         };
@@ -343,11 +368,23 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         const glowTexture = new THREE.CanvasTexture(glowCanvas);
         const lensSprite = new THREE.SpriteMaterial({ map: glowTexture, color: 0x6cbcff, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
         const ledMaterial = new THREE.MeshBasicMaterial({ color: 0x4aa8ff, toneMapped: false });
-        // Holographic scanner: a level grid beam from the lens with a laser
-        // sheet sweeping vertically (uAxis 0) or horizontally (uAxis 1).
-        // uScan runs from -1 to 1 across the beam; uPresence fades it in/out.
-        const beamTall = Math.tan(0.2);
+        // Holographic scanner: a straight, level grid beam from the lens with a
+        // laser sheet sweeping top to bottom (uAxis 0), then side to side
+        // (uAxis 1), onto a flat holographic screen at its far end. uScan runs
+        // from -1 to 1 across the beam.
+        const beamTall = Math.tan(0.27);
         const beamWide = Math.tan(0.4);
+        const beamLength = 1.25;
+        // Where the ray (1, y, z) meets the screen, square to the beam.
+        const reach = (y: number, z: number, out = new THREE.Vector3()) => out.set(1, y, z).multiplyScalar(beamLength);
+        const sheetA = new THREE.Vector3(), sheetB = new THREE.Vector3();
+        // Moves a laser sheet's far edge to the current scan line.
+        const placeSheet = (mesh: import("three").Mesh, a: import("three").Vector3, b: import("three").Vector3) => {
+          const position = mesh.geometry.getAttribute("position") as import("three").BufferAttribute;
+          position.setXYZ(1, a.x, a.y, a.z);
+          position.setXYZ(2, b.x, b.y, b.z);
+          position.needsUpdate = true;
+        };
         const beamMaterial = new THREE.ShaderMaterial({
           uniforms: { uScan: { value: 0 }, uAxis: { value: 0 }, uIntensity: { value: 1 }, uColor: { value: new THREE.Color(0x3d9bff) } },
           vertexShader: "varying vec2 vUv; varying vec3 vLocal; void main(){ vUv = uv; vLocal = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
@@ -389,6 +426,30 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
           blending: THREE.AdditiveBlending,
           toneMapped: false,
         });
+        // The far screen: +1 is the top (uAxis 0) or screen right (uAxis 1).
+        const holoMaterial = new THREE.ShaderMaterial({
+          uniforms: { uScan: { value: 0 }, uAxis: { value: 0 }, uIntensity: { value: 0 } },
+          vertexShader: "varying vec3 vLocal; void main(){ vLocal = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+          fragmentShader: `uniform float uScan; uniform float uAxis; uniform float uIntensity; varying vec3 vLocal;
+            void main(){
+              vec2 p = vec2(-vLocal.z / (vLocal.x * ${beamWide.toFixed(4)}), vLocal.y / (vLocal.x * ${beamTall.toFixed(4)}));
+              float h = mix(p.y, p.x, uAxis);
+              vec2 cell = abs(fract(p * vec2(4.0, 2.5)) - 0.5);
+              float lines = smoothstep(0.46, 0.5, max(cell.x, cell.y));
+              float border = smoothstep(0.94, 0.99, max(abs(p.x), abs(p.y)));
+              float line = exp(-pow((h - uScan) * 30.0, 2.0));
+              float swept = (uAxis < 0.5 ? step(uScan, h) : step(h, uScan)) * 0.1;
+              float alpha = min(0.95, (0.05 + 0.2 * lines + 0.6 * border + 1.1 * line + swept) * uIntensity);
+              gl_FragColor = vec4(mix(vec3(0.16, 0.52, 1.0), vec3(0.62, 0.9, 1.0), line), alpha);
+            }`,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+          // Normal blending keeps the blue visible over the white shell it
+          // sits in front of; additive light would wash out to white there.
+          blending: THREE.NormalBlending,
+          toneMapped: false,
+        });
         const materials: import("three").Material[] = [
           silver,
           screen,
@@ -397,6 +458,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
           ledMaterial,
           beamMaterial,
           sheetMaterial,
+          holoMaterial,
         ];
         const originals = new Set<import("three").Material>();
         let root: import("three").Group | null = null;
@@ -449,64 +511,123 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         let beam: import("three").Group | null = null;
         let sheet: import("three").Mesh | null = null;
         let sheetSide: import("three").Mesh | null = null;
-        // Scans run while SOZO researches and, when idle, now and then in a
-        // random direction. Never with reduced motion unless working.
-        type Sweep = { axis: 0 | 1; from: number; start: number; duration: number };
-        const directions: Array<[0 | 1, number]> = [[0, 1], [0, -1], [1, -1], [1, 1]];
-        let sweep: Sweep | null = null;
-        let nextIdleScan = performance.now() + 6000 + Math.random() * 5000;
+        let lensMarker: import("three").Object3D | null = null;
         let presence = 0;
-        const startSweep = (time: number, duration: number) => {
-          const [axis, from] = directions[Math.floor(Math.random() * directions.length)];
-          sweep = { axis, from, start: time, duration };
+        const ease = (p: number) => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2);
+        const lensWorld = new THREE.Vector3();
+        // The sensor lens in viewport pixels, wherever the canvas is.
+        const lensPoint = () => {
+          if (!lensMarker) return null;
+          lensMarker.getWorldPosition(lensWorld).project(camera);
+          const r = renderer.domElement.getBoundingClientRect();
+          return { x: r.left + ((lensWorld.x + 1) / 2) * r.width, y: r.top + ((1 - lensWorld.y) / 2) * r.height };
+        };
+        const finishScan = () => {
+          if (!scan) return;
+          const done = scan;
+          scan = null;
+          if (done.flyer) { element.appendChild(renderer.domElement); done.flyer.remove(); }
+          done.overlay?.remove();
+          done.resolve();
+        };
+        // Scans run only when asked. Robot scans glide aside and sweep the
+        // screen; page scans fly beside the target, sweep it, and fly home.
+        const startScan = (target: Element | null | undefined, label: string, resolve: () => void) => {
+          finishScan();
+          if (!target) { scan = { start: performance.now(), resolve, dir: 1, label }; return; }
+          const launch = () => {
+            if (disposed || !target.isConnected) return resolve();
+            const home = element.getBoundingClientRect();
+            const k = Math.min(1, 240 / Math.max(home.width, home.height, 1));
+            const w = home.width * k, h = home.height * k, t = visibleRect(target);
+            const fits = (x: number) => x >= 8 && x + w <= innerWidth - 8;
+            const leftX = t.left - w * 0.8, rightX = t.right - w * 0.2;
+            const centre = home.left + home.width / 2;
+            const preferLeft = Math.abs(centre - leftX - w / 2) <= Math.abs(centre - rightX - w / 2);
+            let x = preferLeft ? (fits(leftX) ? leftX : rightX) : fits(rightX) ? rightX : leftX;
+            x = Math.max(8, Math.min(innerWidth - w - 8, x));
+            const y = Math.max(8, Math.min(innerHeight - h - 8, t.top - h * 0.25));
+            const flyer = document.createElement("div");
+            Object.assign(flyer.style, { position: "fixed", left: `${home.left}px`, top: `${home.top}px`, width: `${home.width}px`, height: `${home.height}px`, zIndex: "2147483645", pointerEvents: "none", transformOrigin: "0 0", transition: `transform ${TRAVEL}ms cubic-bezier(.65,0,.35,1)` });
+            document.body.appendChild(flyer);
+            flyer.appendChild(renderer.domElement);
+            if (!reduced) requestAnimationFrame(() => requestAnimationFrame(() => { flyer.style.transform = `translate(${x - home.left}px, ${y - home.top}px) scale(${k})`; }));
+            scan = { start: performance.now(), resolve, dir: t.left + t.width / 2 >= x + w / 2 ? 1 : -1, label, target, overlay: createScanOverlay(), flyer, home };
+          };
+          const r = target.getBoundingClientRect();
+          if (r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth) return launch();
+          target.scrollIntoView({ block: "center", inline: "nearest", behavior: reduced ? "auto" : "smooth" });
+          setTimeout(launch, reduced ? 0 : 550);
         };
         let led: import("three").Mesh | null = null;
         const render = (time: number) => {
           if (disposed) return;
           frame = requestAnimationFrame(render);
-          if (document.hidden || !inView || time - previous < 33) return;
+          if (document.hidden || (!inView && !scan) || time - previous < 33) return;
           previous = time;
-          drawFace(time);
           const state = activity.current.speaking ? "speaking" : activity.current.signal;
+          // Scan timeline: lead-in (glide or flight), top to bottom, side to
+          // side, a short hold, then back home.
+          let phase: ScanPhase | null = null, progress = 0, travel = 0;
+          if (scan) {
+            const t = time - scan.start, lead = scan.target ? TRAVEL : GLIDE, swept = lead + 2 * SWEEP;
+            if (reduced) { if (t < 1600) phase = "done"; else finishScan(); }
+            else if (t < lead) { phase = "travel"; travel = ease(t / lead); }
+            else if (t < lead + SWEEP) { phase = "vertical"; progress = ease((t - lead) / SWEEP); travel = 1; }
+            else if (t < swept) { phase = "horizontal"; progress = ease((t - lead - SWEEP) / SWEEP); travel = 1; }
+            else if (t < swept + HOLD + lead) {
+              phase = "done";
+              progress = 1;
+              scan.resolve();
+              const back = Math.max(0, t - swept - HOLD) / lead;
+              travel = 1 - ease(Math.min(1, back));
+              if (back > 0 && !scan.returning && scan.flyer && scan.home) {
+                scan.returning = true;
+                const home = element.getBoundingClientRect();
+                scan.flyer.style.transform = `translate(${home.left - scan.home.left}px, ${home.top - scan.home.top}px) scale(1)`;
+              }
+            } else finishScan();
+          }
+          const active = scan;
+          if (active?.overlay && active.target && phase) active.overlay.update({ rect: visibleRect(active.target), lens: lensPoint(), phase, progress, label: active.label });
+          drawFace(time);
           if (idle && !reduced) {
             idle.position.y = 0.035 * Math.sin(time / 1100);
-            idle.rotation.z = 0.015 * Math.sin(time / 1500);
-            // A slow look-around while nobody is turning the model.
+            // Level and still while scanning, so the beam stays straight.
+            idle.rotation.z += ((phase ? 0 : 0.015 * Math.sin(time / 1500)) - idle.rotation.z) * 0.2;
+            // Square to the viewer for a straight scan, or facing a page
+            // target; otherwise a slow look-around while nobody turns it.
             const resting = time - lastInteraction > 4000;
-            idle.rotation.y += ((resting ? 0.16 * Math.sin(time / 3200) : 0) - idle.rotation.y) * 0.04;
+            const facing = phase ? (active?.target ? 0.42 * active.dir : 0) : resting ? 0.16 * Math.sin(time / 3200) : 0;
+            idle.rotation.y += (facing - idle.rotation.y) * (phase ? 0.12 : 0.04);
+          }
+          if (root && !reduced) {
+            // Flights lean into the direction of travel.
+            const flying = active?.target && (phase === "travel" || active.returning);
+            const lean = flying ? (active.returning ? active.dir : -active.dir) * 0.2 * Math.sin(Math.PI * travel) : 0;
+            root.rotation.z += (lean - root.rotation.z) * 0.25;
           }
           if (beam && sheet && sheetSide) {
-            const working = state === "thinking";
-            if (!sweep || time - sweep.start > sweep.duration) {
-              sweep = null;
-              if (working) startSweep(time, reduced ? 1e9 : 1300 + Math.random() * 500);
-              else if (!reduced && time > nextIdleScan) {
-                startSweep(time, 2600 + Math.random() * 900);
-                nextIdleScan = time + 14000 + Math.random() * 14000;
-              }
+            const local = Boolean(active && !active.target);
+            const sweeping = local && (phase === "vertical" || phase === "horizontal");
+            const target = local && (sweeping || reduced || phase === "travel") ? 1 : 0;
+            presence += (target - presence) * (target > presence ? 0.22 : 0.1);
+            beam.visible = presence > 0.01;
+            lensSprite.opacity = 0.35 + 0.65 * Math.max(presence, active?.target && phase ? 1 : 0);
+            const axis = phase === "horizontal" ? 1 : 0;
+            // Top (+1) to bottom (-1), then screen left (-1) to right (+1).
+            const position = sweeping ? (axis === 0 ? 1 - 2 * progress : -1 + 2 * progress) : axis === 0 ? 1 : -1;
+            const intensity = 1.15 * presence;
+            for (const material of [beamMaterial, holoMaterial]) {
+              material.uniforms.uScan.value = position;
+              material.uniforms.uAxis.value = axis;
+              material.uniforms.uIntensity.value = intensity;
             }
-            const target = sweep ? 1 : 0;
-            presence += (target - presence) * (target > presence ? 0.22 : 0.08);
-            const visible = presence > 0.01;
-            beam.visible = visible;
-            lensSprite.opacity = 0.35 + 0.65 * presence;
-            if (visible && sweep) {
-              const progress = reduced ? 0.5 : Math.min(1, (time - sweep.start) / sweep.duration);
-              const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-              const position = sweep.from * (1 - 2 * eased);
-              const intensity = (working ? 1.3 : 1) * presence;
-              beamMaterial.uniforms.uScan.value = position;
-              beamMaterial.uniforms.uAxis.value = sweep.axis;
-              beamMaterial.uniforms.uIntensity.value = intensity;
-              sheetMaterial.uniforms.uIntensity.value = intensity * (reduced ? 0.8 : Math.min(1, Math.min(progress, 1 - progress) * 10));
-              sheet.visible = sweep.axis === 0;
-              sheetSide.visible = sweep.axis === 1;
-              sheet.rotation.z = Math.atan(position * beamTall);
-              sheetSide.rotation.y = Math.atan(position * beamWide);
-            } else {
-              beamMaterial.uniforms.uIntensity.value = 0.9 * presence;
-              sheetMaterial.uniforms.uIntensity.value = 0;
-            }
+            sheetMaterial.uniforms.uIntensity.value = sweeping ? intensity * Math.min(1, Math.min(progress, 1 - progress) * 10) : 0;
+            sheet.visible = sweeping && axis === 0;
+            sheetSide.visible = sweeping && axis === 1;
+            if (sweeping && axis === 0) placeSheet(sheet, reach(position * beamTall, beamWide, sheetA), reach(position * beamTall, -beamWide, sheetB));
+            if (sweeping && axis === 1) placeSheet(sheetSide, reach(beamTall, position * beamWide, sheetA), reach(-beamTall, position * beamWide, sheetB));
           }
           if (led) ledMaterial.color.setHSL(0.585, 1, (state === "speaking" ? 0.55 : 0.5) + (reduced ? 0 : 0.08 * Math.sin(time / (state === "speaking" ? 140 : 700))));
           controls.update();
@@ -514,6 +635,8 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         };
         frame = requestAnimationFrame(render);
         cleanup = () => {
+          scanner.current = null;
+          finishScan();
           cancelAnimationFrame(frame);
           observer.disconnect();
           element.removeEventListener("keydown", onKey);
@@ -604,13 +727,8 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         lensFlare.position.copy(lens);
         lensFlare.scale.setScalar(0.2);
         gltf.scene.add(lensFlare);
-        const length = 1.55, wide = beamWide * length, tall = beamTall * length;
-        const corners = [
-          new THREE.Vector3(length, tall, wide),
-          new THREE.Vector3(length, tall, -wide),
-          new THREE.Vector3(length, -tall, -wide),
-          new THREE.Vector3(length, -tall, wide),
-        ];
+        lensMarker = lensFlare;
+        const corners = [reach(beamTall, beamWide), reach(beamTall, -beamWide), reach(-beamTall, -beamWide), reach(-beamTall, beamWide)];
         const positions: number[] = [], uvs: number[] = [];
         for (let i = 0; i < 4; i++) {
           const a = corners[i], b = corners[(i + 1) % 4];
@@ -623,22 +741,30 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         const beamMesh = new THREE.Mesh(beamGeometry, beamMaterial);
         beamMesh.renderOrder = 2;
         const sheetGeometry = new THREE.BufferGeometry();
-        sheetGeometry.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, length, 0, wide, length, 0, -wide], 3));
+        sheetGeometry.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, ...reach(0, beamWide).toArray(), ...reach(0, -beamWide).toArray()], 3));
         sheetGeometry.setAttribute("uv", new THREE.Float32BufferAttribute([0.5, 0, 0, 1, 1, 1], 2));
         sheet = new THREE.Mesh(sheetGeometry, sheetMaterial);
         sheet.renderOrder = 3;
+        sheet.frustumCulled = false;
         // A vertical sheet for side-to-side sweeps.
         const sideGeometry = new THREE.BufferGeometry();
-        sideGeometry.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, length, tall, 0, length, -tall, 0], 3));
+        sideGeometry.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, ...reach(beamTall, 0).toArray(), ...reach(-beamTall, 0).toArray()], 3));
         sideGeometry.setAttribute("uv", new THREE.Float32BufferAttribute([0.5, 0, 0, 1, 1, 1], 2));
         sheetSide = new THREE.Mesh(sideGeometry, sheetMaterial);
         sheetSide.renderOrder = 3;
+        sheetSide.frustumCulled = false;
         sheetSide.visible = false;
-        // Straight and level: aimed to the robot's left (screen right) and
-        // slightly towards the viewer, with no tilt.
+        const holoGeometry = new THREE.BufferGeometry();
+        holoGeometry.setAttribute("position", new THREE.Float32BufferAttribute([corners[0], corners[3], corners[2], corners[1]].flatMap((corner) => corner.toArray()), 3));
+        holoGeometry.setIndex([0, 1, 2, 0, 2, 3]);
+        const holo = new THREE.Mesh(holoGeometry, holoMaterial);
+        holo.renderOrder = 1;
+        // Straight ahead out of the sensor, towards the viewer, dipped a
+        // little so the screen sits in front of the face. Local +x is the
+        // beam; the Euler order tilts it down first, then turns it forward.
         const aim = new THREE.Group();
-        aim.rotation.set(0, -0.62, 0);
-        aim.add(beamMesh, sheet, sheetSide);
+        aim.rotation.set(0, -Math.PI / 2, -0.4);
+        aim.add(beamMesh, sheet, sheetSide, holo);
         beam = new THREE.Group();
         beam.position.copy(lens);
         beam.add(aim);
@@ -668,6 +794,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         root.add(idle);
         root.scale.setScalar(2.65 / Math.max(size.x, size.y, size.z));
         scene.add(root);
+        scanner.current = (target, label = "view") => new Promise<void>((resolve) => startScan(target, label, resolve));
         setReady(true);
       } catch {
         cleanup();
@@ -717,6 +844,12 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
           Drag to discover
         </span>
         {ready && greeting && <button onClick={greet} aria-label="Say hello"><Volume2 size={14}/> Say hello</button>}
+        {ready && (
+          <button onClick={() => (onScan ? onScan() : void runScan())} disabled={scanning} aria-label={onScan ? "Scan this page" : "Scan"}>
+            <ScanLine size={14} />
+            {scanning ? "Scanning…" : "Scan"}
+          </button>
+        )}
         {failed ? (
           <button onClick={() => setAttempt((value) => value + 1)}>
             Retry 3D view

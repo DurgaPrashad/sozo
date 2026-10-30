@@ -11,7 +11,7 @@ export default function ScientificArticles({ compact = false }: { compact?: bool
   const [body, setBody] = useState("all"), [query, setQuery] = useState(""), [term, setTerm] = useState("");
   const [result, setResult] = useState<(ArticleDiscovery & {cache?:{status:string;upstreamRetrievedAt:string}[]}) | null>(null), [busy, setBusy] = useState(false), [error, setError] = useState("");
   const [limit, setLimit] = useState(compact ? 4 : 8), [selected, setSelected] = useState<ScientificArticle | null>(null);
-  const [topic, setTopic] = useState("all"), [kind, setKind] = useState("all"), [sort, setSort] = useState("relevance"), [recent, setRecent] = useState(false);
+  const [topic, setTopic] = useState("all"), [kind, setKind] = useState("all"), [sort, setSort] = useState(compact ? "date" : "relevance"), [recent, setRecent] = useState(false);
   const section = useRef<HTMLElement>(null), controller = useRef<AbortController | null>(null);
   const [visible, setVisible] = useState(!compact);
   useEffect(() => {
@@ -40,9 +40,11 @@ export default function ScientificArticles({ compact = false }: { compact?: bool
     return items;
   }, [result, topic, kind, sort, recent]);
   const topics = [...new Set((result?.records ?? []).flatMap((article) => article.topics))];
+  const thisYear = new Date().getFullYear();
+  const fresh = records.filter((article) => Number(article.year) >= thisYear).length;
   return <section ref={section} id={compact ? "articles" : undefined} className={`scientific-articles ${compact ? "articles-landing" : "articles-workspace"}`} aria-labelledby="articles-title">
     <div className="articles-heading">
-      <div><span className="section-kicker">ARTICLES & SCIENTIFIC DISCOVERIES</span><h2 id="articles-title">{compact ? <>Discover the science<br />behind the next frontier.</> : "Follow the evidence."}</h2><p>Explore Moon and Mars research from identifiable scientific publications. Inspect the record, then bring the question to SOZO.</p></div>
+      <div><span className="section-kicker">ARTICLES & SCIENTIFIC DISCOVERIES{compact ? " · LATEST FIRST" : ""}</span><h2 id="articles-title">{compact ? <>Discover the science<br />behind the next frontier.</> : "Follow the evidence."}</h2><p>Explore Moon and Mars research from identifiable scientific publications. Inspect the record, then bring the question to SOZO.{compact && fresh > 0 ? ` ${fresh} published in ${thisYear} ${fresh === 1 ? "is" : "are"} marked NEW.` : ""}</p></div>
       <button className="text-link" onClick={() => void search()} disabled={busy || !visible}><RefreshCw size={14} className={busy ? "spin" : ""} /> Refresh discovery</button>
     </div>
     <form className="articles-search" onSubmit={submit}>
@@ -53,11 +55,11 @@ export default function ScientificArticles({ compact = false }: { compact?: bool
       <div className="articles-worlds" aria-label="Filter articles by world">{[["all", "Both worlds"], ["moon", "The Moon"], ["mars", "Mars"]].map(([value, label]) => <button type="button" key={value} aria-pressed={body === value} onClick={() => { setBody(value); setLimit(compact ? 4 : 8); }}>{label}</button>)}</div>
       <label><SlidersHorizontal size={13} /><span className="sr-only">Scientific subject</span><select aria-label="Scientific subject" value={topic} onChange={(event) => setTopic(event.target.value)}><option value="all">All subjects</option>{topics.map((item) => <option key={item}>{item}</option>)}</select></label>
       <select aria-label="Publication type" value={kind} onChange={(event) => setKind(event.target.value)}><option value="all">All publication types</option><option value="paper">Journal articles</option><option value="preprint">Preprints</option></select>
-      <select aria-label="Sort scientific articles" value={sort} onChange={(event) => setSort(event.target.value)}><option value="relevance">Scientific relevance</option><option value="date">Publication year</option></select>
+      <select aria-label="Sort scientific articles" value={sort} onChange={(event) => setSort(event.target.value)}><option value="relevance">Scientific relevance</option><option value="date">Latest first</option></select>
       <label className="articles-recent"><input type="checkbox" checked={recent} onChange={(event) => setRecent(event.target.checked)} /> Last 5 years</label>
     </div>
     {error ? <div role="alert" className="articles-state"><BookOpen size={26} /><h3>Discovery needs another try.</h3><p>{error}</p><button className="secondary-button" onClick={() => void search()}>Retry</button></div> : busy && !result ? <div role="status" className="articles-state"><Loader2 className="spin" size={26} /><p>Retrieving scientific publication metadata…</p></div> : visible && result && !records.length ? <div className="articles-state"><BookOpen size={26} /><h3>No publications match these checks.</h3><p>Try a specific mission or instrument, broaden the subject, or reset your publication filters. Missing evidence is never replaced with fictional articles.</p></div> : <div className="articles-grid" aria-busy={busy}>{records.map((article) => <article className={`science-article ${article.body}`} key={article.doi || article.title}>
-      <div className="article-meta"><span className={`article-world ${article.body}`}>{article.body === "moon" ? "THE MOON" : article.body === "mars" ? "MARS" : "MOON + MARS"}</span><span>{article.year || "Year unavailable"} · {article.type}</span></div>
+      <div className="article-meta"><span className={`article-world ${article.body}`}>{article.body === "moon" ? "THE MOON" : article.body === "mars" ? "MARS" : "MOON + MARS"}</span>{Number(article.year) >= thisYear && <span className="article-new">NEW</span>}<span>{article.year || "Year unavailable"} · {article.type}</span></div>
       <h3><button onClick={() => setSelected(article)}>{article.title}</button></h3>
       <p>{article.abstract ? article.abstract.slice(0, 260) + (article.abstract.length > 260 ? "…" : "") : "Abstract unavailable in this record. Open the original publication to inspect its methods and findings."}</p>
       <div className="article-source"><BookOpen size={13} /><span>{article.journal || article.provider}</span></div>

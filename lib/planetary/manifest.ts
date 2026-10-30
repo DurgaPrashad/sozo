@@ -404,12 +404,24 @@ function toDataset(
     lastSynchronized: null,
   };
 }
-export const lunarCapabilities = [
+export type Capability = {
+  letter: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  highlight: string;
+  // Opens the whole-world globe instead of the regional planner.
+  link?: "globe";
+  specifics: string[];
+  detail: string;
+};
+export const lunarCapabilities: Capability[] = [
   {
     letter: "A",
     title: "Terrain & light",
     subtitle: "See the surface. Understand the shadows.",
     image: "moon-light",
+    highlight: "LROC NAC 1 m",
     specifics: [
       "Terrain products retain uncertainty, effective resolution, and laser return counts.",
       "USGS streams LROC NAC and ShadowCam 1 m mosaics, including available observations within permanent shadows.",
@@ -423,6 +435,7 @@ export const lunarCapabilities = [
     title: "A route with a reason",
     subtitle: "Compare distance. Inspect the trade-offs.",
     image: "moon-routes",
+    highlight: "Up to 8 stops",
     specifics: [
       "Compare shortest and lower-risk routes with up to eight stops.",
       "Inspect sunlight and Earth line of sight along the route, plus a return-to-start check.",
@@ -436,6 +449,7 @@ export const lunarCapabilities = [
     title: "Follow the resource evidence",
     subtitle: "Potential is a question, not a discovery.",
     image: "moon-ice",
+    highlight: "Diviner below 110 K",
     specifics: [
       "Barker et al. 2023 supplies permanent-shadow and roughness products.",
       "Diviner cold traps use the reported threshold below 110 K.",
@@ -449,6 +463,7 @@ export const lunarCapabilities = [
     title: "A different perspective",
     subtitle: "Play back the route in three dimensions.",
     image: "moon-3d-playback",
+    highlight: "LOLA 5 m terrain",
     specifics: [
       "Playback follows LOLA 5 m terrain with an Apollo LRV and an astronaut.",
       "The project reports a Sun/Earth ephemeris check against JPL Horizons to 0.00002°; SOZO has not independently repeated that validation.",
@@ -462,6 +477,8 @@ export const lunarCapabilities = [
     title: "The whole Moon, connected",
     subtitle: "Every landmark has a history.",
     image: "moon-globe",
+    highlight: "2,045 IAU names",
+    link: "globe",
     specifics: [
       "The object inventory cites LROC and Wagner et al. 2017, with evidence for each location.",
       "Apollo, Luna, Chang’e, and other located landers are distinct from planned missions.",
@@ -475,6 +492,7 @@ export const lunarCapabilities = [
     title: "From investigation to mission",
     subtitle: "Keep the reasoning with the route.",
     image: "moon-mission-plan",
+    highlight: "PDF + GeoJSON",
     specifics: [
       "The dark PDF report preserves distance, mission time, steepest cell, both routes, and arrival visibility.",
       "GeoJSON exports include routes and stops.",
@@ -482,5 +500,94 @@ export const lunarCapabilities = [
     ],
     detail:
       "The MOMAR prototype reports both routes, timeline, sources, limits, sunlight, Earth visibility, and science along the way. PDF and GeoJSON exports preserve the plan.",
+  },
+];
+// What the MOMAR Jezero planner and Mars globe show, as captured from
+// www.momar.si on 30 October 2026.
+export const marsCapabilities: Capability[] = [
+  {
+    letter: "A",
+    title: "Terrain intelligence",
+    subtitle: "Read the ground before the rover does.",
+    image: "mars-terrain",
+    highlight: "HiRISE 25 cm · CTX 6 m",
+    specifics: [
+      "Imagery layers: CTX orthoimage 6 m (MRO Context Camera), HiRISE 25 cm streamed from NASA Trek, Viking MDIM 2.1 colour 231 m, THEMIS day IR 100 m and MOLA hillshade 463 m.",
+      "Elevation, hillshade and Horn-method slope are derived in the browser from a 20 m CTX DTM.",
+      "Pointing at the map reads out elevation, slope, the mapped geologic unit and THEMIS/TES thermal inertia.",
+    ],
+    detail:
+      "Jezero Crater on a 20 m terrain grid. Switch CTX, HiRISE, THEMIS and MOLA layers, and read slope, elevation, geologic unit and thermal inertia anywhere on the map.",
+  },
+  {
+    letter: "B",
+    title: "A route with a reason",
+    subtitle: "Lower risk or shortest. See why.",
+    image: "mars-routes",
+    highlight: "Up to 8 stops",
+    specifics: [
+      "Compare the lower-risk and shortest routes from A to B with up to eight stops in between.",
+      "Start from scenarios built on real Perseverance stops: rim ascent, crater rim ascent (≈530 m climb), up the fan delta, and crater floor to fan front from Octavia E. Butler Landing.",
+      "Each stop shows its arrival time, a confidence label and the rover images taken nearby.",
+    ],
+    detail:
+      "Lower-risk and shortest routes across Jezero with up to eight stops, starting from scenarios built on real Perseverance stops between sols 420 and 1400.",
+  },
+  {
+    letter: "C",
+    title: "Follow the science",
+    subtitle: "Stops chosen at geologic contacts.",
+    image: "mars-science",
+    highlight: "CRISM archive",
+    specifics: [
+      "Suggested science stops sit on contacts between mapped geologic units (USGS SIM 3464), each with a confidence label.",
+      "Each stop lists the CRISM observations that cover it from the PDS archive (calibrated I/F), with date, solar longitude, incidence and resolution.",
+      "These are archive records only: MOMAR derives no spectra here, so no mineral identification is claimed.",
+    ],
+    detail:
+      "Science stops at mapped geologic contacts, with the CRISM observations covering each point and the rover images taken within 250 m. Archive records, not derived spectra.",
+  },
+  {
+    letter: "D",
+    title: "A different perspective",
+    subtitle: "Drive the route in three dimensions.",
+    image: "mars-3d-playback",
+    highlight: "Perseverance in 3D",
+    specifics: [
+      "Play back the lower-risk or shortest route with Perseverance, an astronaut, or both, using orbit, follow or overview cameras.",
+      "The readout tracks the sol, local true solar time, Sun and Earth positions and the distance driven.",
+      "Terrain is shown at true vertical scale; close-range rocks and detail are labelled illustrative, and detail lowers automatically to keep playback smooth.",
+    ],
+    detail:
+      "Replay the route on Jezero terrain with Perseverance or an astronaut, with the Sun and Earth placed by sol and local solar time. Close-range detail is illustrative.",
+  },
+  {
+    letter: "E",
+    title: "See what the rover saw",
+    subtitle: "Real images, placed on the route.",
+    image: "mars-photographs",
+    highlight: "626 rover images",
+    specifics: [
+      "626 raw Perseverance images from sols 1204–1400; 625 are placed at a localized rover position.",
+      "Filter by camera (Navcam, Mastcam-Z, Front Hazcam, SuperCam RMI, SHERLOC WATSON), by sol range, or near a stop.",
+      "A map position is where the rover was on that sol, not the camera's view footprint.",
+    ],
+    detail:
+      "626 raw Perseverance images from sols 1204–1400, plotted along the traverse and filtered by camera, sol or distance from a stop.",
+  },
+  {
+    letter: "F",
+    title: "The whole of Mars, connected",
+    subtitle: "Every name, every landing site.",
+    image: "mars-globe",
+    highlight: "219 IAU names",
+    link: "globe",
+    specifics: [
+      "Viking MDIM 2.1 colour with CTX global mosaic detail (NASA/JPL/MSSS/The Murray Lab) and MOLA 463 m relief.",
+      "Relief can be flat, true, or exaggerated 3× or 10×.",
+      "Search IAU names or jump to Jezero, Gale, Olympus Mons, Valles Marineris, Hellas, Gusev and other sites, then pick a site to plan.",
+    ],
+    detail:
+      "A 3D Mars globe with 219 IAU names, Viking colour, CTX detail and MOLA relief. Jump to Jezero, Gale, Olympus Mons or Valles Marineris and choose a site.",
   },
 ];

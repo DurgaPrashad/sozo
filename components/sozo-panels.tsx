@@ -529,6 +529,7 @@ export function AnalysisLab() {
     </>
   );
 }
+type WebsiteKey = { id: string; key: string; label: string; origins: string[]; createdAt: string };
 export function Developers({ notify }: { notify: (v: string) => void }) {
   const [tab, setTab] = useState("quickstart");
   const [base, setBase] = useState("");
@@ -538,7 +539,25 @@ export function Developers({ notify }: { notify: (v: string) => void }) {
   const [name, setName] = useState("");
   const [newKey, setNewKey] = useState("");
   const [busy, setBusy] = useState(false);
+  const [sites, setSites] = useState<WebsiteKey[]>([]);
+  const [siteLabel, setSiteLabel] = useState(""), [siteOrigins, setSiteOrigins] = useState("");
   useEffect(() => setBase(window.location.origin), []);
+  // Publishable keys live with the companion API, not /api/v1.
+  const websiteKeys = async (method = "GET", body?: unknown) => {
+    const response = await fetch("/api/companion/publishable-keys", { method, headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+    const data = (await response.json()) as { error?: { message?: string }; keys?: WebsiteKey[] };
+    if (!response.ok) throw new Error(data.error?.message || "Something went wrong. Please try again.");
+    return data;
+  };
+  const loadSites = async () => {
+    try {
+      setSites((await websiteKeys()).keys ?? []);
+    } catch (e) {
+      notify((e as Error).message);
+    }
+  };
+  const embed = (key: string) =>
+    `<script src="${base}/embed/sozo-widget.js"></script>\n<sozo-companion api-base="${base}" publishable-key="${key}"></sozo-companion>\n<script>\n  // Optional: "scan the route" flies SOZO to this panel and reads it.\n  document.querySelector("sozo-companion")\n    .registerTarget("route", document.querySelector("#route-panel"));\n</script>`;
   const loadKeys = async () => {
     try {
       setKeys((await api("keys")).keys);
@@ -589,6 +608,7 @@ export function Developers({ notify }: { notify: (v: string) => void }) {
           ["quickstart", "Quickstart"],
           ["reference", "API reference"],
           ["keys", "API keys"],
+          ["websites", "Website keys"],
         ].map(([id, label]) => (
           <button
             key={id}
@@ -596,6 +616,7 @@ export function Developers({ notify }: { notify: (v: string) => void }) {
             onClick={() => {
               setTab(id);
               if (id === "keys") loadKeys();
+              if (id === "websites") loadSites();
             }}
           >
             {label}
@@ -681,6 +702,76 @@ export function Developers({ notify }: { notify: (v: string) => void }) {
               <p>{detail}</p>
             </div>
           ))}
+        </div>
+      )}
+      {tab === "websites" && (
+        <div className="key-section">
+          <h3>SOZO on any website.</h3>
+          <p>
+            A publishable key is public: it goes in your page. It works only
+            from the websites you list, and each visitor gets a ten-minute
+            companion session that shares your workspace quotas (30 requests a
+            minute, 240 an hour). Signed-in or high-volume products should
+            issue sessions from their backend instead.
+          </p>
+          <form
+            className="key-form website-key-form"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setBusy(true);
+              try {
+                await websiteKeys("POST", { label: siteLabel, origins: siteOrigins.split(/[\s,]+/).filter(Boolean) });
+                setSiteLabel("");
+                setSiteOrigins("");
+                loadSites();
+                notify("Website key created.");
+              } catch (e) {
+                notify((e as Error).message);
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            <input required maxLength={100} placeholder="Label, e.g. MOMAR planner" aria-label="Website key label" value={siteLabel} onChange={(e) => setSiteLabel(e.target.value)} />
+            <input required placeholder="https://www.momar.si, http://localhost:3000" aria-label="Websites allowed to use the key" value={siteOrigins} onChange={(e) => setSiteOrigins(e.target.value)} />
+            <button className="primary-button" disabled={busy}>
+              <Plus size={15} />
+              Create key
+            </button>
+          </form>
+          <div className="keys-list">
+            {sites.map((k) => (
+              <div key={k.id}>
+                <Code2 size={18} />
+                <span>
+                  <strong>{k.label}</strong>
+                  <small>
+                    {k.key} · {k.origins.join(", ")} · Created {date(k.createdAt)}
+                  </small>
+                </span>
+                <button className="text-button" onClick={() => copy(embed(k.key))}>
+                  <Copy size={14} />
+                  Embed code
+                </button>
+                <button
+                  className="text-button danger"
+                  onClick={async () => {
+                    try {
+                      await websiteKeys("DELETE", { id: k.id });
+                      loadSites();
+                      notify("Website key revoked.");
+                    } catch (e) {
+                      notify((e as Error).message);
+                    }
+                  }}
+                >
+                  Revoke
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+          {codeBlock("HTML", embed(sites[0]?.key ?? "sozo_pk_your_key"))}
         </div>
       )}
       {tab === "keys" && (

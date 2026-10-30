@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useImperativeHandle, useRef, useState, type FormEvent } from "react";
 import { Mic, MicOff, Send, Square, MonitorUp, Volume2, VolumeX, X, Loader2, RotateCcw, Bot } from "lucide-react";
-import RobotCompanion from "./robot-companion";
+import RobotCompanion, { type RobotControls } from "./robot-companion";
+import { findScanTarget, readScan, SCAN_REQUEST, type ScanReading, type ScanTarget } from "./page-scan";
 import ScientificText from "./scientific-text";
 import { COMPUTATIONAL } from "../lib/science/astro";
 
@@ -21,7 +22,9 @@ type ServiceData = {
 type Calculation = { operation: string; result?: Record<string, number | string>; error?: string };
 type Message = { role: "user" | "assistant"; content: string; citations?: Citation[]; limitations?: string[]; analysis?: Analysis; answeredBy?: string; calculations?: Calculation[] };
 type Style = "brief" | "standard" | "detailed";
-type Stage = "idle" | "retrieving" | "reading" | "answering" | "streaming";
+type Stage = "idle" | "scanning" | "retrieving" | "reading" | "answering" | "streaming";
+// What an embedding page can ask the companion to do.
+export type ConsoleCommands = { scan(target?: string | Element, question?: string): Promise<void> };
 
 // "transfer_time_days" → "transfer time 258.9 days"
 const UNITS: Record<string, string> = { km_s: "km/s", m_s2: "m/s²", m_s: "m/s", days: "days", h: "h", min: "min", s: "s", km: "km", kg: "kg", g: "g" };
@@ -39,8 +42,16 @@ const store = (key: string, value: string) => { try { localStorage.setItem(key, 
 // Literature search helps scientific questions; small talk skips it.
 const scientific = /moon|lunar|mars|martian|rover|terrain|space|mission|geolog|ice|shadow|crater|instrument|paper|evidence|route|map|study|scientific|citation|rocket|orbit|orbital|delta-?v|propuls|thrust|spacecraft|satellite|astronaut|eva|iss|asteroid|comet|planet|radiation|robot|launch|trajector|habitat/i;
 
-export type CompanionConsoleProps = { apiBase?: string; getToken?: () => Promise<string>; sharedContext?: Record<string, unknown>; embedded?: boolean };
-export default function CompanionConsole({ apiBase = "", getToken, sharedContext, embedded = false }: CompanionConsoleProps) {
+export type CompanionConsoleProps = {
+  apiBase?: string;
+  getToken?: () => Promise<string>;
+  sharedContext?: Record<string, unknown>;
+  embedded?: boolean;
+  // Page areas the host registered by name, for "scan the route" and so on.
+  scanTargets?: Map<string, ScanTarget>;
+  commands?: { current: ConsoleCommands | null };
+};
+export default function CompanionConsole({ apiBase = "", getToken, sharedContext, embedded = false, scanTargets, commands }: CompanionConsoleProps) {
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [stage, setStage] = useState<Stage>("idle");
@@ -54,6 +65,7 @@ export default function CompanionConsole({ apiBase = "", getToken, sharedContext
   const [vision, setVision] = useState(false);
   const [models, setModels] = useState<{ primary: string | null; meta: { configured: boolean; model: string | null } }>({ primary: null, meta: { configured: false, model: null } });
   const busy = stage !== "idle";
+  const robot = useRef<RobotControls | null>(null), panel = useRef<HTMLElement>(null);
   const abort = useRef<AbortController | null>(null), player = useRef<{ stop: () => void } | null>(null), recorder = useRef<MediaRecorder | null>(null), stream = useRef<MediaStream | null>(null), audioUrl = useRef("");
 
   const request = async (path: string, init: RequestInit = {}) => {
@@ -130,20 +142,44 @@ export default function CompanionConsole({ apiBase = "", getToken, sharedContext
       return last?.role === "assistant" ? [...prev.slice(0, -1), change(last)] : [...prev, change({ role: "assistant", content: "" })];
     });
 
-  const ask = async (content: string) => {
-    setError(null); setStage("retrieving"); setSources(0); stopAudio();
+  // The companion itself (its shadow host when embedded) is never scanned.
+  const own = () => { const root = panel.current?.getRootNode(); return root instanceof ShadowRoot ? root.host : panel.current; };
+  // Flies the robot to the named (or best) target, scans it and reads its
+  // visible text. Null when the page has nothing to scan.
+  const scanPage = async (name: string, element?: Element): Promise<ScanReading | null> => {
+    const exclude = own() ?? null;
+    const target = element ? { element, label: element.getAttribute("data-sozo-target") || element.getAttribute("aria-label") || "selection", whole: false } : findScanTarget(name, scanTargets ?? new Map(), exclude);
+    if (!target) { await robot.current?.scan(); return null; }
+    // Read once the target has been scrolled into view and swept.
+    await robot.current?.scan(target.element, target.label);
+    return readScan(target, exclude);
+  };
+
+  const ask = async (content: string, options: { scan?: boolean; scanName?: string; scanTarget?: Element } = {}) => {
+    setError(null); setSources(0); stopAudio();
     abort.current = new AbortController();
     const history = messages.slice(-8).map(({ role, content: text }) => ({ role, content: text }));
     setMessages((prev) => [...prev, { role: "user", content }]);
-    // Calculations are their own evidence; literature would only add noise.
-    const retrieve = !COMPUTATIONAL.test(content) && scientific.test(content + history.slice(-2).map((x) => x.content).join(" "));
+    let scan: ScanReading | null = null;
+    if (options.scan || options.scanTarget || SCAN_REQUEST.test(content)) {
+      setStage("scanning");
+      scan = await scanPage(options.scanName ?? content, options.scanTarget);
+      if (!scan) {
+        setStage("idle");
+        setMessages((prev) => [...prev, { role: "assistant", content: "I looked around, but this page has nothing I can scan: no map, large canvas or area marked with data-sozo-target. Point me at one, or share a snapshot under Map & exploration context." }]);
+        return;
+      }
+    }
+    setStage("retrieving");
+    // Calculations and page scans are their own evidence; literature would only add noise.
+    const retrieve = !scan && !COMPUTATIONAL.test(content) && scientific.test(content + history.slice(-2).map((x) => x.content).join(" "));
     let answer = "";
     try {
       const response = await request("chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
         signal: abort.current.signal,
-        body: JSON.stringify({ message: content, history, retrieve, style, context: { ...sharedContext, body, notes: [sharedContext?.notes, notes].filter(Boolean).join("\n"), ...(screenshot ? { screenshot } : {}) } }),
+        body: JSON.stringify({ message: content, history, retrieve, style, context: { ...sharedContext, body, notes: [sharedContext?.notes, notes].filter(Boolean).join("\n"), ...(screenshot ? { screenshot } : {}), ...(scan ? { scan } : {}) } }),
       });
       if (!response.headers.get("content-type")?.includes("event-stream")) {
         const data = await response.json() as ServiceData;
@@ -192,6 +228,13 @@ export default function CompanionConsole({ apiBase = "", getToken, sharedContext
       if (!answer) { setMessages((prev) => prev.slice(0, -1)); setDraft(content); }
     }
   };
+  useImperativeHandle(commands, () => ({
+    scan: async (target, question) => {
+      if (busy) throw new Error("SOZO is still answering. Try again in a moment.");
+      const name = typeof target === "string" ? target : undefined;
+      await ask(question?.trim() || (name ? `Scan the ${name}` : "Scan this page"), { scan: true, scanName: name, scanTarget: typeof target === "string" ? undefined : target });
+    },
+  }));
   const submit = async (event?: FormEvent) => {
     event?.preventDefault();
     if (!draft.trim() || busy) return;
@@ -250,12 +293,12 @@ export default function CompanionConsole({ apiBase = "", getToken, sharedContext
     finally { capture?.getTracks().forEach((t) => t.stop()); }
   };
 
-  const working = stage === "retrieving" ? "Searching Crossref and Europe PMC…" : stage === "reading" ? `Reading ${sources} source${sources === 1 ? "" : "s"}…` : stage === "answering" ? "Working out the answer…" : "";
+  const working = stage === "scanning" ? "Scanning the page…" : stage === "retrieving" ? "Searching Crossref and Europe PMC…" : stage === "reading" ? `Reading ${sources} source${sources === 1 ? "" : "s"}…` : stage === "answering" ? "Working out the answer…" : "";
   const signal = recording ? "listening" : stage === "streaming" ? "speaking" : busy ? "thinking" : speaking ? "speaking" : "idle";
-  return <section className={`companion-console ${embedded ? "embedded" : ""}`} aria-label="Talk with SOZO">
+  return <section ref={panel} className={`companion-console ${embedded ? "embedded" : ""}`} aria-label="Talk with SOZO">
     <div className="companion-avatar">
-      <RobotCompanion assetBase={apiBase} speaking={speaking || stage === "streaming"} signal={signal} greeting={false} />
-      <div className="companion-live-label"><i />{recording ? "Microphone on" : speaking ? "Speaking" : stage === "streaming" ? "Answering" : busy ? "Researching your question" : "Ready when you are"}</div>
+      <RobotCompanion assetBase={apiBase} speaking={speaking || stage === "streaming"} signal={signal} greeting={false} controls={robot} onScan={() => { if (!busy) void ask("Scan this page"); }} />
+      <div className="companion-live-label"><i />{recording ? "Microphone on" : speaking ? "Speaking" : stage === "scanning" ? "Scanning" : stage === "streaming" ? "Answering" : busy ? "Researching your question" : "Ready when you are"}</div>
     </div>
     <div className="companion-conversation">
       <header>
@@ -273,7 +316,7 @@ export default function CompanionConsole({ apiBase = "", getToken, sharedContext
         </div>
       </header>
       <div className="companion-messages" aria-live="polite" aria-busy={busy}>
-        {!messages.length && <div className="companion-welcome"><p>Ask about a world, a rocket or an orbit. SOZO shows the evidence and the working.</p><div className="console-prompts">{["What evidence supports lunar south-pole ice?", "Delta-v for a Hohmann transfer from LEO to GEO?", "What hazards matter for a rover at Jezero?"].map((text) => <button key={text} onClick={() => setDraft(text)}>{text}</button>)}</div></div>}
+        {!messages.length && <div className="companion-welcome"><p>Ask about a world, a rocket or an orbit. SOZO shows the evidence and the working.</p><div className="console-prompts">{["What evidence supports lunar south-pole ice?", "Delta-v for a Hohmann transfer from LEO to GEO?", "Scan this page"].map((text) => <button key={text} onClick={() => setDraft(text)}>{text}</button>)}</div></div>}
         {messages.map((message, i) => <article className={`companion-message ${message.role}`} key={i}>
           <strong>{message.role === "user" ? "You" : "SOZO"}</strong>
           <ScientificText text={message.content} sources={message.citations?.filter((c): c is { url: string; title: string } => Boolean(c.url && c.title))} />

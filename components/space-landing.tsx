@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Globe2,
   ScanLine,
+  Cpu,
 } from "lucide-react";
 import PlanetScene from "./planet-scene";
 import MissionFilm from "./mission-film";
@@ -19,13 +20,52 @@ import ScientificArticles from "./scientific-articles";
 import {
   planetaryMetrics,
   lunarCapabilities,
+  marsCapabilities,
   datasets,
   type PlanetaryBody,
 } from "../lib/planetary/manifest";
+import { SOZO_MODELS, MODEL_STATUS_LABEL, type ModelCategory } from "../lib/companion/models";
 const metrics = planetaryMetrics();
 const lunar = metrics.bodies.moon;
 const mars = metrics.bodies.mars;
 const number = (value: number) => value.toLocaleString("en-US");
+// The prototype section's two worlds, with the figures worth leading with.
+const prototypes = {
+  moon: {
+    eyebrow: "INSIDE THE MOMAR LUNAR PROTOTYPE",
+    intro: "Six connected perspectives at the lunar south pole, from terrain and light to the mission plan.",
+    capabilities: lunarCapabilities,
+    world: lunar,
+    cta: "Open the lunar prototype",
+    highlights: [
+      [`≈${number(lunar.areaKm2)} km²`, "South-pole workspace"],
+      [`${lunar.gridMeters} m`, "Terrain grid"],
+      [String(lunar.integratedOrDerivedSources), "Integrated or derived sources"],
+      [number(lunar.namedFeatures), `IAU names · ${lunar.locatedObjects} located objects`],
+    ],
+  },
+  mars: {
+    eyebrow: "INSIDE THE MOMAR MARS PROTOTYPE",
+    intro: "Six connected perspectives on Jezero Crater, from terrain and routes to rover photographs and the whole planet.",
+    capabilities: marsCapabilities,
+    world: mars,
+    cta: "Open the Mars planner",
+    highlights: [
+      ["Jezero + Gale", "Detailed workspaces"],
+      [`${mars.gridMeters} m`, "Terrain grid"],
+      ["626", "Perseverance images on the route"],
+      [number(mars.namedFeatures), "IAU names on the globe"],
+    ],
+  },
+} as const;
+const modelCategories: ("All" | ModelCategory)[] = ["All", "Space science", "Rockets & engines", "Orbital calculations", "Planetary zones", "Planets & imagery", "Voice"];
+const modelExample = `curl https://sozo.momar.si/api/companion/models
+
+curl -X POST https://sozo.momar.si/api/companion/chat \\
+  -H "Authorization: Bearer $SOZO_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"message":"Earth to Mars transfer time and delta-v?",
+       "provider":"sarvam","style":"brief"}'`;
 function Brand() {
   return (
     <a className="premium-brand" href="/" aria-label="SOZO home">
@@ -36,8 +76,12 @@ function Brand() {
 }
 export default function SpaceLanding() {
   const [menu, setMenu] = useState(false),
-    [body, setBody] = useState<PlanetaryBody>("moon");
+    [body, setBody] = useState<PlanetaryBody>("moon"),
+    [world, setWorld] = useState<PlanetaryBody>("moon"),
+    [category, setCategory] = useState<(typeof modelCategories)[number]>("All");
   const current = metrics.bodies[body];
+  const prototype = prototypes[world];
+  const models = SOZO_MODELS.filter((model) => category === "All" || model.category === category);
   return (
     <div className="premium-site">
       <a className="space-skip" href="#frontiers">
@@ -57,7 +101,16 @@ export default function SpaceLanding() {
           <a href="#intelligence" onClick={() => setMenu(false)}>
             SOZO agent
           </a>
-          <a href="#articles" onClick={() => setMenu(false)}>Articles</a>
+          <a href={metrics.sourceUrl} target="_blank" rel="noreferrer" className="nav-external">
+            MOMAR
+            <ArrowUpRight size={12} />
+          </a>
+          <a href="#articles" onClick={() => setMenu(false)}>
+            Articles <span className="nav-new">NEW</span>
+          </a>
+          <a href="#models" onClick={() => setMenu(false)}>
+            Models
+          </a>
           <a href="#evidence" onClick={() => setMenu(false)}>
             The evidence
           </a>
@@ -364,6 +417,89 @@ export default function SpaceLanding() {
           </div>
         </section>
         <ScientificArticles compact />
+        <section className="models-section premium-section" id="models">
+          <div className="models-heading">
+            <div>
+              <span className="premium-eyebrow">
+                <Cpu size={14} />
+                SOZO MODELS / ONE API
+              </span>
+              <h2>
+                Models for every
+                <br />
+                <span>part of the mission.</span>
+              </h2>
+            </div>
+            <p>
+              Science, rockets, orbits and planetary zones. Live models answer
+              through one API today; everything else says plainly where it
+              stands.
+            </p>
+          </div>
+          <div className="models-filter" role="group" aria-label="Filter models by field">
+            {modelCategories.map((value) => (
+              <button key={value} type="button" aria-pressed={category === value} onClick={() => setCategory(value)}>
+                {value}
+              </button>
+            ))}
+          </div>
+          <div className="models-grid">
+            {models.map((model) => (
+              <article key={model.id} className={`model-card ${model.status}`}>
+                <div className="model-card-top">
+                  <span>{model.category}</span>
+                  <span className={`premium-status ${model.status === "live" ? "" : model.status}`}>{MODEL_STATUS_LABEL[model.status]}</span>
+                </div>
+                <h3>{model.name}</h3>
+                <p>{model.summary}</p>
+                <ul>
+                  {model.capabilities.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <div className="model-meta">
+                  <span>{model.provider}</span>
+                  {model.model && <code>{model.model}</code>}
+                </div>
+                {model.access ? (
+                  <code className="model-access">
+                    <b>{model.access.method}</b> {model.access.path}
+                    <i> · {model.access.use}</i>
+                  </code>
+                ) : model.status === "prototype" ? (
+                  <a className="model-access" href={metrics.sourceUrl} target="_blank" rel="noreferrer">
+                    Open in MOMAR <ArrowUpRight size={12} />
+                  </a>
+                ) : (
+                  <span className="model-access muted">On the roadmap</span>
+                )}
+              </article>
+            ))}
+          </div>
+          <div className="models-api">
+            <div>
+              <h3>One API for all of it.</h3>
+              <p>
+                List the models, then ask. The same request works from a
+                server, the CLI, or the companion embedded on any website with
+                a publishable key.
+              </p>
+              <div className="models-api-links">
+                <a href="/dashboard?view=developers" className="premium-button light">
+                  Get an API key
+                  <ArrowUpRight size={16} />
+                </a>
+                <a href="/api/companion/models" target="_blank" rel="noreferrer" className="premium-text-link">
+                  GET /api/companion/models
+                  <ArrowUpRight size={14} />
+                </a>
+              </div>
+            </div>
+            <pre>
+              <code>{modelExample}</code>
+            </pre>
+          </div>
+        </section>
         <section className="evidence-section premium-section" id="evidence">
           <div className="evidence-heading">
             <div>
@@ -499,41 +635,68 @@ export default function SpaceLanding() {
         <section className="prototype-section premium-section" id="prototype">
           <div className="prototype-heading">
             <div>
-              <span className="premium-eyebrow">
-                INSIDE THE MOMAR LUNAR PROTOTYPE
-              </span>
+              <span className="premium-eyebrow">{prototype.eyebrow}</span>
               <h2>
                 See the surface.
                 <br />
                 <span>Understand the possibilities.</span>
               </h2>
             </div>
-            <p>
-              Six connected perspectives, from terrain and light to the mission
-              plan. Open the external prototype to explore its working tools.
-            </p>
+            <div className="prototype-heading-side">
+              <div className="premium-body-tabs prototype-tabs" role="group" aria-label="Choose a world">
+                {(["moon", "mars"] as const).map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setWorld(value)}
+                    aria-pressed={world === value}
+                    className={world === value ? `active ${value}` : value}
+                  >
+                    {value === "moon" ? "The Moon" : "Mars"}
+                  </button>
+                ))}
+              </div>
+              <p>
+                {prototype.intro} Open the external prototype to explore its
+                working tools.
+              </p>
+            </div>
           </div>
-          <div className="premium-prototypes">
-            {lunarCapabilities.map((feature) => (
+          <div className={`prototype-highlights ${world}`}>
+            {prototype.highlights.map(([value, label]) => (
+              <span key={label}>
+                <strong>{value}</strong>
+                {label}
+              </span>
+            ))}
+            <a href={prototype.world.url} target="_blank" rel="noreferrer">
+              {prototype.cta}
+              <ArrowUpRight size={15} />
+            </a>
+          </div>
+          <div className={`premium-prototypes ${world}`} key={world}>
+            {prototype.capabilities.map((feature) => (
               <article key={feature.letter}>
                 <a
                   className="premium-prototype-image"
-                  href={lunar.url}
+                  href={feature.link === "globe" ? prototype.world.globeUrl : prototype.world.url}
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`Open MOMAR ${feature.title}`}
                 >
                   <img
                     src={`/planetary/${feature.image}.webp`}
-                    alt={`MOMAR prototype: ${feature.title}`}
+                    alt={`MOMAR ${world === "moon" ? "lunar" : "Mars"} prototype: ${feature.title}`}
                     loading="lazy"
                   />
                   <span>
                     {feature.letter}
                     <ArrowUpRight size={17} />
                   </span>
+                  <em>{feature.highlight}</em>
                 </a>
                 <div>
+                  <small className="prototype-subtitle">{feature.subtitle}</small>
                   <h3>{feature.title}</h3>
                   <p>{feature.detail}</p>
                   <details>

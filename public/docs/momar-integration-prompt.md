@@ -8,7 +8,9 @@ Before you paste it:
 2. Add these to the MOMAR **backend** environment (never the browser bundle):
    `SOZO_BASE_URL=https://sozo.momar.si` and `SOZO_API_KEY=<the sozo_… key>`.
 
-The machine-readable contract is at https://sozo.momar.si/openapi.json.
+For the embedded 3D companion only (no backend proxy), you can instead create a **publishable key** under **API & developers → Website keys** for `https://www.momar.si` and put it in the page; see "Embedded companion and scanning" below.
+
+The machine-readable contract is at https://sozo.momar.si/openapi.json, and the model catalog at https://sozo.momar.si/api/companion/models.
 
 ````text
 You are integrating SOZO into MOMAR. SOZO is an AI space scientist API at
@@ -50,7 +52,10 @@ Cannot (never present it as doing these):
    {"allowedOrigin":"https://www.momar.si"}; the browser calls
    /api/companion/* with `Authorization: Bearer <token>`. Keep tokens in
    memory only and refresh after expiresAt. Tokens work only from that exact
-   origin and only for companion endpoints.
+   origin and only for companion endpoints. Without a backend, a publishable
+   key (sozo_pk_…, public, bound to https://www.momar.si) buys the same
+   token: POST /api/companion/sessions with `Authorization: Bearer sozo_pk_…`
+   from the browser.
 4. Use a 60-second timeout. Retry 429/502/503 with exponential backoff (max 2
    retries). Never retry 400/401/403/413.
 
@@ -172,6 +177,35 @@ Add an "Ask SOZO" panel to the Moon and Mars planners:
 - SOZO output never triggers an action by itself. Applying a suggested
   route, waypoint or plan change requires an explicit user confirmation.
 
+## Embedded companion and scanning
+
+If MOMAR shows SOZO's 3D companion, use the ready-made component:
+
+```html
+<script src="https://sozo.momar.si/embed/sozo-widget.js"></script>
+<sozo-companion api-base="https://sozo.momar.si"
+  publishable-key="sozo_pk_…"></sozo-companion>
+```
+
+(or `session-endpoint="/api/sozo/session"` when MOMAR's backend issues the
+token). Then name the areas SOZO may scan:
+
+```js
+const sozo = document.querySelector("sozo-companion");
+sozo.registerTarget("map", document.querySelector(".leaflet-container"));
+sozo.registerTarget("route", routePanelElement, () => toSozoContext(plan));
+sozo.registerTarget("default", routePanelElement); // used for a plain "scan"
+sozo.setContext(toSozoContext(plan));
+```
+
+When the user types "scan the route" (or presses Scan, or MOMAR calls
+`sozo.scan("route", "What are the risks on this route?")`), the robot flies
+from its place to that panel, sweeps it top to bottom and side to side, reads
+the panel's visible text (plus the describe() result), flies home and answers.
+It reads text only: no map pixels, images or form fields, and emails, card
+numbers and keys are redacted. Keep sensitive panels out of scans with
+`data-sozo-ignore`, or mark scannable areas with `data-sozo-target="name"`.
+
 ## If MOMAR has its own AI assistant
 
 Expose SOZO as a tool instead of copying its logic:
@@ -206,6 +240,8 @@ Expose SOZO as a tool instead of copying its logic:
    browser network tab or bundle.
 6. A 429 shows a friendly "SOZO is busy, retry in a minute" state.
 7. A research report completes (or reports partial) and shows citations.
+8. "Scan the route" flies the companion to the route panel, sweeps it, and
+   the reply quotes values that are visible in that panel.
 
 Deliver: the proxy routes, the context mapper with unit tests, the planner UI,
 environment documentation for SOZO_BASE_URL and SOZO_API_KEY, and a short

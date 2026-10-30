@@ -17,6 +17,8 @@ const POSTGRES_RUNTIME_TABLES = `
 CREATE TABLE IF NOT EXISTS sozo.sozo_widget_sessions (id TEXT PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE, owner_id TEXT NOT NULL, allowed_origin TEXT NOT NULL, expires_at TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS sozo_widget_expiry ON sozo.sozo_widget_sessions(expires_at);
 CREATE TABLE IF NOT EXISTS sozo.sozo_companion_limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS sozo.sozo_publishable_keys (id TEXT PRIMARY KEY, key TEXT NOT NULL UNIQUE, owner_id TEXT NOT NULL, label TEXT NOT NULL, origins TEXT NOT NULL, created_at TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS sozo_publishable_owner ON sozo.sozo_publishable_keys(owner_id);
 CREATE TABLE IF NOT EXISTS sozo.sozo_article_cache (cache_key TEXT PRIMARY KEY, payload TEXT NOT NULL, retrieved_at TEXT NOT NULL);
 `;
 

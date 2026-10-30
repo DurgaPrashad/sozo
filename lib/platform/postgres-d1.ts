@@ -11,7 +11,7 @@ const QUOTED_TABLES = new Set([
   "projects", "research_runs", "notebook", "integrations", "api_keys",
   "audit_events", "workspace_sessions", "login_limits",
 ]);
-const BARE_TABLES = new Set(["sozo_widget_sessions", "sozo_companion_limits", "sozo_article_cache"]);
+const BARE_TABLES = new Set(["sozo_widget_sessions", "sozo_companion_limits", "sozo_publishable_keys", "sozo_article_cache"]);
 
 export type PostgresResult = { columns: string[]; rows: unknown[][]; count: number };
 export type PostgresRunner = {

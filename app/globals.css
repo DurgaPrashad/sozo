@@ -3449,3 +3449,14 @@ input[type="file"][hidden] {
     visibility: visible;
   }
 }
+.keys-list small {
+  overflow-wrap: anywhere;
+}
+.website-key-form input:first-child {
+  max-width: 260px;
+}
+@media (max-width: 600px) {
+  .website-key-form input:first-child {
+    max-width: none;
+  }
+}

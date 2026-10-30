@@ -1,6 +1,10 @@
 import { createSessionToken, hashSecret } from "../auth/crypto";
 
 export type WidgetSession = { id: string; ownerId: string; allowedOrigin: string; expiresAt: string };
+// A public key for a website without a backend: browsers on its listed
+// origins exchange it for an ordinary ten-minute widget session.
+export type PublishableKey = { id: string; key: string; label: string; origins: string[]; createdAt: string };
+export const PUBLISHABLE_KEY = /^sozo_pk_[a-f0-9]{32}$/;
 export interface CompanionStore {
   issue(ownerId: string, allowedOrigin: string): Promise<WidgetSession & { token: string }>;
   resolve(token: string): Promise<WidgetSession | null>;
@@ -8,6 +12,10 @@ export interface CompanionStore {
   revoke(ownerId: string, id: string): Promise<void>;
   // Requests already counted in the current window, without counting one.
   usage?(ownerId: string, bucket: string, windowMs: number): Promise<number>;
+  createPublishableKey?(ownerId: string, label: string, origins: string[]): Promise<PublishableKey>;
+  listPublishableKeys?(ownerId: string): Promise<PublishableKey[]>;
+  revokePublishableKey?(ownerId: string, id: string): Promise<void>;
+  resolvePublishableKey?(key: string): Promise<(PublishableKey & { ownerId: string }) | null>;
 }
 export function normalizeOrigin(value: string): string | null {
   try {
@@ -28,6 +36,8 @@ export class D1CompanionStore implements CompanionStore {
       await this.db.prepare("CREATE TABLE IF NOT EXISTS sozo_widget_sessions (id TEXT PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE, owner_id TEXT NOT NULL, allowed_origin TEXT NOT NULL, expires_at TEXT NOT NULL)").run();
       await this.db.prepare("CREATE INDEX IF NOT EXISTS sozo_widget_expiry ON sozo_widget_sessions(expires_at)").run();
       await this.db.prepare("CREATE TABLE IF NOT EXISTS sozo_companion_limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires_at TEXT NOT NULL)").run();
+      await this.db.prepare("CREATE TABLE IF NOT EXISTS sozo_publishable_keys (id TEXT PRIMARY KEY, key TEXT NOT NULL UNIQUE, owner_id TEXT NOT NULL, label TEXT NOT NULL, origins TEXT NOT NULL, created_at TEXT NOT NULL)").run();
+      await this.db.prepare("CREATE INDEX IF NOT EXISTS sozo_publishable_owner ON sozo_publishable_keys(owner_id)").run();
     })().catch(error => { this.prepared = null; throw error; });
     return this.prepared;
   }
@@ -42,6 +52,24 @@ export class D1CompanionStore implements CompanionStore {
     await this.prepare();
     const row = await this.db.prepare("SELECT id, owner_id, allowed_origin, expires_at FROM sozo_widget_sessions WHERE token_hash = ? AND expires_at > ?").bind(await hashSecret(token), new Date().toISOString()).first<{ id: string; owner_id: string; allowed_origin: string; expires_at: string }>();
     return row ? { id: row.id, ownerId: row.owner_id, allowedOrigin: row.allowed_origin, expiresAt: row.expires_at } : null;
+  }
+  async createPublishableKey(ownerId: string, label: string, origins: string[]) {
+    await this.prepare();
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    const record = { id: crypto.randomUUID(), key: `sozo_pk_${[...bytes].map((b) => b.toString(16).padStart(2, "0")).join("")}`, label, origins, createdAt: new Date().toISOString() };
+    await this.db.prepare("INSERT INTO sozo_publishable_keys (id, key, owner_id, label, origins, created_at) VALUES (?, ?, ?, ?, ?, ?)").bind(record.id, record.key, ownerId, label, JSON.stringify(origins), record.createdAt).run();
+    return record;
+  }
+  async listPublishableKeys(ownerId: string) {
+    await this.prepare();
+    const { results } = await this.db.prepare("SELECT id, key, label, origins, created_at FROM sozo_publishable_keys WHERE owner_id = ? ORDER BY created_at DESC").bind(ownerId).all<{ id: string; key: string; label: string; origins: string; created_at: string }>();
+    return results.map((row) => ({ id: row.id, key: row.key, label: row.label, origins: JSON.parse(row.origins) as string[], createdAt: row.created_at }));
+  }
+  async revokePublishableKey(ownerId: string, id: string) { await this.prepare(); await this.db.prepare("DELETE FROM sozo_publishable_keys WHERE owner_id = ? AND id = ?").bind(ownerId, id).run(); }
+  async resolvePublishableKey(key: string) {
+    await this.prepare();
+    const row = await this.db.prepare("SELECT id, key, owner_id, label, origins, created_at FROM sozo_publishable_keys WHERE key = ?").bind(key).first<{ id: string; key: string; owner_id: string; label: string; origins: string; created_at: string }>();
+    return row ? { id: row.id, key: row.key, ownerId: row.owner_id, label: row.label, origins: JSON.parse(row.origins) as string[], createdAt: row.created_at } : null;
   }
   async revoke(ownerId: string, id: string) { await this.prepare(); await this.db.prepare("DELETE FROM sozo_widget_sessions WHERE owner_id = ? AND id = ?").bind(ownerId, id).run(); }
   async usage(ownerId: string, kind: string, windowMs: number) {

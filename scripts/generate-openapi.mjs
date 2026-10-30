@@ -350,14 +350,18 @@ for (const [path,method,summary] of [
  ["/api/companion/health","get","Real provider health for chat, speech and transcription (public, cached 60 s)"],
  ["/api/companion/whoami","get","Who this key or session belongs to, and the quota left"],
  ["/api/companion/model","get","The companion's GLB model (no Content-Encoding claim unless the body is compressed)"],
- ["/api/companion/sessions","post","Issue a 10-minute origin-bound companion session"],
+ ["/api/companion/models","get","SOZO's model catalog: space science, rockets and engines, orbital calculations, planetary zones, imagery and voice, with status and how to call each (public)"],
+ ["/api/companion/sessions","post","Issue a 10-minute origin-bound companion session: from a host backend with a SOZO API key and {allowedOrigin}, or from a browser with a publishable key (Authorization: Bearer sozo_pk_...) on one of its listed origins"],
+ ["/api/companion/publishable-keys","get","List this workspace's publishable website keys"],
+ ["/api/companion/publishable-keys","post","Create a publishable key for up to 10 website origins: {label, origins}"],
+ ["/api/companion/publishable-keys","delete","Revoke a publishable key: {id}"],
  ["/api/companion/sessions","delete","Revoke an owned companion session"],
  ["/api/companion/chat","post","Grounded conversation. JSON by default; Accept: text/event-stream streams status, delta, calculations, citations, analysis, limitations, done and error events. Recommended client timeout: 60 s for JSON, none for SSE."],
  ["/api/companion/text-to-speech","post","Spoken audio from SOZO's voice (Sarvam)"],
  ["/api/companion/speech-to-text","post","Transcribe an explicit microphone recording"],
  ["/api/articles","get","Relevant Moon and Mars publication metadata"]
 ]) {
- const open = ["/api/companion/status","/api/companion/health","/api/companion/model","/api/articles"].includes(path);
+ const open = ["/api/companion/status","/api/companion/health","/api/companion/model","/api/companion/models","/api/articles"].includes(path);
  (paths[path]??={})[method]={summary,operationId:method+path.replace(/[^a-zA-Z0-9]/g,"_"),security:open?[]:[{SozoKey:[]}],responses:{200:{description:"Success; see companion integration guide for exact payloads"},...(path.startsWith("/api/companion")?{400:companionError,401:companionError,429:companionError,502:companionError,503:companionError,504:companionError}:{400:{$ref:"#/components/responses/Error"},401:{$ref:"#/components/responses/Error"}})},externalDocs:{url:"/docs/companion-integration.md"}};
 }
 paths["/api/companion/chat"].post.responses[200] = {
@@ -402,6 +406,7 @@ paths["/api/companion/chat"].post.requestBody = {
     message: { type: "string", minLength: 1, maxLength: 3000 },
     retrieve: { type: "boolean", default: false, description: "Retrieve Crossref and Europe PMC records (at most 8 s) and cite them as [n]." },
     style: { type: "string", enum: ["brief", "standard", "detailed"], default: "standard", description: "brief: two to four sentences with the key figures; grows to standard when the question asks for an explanation." },
+    provider: { type: "string", enum: ["sarvam", "meta"], description: "Which conversation model answers first; the others stay as fallbacks. provider_unconfigured when that model has no key on this server." },
     history: { type: "array", maxItems: 10, items: object({ role: { type: "string", enum: ["user", "assistant"] }, content: { type: "string", maxLength: 4000 } }, ["role", "content"]) },
     context: { ...object({
       body: { type: "string", enum: ["moon", "mars"] },
@@ -411,6 +416,12 @@ paths["/api/companion/chat"].post.requestBody = {
       metrics: routeMetrics,
       alternatives: { type: "array", maxItems: 4, items: { ...object({ label: { type: "string", maxLength: 120 }, route: lineString, metrics: routeMetrics }, ["label", "route"]), additionalProperties: false } },
       facts: { type: "object", maxProperties: 60, description: "Other planner facts; keys up to 64 characters.", additionalProperties: { oneOf: [{ type: "number" }, { type: "string", maxLength: 300 }, { type: "boolean" }] } },
+      scan: { ...object({
+        target: { type: "string", maxLength: 120 },
+        title: { type: "string", maxLength: 200 },
+        url: { type: "string", maxLength: 500 },
+        text: { type: "string", maxLength: 4000, description: "Visible text of the page area the user asked SOZO to scan (no images or form fields), redacted for emails, card numbers and secrets." },
+      }, ["target", "text"]), additionalProperties: false },
       screenshot: { type: "string", description: "data:image/(jpeg|png|webp);base64 URL under 2 MB" },
     }), additionalProperties: false },
   }, ["message"]), additionalProperties: false } } },

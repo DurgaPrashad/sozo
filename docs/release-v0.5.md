@@ -11,7 +11,7 @@
 - `GET /api/companion/health` (real provider checks) and `GET /api/companion/whoami` (key label and remaining quota).
 - Provider keys pasted with hidden characters, quotes or a `NAME=`/`Bearer` prefix are cleaned before use; a key that is still unusable reports `provider_key_invalid` (previously every such failure read "the speech provider could not be reached"). `/api/companion/health` describes each key's format without revealing it.
 - `GET /api/companion/model` no longer forwards a `Content-Encoding` the body does not have (fixes `ERR_CONTENT_DECODING_FAILED`).
-- The 3D companion's scanner runs while SOZO researches and occasionally at random, in any direction.
+- The 3D companion's scanner runs while SOZO researches and occasionally at random, in any direction (replaced in v0.6 by scanning on demand).
 
 ## Migration note for MOMAR (`src/lib/sozo/server.ts`)
 
