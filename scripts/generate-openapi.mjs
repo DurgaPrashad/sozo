@@ -323,17 +323,61 @@ const spec = {
     },
   },
 };
+// Every companion error, in the body and in SSE "error" events.
+const companionErrorCodes = [
+  "invalid_request", "payload_too_large", "unsupported_media_type", "unauthorized", "forbidden_origin",
+  "session_invalid", "session_forbidden", "rate_limited", "not_found", "method_not_allowed", "model_unavailable",
+  "storage_unconfigured", "internal_error",
+  "provider_unconfigured", "provider_timeout", "provider_unreachable", "provider_auth", "provider_credits",
+  "provider_rate_limited", "provider_error", "provider_rejected", "provider_bad_response",
+];
+spec.components.schemas = {
+  CompanionError: object({
+    error: object({
+      code: { type: "string", enum: companionErrorCodes },
+      message: { type: "string" },
+      retryable: { type: "boolean", description: "Worth retrying: provider_timeout, provider_unreachable, provider_error, provider_bad_response, provider_rate_limited, rate_limited, internal_error." },
+      retryAfterSeconds: { type: "integer", description: "Also sent as the Retry-After header." },
+      requestId: { type: "string", description: "Also sent as the X-Request-ID header." },
+      fields: { type: "array", items: str, description: "invalid_request only: the invalid input paths." },
+    }, ["code", "message", "retryable", "requestId"]),
+  }, ["error"]),
+  Calculation: object({ operation: str, input: { type: "object" }, result: { type: "object" }, error: str }, ["operation", "input"]),
+};
+const companionError = { description: "CompanionError. Codes: " + companionErrorCodes.join(", "), content: { "application/json": { schema: { $ref: "#/components/schemas/CompanionError" } } } };
 for (const [path,method,summary] of [
- ["/api/companion/status","get","Companion configuration, without credentials"],
+ ["/api/companion/status","get","Companion configuration (which models are set up), without credentials"],
+ ["/api/companion/health","get","Real provider health for chat, speech and transcription (public, cached 60 s)"],
+ ["/api/companion/whoami","get","Who this key or session belongs to, and the quota left"],
+ ["/api/companion/model","get","The companion's GLB model (no Content-Encoding claim unless the body is compressed)"],
  ["/api/companion/sessions","post","Issue a 10-minute origin-bound companion session"],
  ["/api/companion/sessions","delete","Revoke an owned companion session"],
- ["/api/companion/chat","post","Grounded conversation with optional explicit screen snapshot"],
- ["/api/companion/text-to-speech","post","Sarvam spoken audio"],
+ ["/api/companion/chat","post","Grounded conversation. JSON by default; Accept: text/event-stream streams status, delta, calculations, citations, analysis, limitations, done and error events. Recommended client timeout: 60 s for JSON, none for SSE."],
+ ["/api/companion/text-to-speech","post","Spoken audio from SOZO's voice (Sarvam)"],
  ["/api/companion/speech-to-text","post","Transcribe an explicit microphone recording"],
  ["/api/articles","get","Relevant Moon and Mars publication metadata"]
 ]) {
- (paths[path]??={})[method]={summary,operationId:method+path.replace(/[^a-zA-Z0-9]/g,"_"),security:path.endsWith("status")||path==="/api/articles"?[]:[{SozoKey:[]}],responses:{200:{description:"Success; see companion integration guide for exact payloads"},400:{$ref:"#/components/responses/Error"},401:{$ref:"#/components/responses/Error"}},externalDocs:{url:"/docs/companion-integration.md"}};
+ const open = ["/api/companion/status","/api/companion/health","/api/companion/model","/api/articles"].includes(path);
+ (paths[path]??={})[method]={summary,operationId:method+path.replace(/[^a-zA-Z0-9]/g,"_"),security:open?[]:[{SozoKey:[]}],responses:{200:{description:"Success; see companion integration guide for exact payloads"},...(path.startsWith("/api/companion")?{400:companionError,401:companionError,429:companionError,502:companionError,503:companionError,504:companionError}:{400:{$ref:"#/components/responses/Error"},401:{$ref:"#/components/responses/Error"}})},externalDocs:{url:"/docs/companion-integration.md"}};
 }
+paths["/api/companion/chat"].post.responses[200] = {
+  description: "Answer (JSON), or an SSE stream when Accept: text/event-stream.",
+  content: {
+    "application/json": { schema: object({
+      reply: str, model: str, provider: str,
+      style: { type: "string", enum: ["brief", "standard", "detailed"] },
+      calculations: { type: "array", items: { $ref: "#/components/schemas/Calculation" } },
+      citations: { type: "array", items: { type: "object" } },
+      analysis: { type: "object", nullable: true },
+      limitations: { type: "array", items: str },
+      contextUsed: { type: "object" },
+      timings: object({ retrievalMs: { type: "integer" }, modelMs: { type: "integer" }, totalMs: { type: "integer" } }, ["retrievalMs", "modelMs", "totalMs"]),
+      usage: { type: "object", nullable: true },
+      requestId: str,
+    }, ["reply", "model", "style", "citations", "limitations", "timings", "requestId"]) },
+    "text/event-stream": { schema: { type: "string", description: "Events: status {stage: retrieving|reading|answering}, calculations [Calculation], citations [..], analysis {..}|null, delta {text}, limitations [..], done {model, provider, usage, style, contextUsed, timings, requestId}, error {error: CompanionError.error}." } },
+  },
+};
 // Mirrors chatSchema in lib/companion/context.ts.
 const fraction = { type: "number", minimum: 0, maximum: 1 };
 const lineString = object({
@@ -356,7 +400,8 @@ paths["/api/companion/chat"].post.requestBody = {
   required: true,
   content: { "application/json": { schema: { ...object({
     message: { type: "string", minLength: 1, maxLength: 3000 },
-    retrieve: { type: "boolean", default: false, description: "Retrieve Crossref and Europe PMC records and cite them as [n]." },
+    retrieve: { type: "boolean", default: false, description: "Retrieve Crossref and Europe PMC records (at most 8 s) and cite them as [n]." },
+    style: { type: "string", enum: ["brief", "standard", "detailed"], default: "standard", description: "brief: two to four sentences with the key figures; grows to standard when the question asks for an explanation." },
     history: { type: "array", maxItems: 10, items: object({ role: { type: "string", enum: ["user", "assistant"] }, content: { type: "string", maxLength: 4000 } }, ["role", "content"]) },
     context: { ...object({
       body: { type: "string", enum: ["moon", "mars"] },
@@ -365,7 +410,7 @@ paths["/api/companion/chat"].post.requestBody = {
       route: lineString,
       metrics: routeMetrics,
       alternatives: { type: "array", maxItems: 4, items: { ...object({ label: { type: "string", maxLength: 120 }, route: lineString, metrics: routeMetrics }, ["label", "route"]), additionalProperties: false } },
-      facts: { type: "object", maxProperties: 40, description: "Other planner facts; keys up to 64 characters.", additionalProperties: { oneOf: [{ type: "number" }, { type: "string", maxLength: 300 }, { type: "boolean" }] } },
+      facts: { type: "object", maxProperties: 60, description: "Other planner facts; keys up to 64 characters.", additionalProperties: { oneOf: [{ type: "number" }, { type: "string", maxLength: 300 }, { type: "boolean" }] } },
       screenshot: { type: "string", description: "data:image/(jpeg|png|webp);base64 URL under 2 MB" },
     }), additionalProperties: false },
   }, ["message"]), additionalProperties: false } } },

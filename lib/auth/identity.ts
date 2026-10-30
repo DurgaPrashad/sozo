@@ -9,6 +9,7 @@ export type Identity = {
   name: string;
   email: string;
   method: "session" | "chatgpt" | "api_key";
+  keyLabel?: string;
 };
 export async function getIdentity(request?: Request): Promise<Identity | null> {
   const h = request?.headers ?? (await headers());
@@ -22,7 +23,7 @@ export async function getIdentity(request?: Request): Promise<Identity | null> {
       .where(eq(apiKeys.hash, await hashSecret(token)))
       .limit(1);
     return key
-      ? { id: key.ownerId, name: "API client", email: "", method: "api_key" }
+      ? { id: key.ownerId, name: "API client", email: "", method: "api_key", keyLabel: key.name }
       : null;
   }
   const token = sessionToken(h.get("cookie"));

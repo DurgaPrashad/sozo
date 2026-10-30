@@ -274,7 +274,7 @@ export default function SpaceLanding() {
               Talk with SOZO
               <ArrowRight size={17} />
             </a>
-            <span className="companion-concept">3D COMPANION · SARVAM VOICE</span>
+            <span className="companion-concept">3D COMPANION · SARVAM AI &amp; VOICE · META LLAMA READY TO CONNECT</span>
           </div>
           <RobotCompanion />
         </section>

@@ -30,6 +30,8 @@
     "lib/auth/supabase.ts",
     "tests/supabase.test.ts",
     "lib/platform/diagnostics.ts",
-    "tests/diagnostics.test.ts"
+    "tests/diagnostics.test.ts",
+    "tests/companion-reliability.test.ts",
+    "tests/astro.test.ts"
   ]
 }

@@ -68,6 +68,49 @@ Optional `context.screenshot` accepts a JPEG, PNG or WebP inline data URL under 
 
 Load `/embed/sozo-context.js` to use `window.SozoContext.captureScreen()` from a user's explicit button click. It opens the browser's native selection dialog, captures one image and immediately stops all media tracks. It sends nothing. Show a local preview, allow Remove, and obtain an explicit Send action before including that image in a chat request. Alternatively let the user upload a map image. Never scrape unrelated browser tabs, capture silently, or continually transmit the desktop. Prefer structured map layers/route metadata over screenshots when available.
 
+## Answers, streaming and errors
+
+**Request fields.** Besides `message`, `retrieve`, `history` and `context`, chat accepts `style`: `brief` (two to four sentences with the key figures), `standard` (default) or `detailed` (structured explanation). A brief question that asks to explain or derive something is answered as `standard`; the response's `style` says which was used. `context.facts` holds up to 60 entries.
+
+**Time budget.** Each chat request finishes within 50 s. Literature retrieval (`retrieve: true`) gets at most 8 s, with Crossref and Europe PMC queried in parallel; a source that does not answer in time is skipped and named in `limitations`. The model gets what remains, at most 40 s. Recommended client timeout: 60 s for JSON chat, none for SSE.
+
+**Streaming.** Send `Accept: text/event-stream` to receive Server-Sent Events: `status` (`{stage: "retrieving" | "reading" | "answering"}`), `calculations`, `citations`, `analysis`, `delta` (`{text}`, repeated), `limitations`, then `done` (`{model, provider, usage, style, contextUsed, timings, requestId}`). A failure after the stream starts arrives as an `error` event with the error object below. Clients that do not ask for SSE get one JSON response with the same fields plus `reply`.
+
+**Calculations.** Numeric astrodynamics questions (orbits, escape velocity, Hohmann and planet-to-planet transfers, the rocket equation, surface gravity) go through SOZO's exact two-body calculator (`lib/science/astro.ts`) as a model tool; results are returned in `calculations` and quoted in the answer. They are idealised two-body values, not mission-certified figures.
+
+**Successful responses** include `timings` (`retrievalMs`, `modelMs`, `totalMs`) and `requestId`.
+
+**Errors** always have this shape, with `X-Request-ID` and (when retryable) `Retry-After` headers:
+
+```json
+{ "error": { "code": "provider_timeout", "message": "SOZO's conversation model took too long to answer. Please retry.", "retryable": true, "retryAfterSeconds": 5, "requestId": "…", "fields": ["only for invalid_request"] } }
+```
+
+| Code | HTTP | Retry? | Meaning |
+| --- | --- | --- | --- |
+| `invalid_request` | 400 | no | Input failed validation; `fields` lists the paths. |
+| `payload_too_large` / `unsupported_media_type` | 413 / 415 | no | Body too big or wrong content type. |
+| `unauthorized` / `session_invalid` | 401 | no | Missing or wrong key, or an expired/foreign-origin session. |
+| `forbidden_origin` / `session_forbidden` | 403 | no | Long-lived key from a browser origin, or a session trying to manage sessions. |
+| `rate_limited` | 429 | yes | Workspace quota (30/min, 240/hour); wait `retryAfterSeconds`. |
+| `provider_rate_limited` | 429 | yes | The model provider's quota; wait `retryAfterSeconds`. |
+| `provider_timeout` | 504 | yes | The model did not answer within the budget. |
+| `provider_unreachable` | 502 | yes | DNS, TLS or connection failure to the provider (already retried once). |
+| `provider_error` / `provider_bad_response` | 502 | yes | Provider 5xx or unreadable reply. |
+| `provider_auth` | 502 | no | The provider rejected SOZO's key or model access: fix the server key. |
+| `provider_credits` | 503 | no | The provider account needs credits. |
+| `provider_rejected` | 502 | no | The provider refused this specific request. |
+| `provider_unconfigured` / `storage_unconfigured` | 503 | no | A server setting is missing. |
+| `internal_error` | 500 | yes | Unexpected failure; report the `requestId`. |
+
+Messages name the service that failed: "SOZO's conversation model", "SOZO's voice", "SOZO's speech recognition" or "SOZO's image model".
+
+**Models.** Sarvam (`sarvam-105b-conversations`) answers first. Transient failures are retried once with jitter when at least 15 s remain. If Meta Llama is configured (`META_LLAMA_API_KEY`, optional `META_LLAMA_MODEL`, default `Llama-4-Maverick-17B-128E-Instruct-FP8`, and `META_LLAMA_BASE_URL`, default `https://api.llama.com/compat/v1`; any OpenAI-compatible Llama host works), it answers when Sarvam fails, with fewer tokens. `SOZO_CHAT_PROVIDER=meta` makes Meta Llama primary. `model` and `provider` in the response say which answered.
+
+**Health and identity.**
+- `GET /api/companion/health` (public, cached 60 s) makes the cheapest real provider calls: a one-token chat per configured model, a two-word voice clip and a silent transcription. It returns `{chat, chatProviders, speech, transcription, checkedAt}`, each `{status: "ok" | "degraded" | "down" | "unconfigured", latencyMs?, code?}`. `GET /api/companion/status` only reports configuration.
+- `GET /api/companion/whoami` (key or session) returns `{method, workspace: {name}, key?: {label}, quotas: {minute: {limit, remaining}, hour: {limit, remaining}}}` without using quota.
+
 ## Speech
 
 - `POST /api/companion/text-to-speech`, JSON `{ "text": "Hello from SOZO", "language": "en-IN" }`: returns `{audio, mimeType, model}`. `audio` is base64 MP3 (`audio/mpeg`), generated by `bulbul:v4-flash`. Text is limited to 2,500 characters. Browser playback requires a user gesture and should provide Stop.

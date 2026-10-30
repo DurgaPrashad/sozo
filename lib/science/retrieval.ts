@@ -61,11 +61,11 @@ export function deduplicateSources(sources: Source[]): Source[] {
     })
     .map((s, i) => ({ ...s, id: `S${i + 1}` }));
 }
-export async function getJSON(url: string) {
+export async function getJSON(url: string, timeoutMs = 12000) {
   const response = await fetch(url, {
     headers: { Accept: "application/json", "User-Agent": "SOZO-Research/0.1" },
     redirect: "manual",
-    signal: AbortSignal.timeout(12000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!response.ok) {
     await response.body?.cancel();

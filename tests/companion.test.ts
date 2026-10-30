@@ -53,7 +53,8 @@ test("alternative routes are measured and their geometry stays out of the model 
 });
 test("planner facts and alternatives are bounded", () => {
   const route = { type: "LineString", coordinates: [[0, 0], [1, 0]] };
-  assert.equal(contextSchema.safeParse({ facts: Object.fromEntries(Array.from({ length: 41 }, (_, i) => [`f${i}`, i])) }).success, false);
+  assert.equal(contextSchema.safeParse({ facts: Object.fromEntries(Array.from({ length: 60 }, (_, i) => [`f${i}`, i])) }).success, true);
+  assert.equal(contextSchema.safeParse({ facts: Object.fromEntries(Array.from({ length: 61 }, (_, i) => [`f${i}`, i])) }).success, false);
   assert.equal(contextSchema.safeParse({ facts: { nested: { command: "x" } } }).success, false);
   assert.equal(contextSchema.safeParse({ alternatives: Array.from({ length: 5 }, (_, i) => ({ label: `R${i}`, route })) }).success, false);
   assert.equal(contextSchema.safeParse({ metrics: { sunlitFraction: 1.2 } }).success, false);

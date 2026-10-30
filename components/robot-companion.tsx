@@ -344,16 +344,18 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         const lensSprite = new THREE.SpriteMaterial({ map: glowTexture, color: 0x6cbcff, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
         const ledMaterial = new THREE.MeshBasicMaterial({ color: 0x4aa8ff, toneMapped: false });
         // Holographic scanner: a level grid beam from the lens with a laser
-        // sheet that sweeps from top to bottom. uScan runs 1 (top) to -1.
+        // sheet sweeping vertically (uAxis 0) or horizontally (uAxis 1).
+        // uScan runs from -1 to 1 across the beam; uPresence fades it in/out.
         const beamTall = Math.tan(0.2);
+        const beamWide = Math.tan(0.4);
         const beamMaterial = new THREE.ShaderMaterial({
-          uniforms: { uScan: { value: 0 }, uIntensity: { value: 1 }, uColor: { value: new THREE.Color(0x3d9bff) } },
+          uniforms: { uScan: { value: 0 }, uAxis: { value: 0 }, uIntensity: { value: 1 }, uColor: { value: new THREE.Color(0x3d9bff) } },
           vertexShader: "varying vec2 vUv; varying vec3 vLocal; void main(){ vUv = uv; vLocal = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
-          fragmentShader: `uniform float uScan; uniform float uIntensity; uniform vec3 uColor; varying vec2 vUv; varying vec3 vLocal;
+          fragmentShader: `uniform float uScan; uniform float uAxis; uniform float uIntensity; uniform vec3 uColor; varying vec2 vUv; varying vec3 vLocal;
             void main(){
               float along = vUv.y;
               float across = (vUv.x - 0.5) / max(along, 0.001) + 0.5;
-              float height = vLocal.y / max(vLocal.x * ${beamTall.toFixed(4)}, 0.0001);
+              float height = mix(vLocal.y / max(vLocal.x * ${beamTall.toFixed(4)}, 0.0001), -vLocal.z / max(vLocal.x * ${beamWide.toFixed(4)}, 0.0001), uAxis);
               float gridU = 1.0 - smoothstep(0.0, 0.04, abs(fract(across * 8.0 + 0.5) - 0.5));
               float gridV = 1.0 - smoothstep(0.0, 0.07, abs(fract(along * 11.0 + 0.5) - 0.5));
               float edge = 1.0 - smoothstep(0.0, 0.035, min(across, 1.0 - across));
@@ -446,6 +448,18 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         let idle: import("three").Group | null = null;
         let beam: import("three").Group | null = null;
         let sheet: import("three").Mesh | null = null;
+        let sheetSide: import("three").Mesh | null = null;
+        // Scans run while SOZO researches and, when idle, now and then in a
+        // random direction. Never with reduced motion unless working.
+        type Sweep = { axis: 0 | 1; from: number; start: number; duration: number };
+        const directions: Array<[0 | 1, number]> = [[0, 1], [0, -1], [1, -1], [1, 1]];
+        let sweep: Sweep | null = null;
+        let nextIdleScan = performance.now() + 6000 + Math.random() * 5000;
+        let presence = 0;
+        const startSweep = (time: number, duration: number) => {
+          const [axis, from] = directions[Math.floor(Math.random() * directions.length)];
+          sweep = { axis, from, start: time, duration };
+        };
         let led: import("three").Mesh | null = null;
         const render = (time: number) => {
           if (disposed) return;
@@ -461,17 +475,38 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
             const resting = time - lastInteraction > 4000;
             idle.rotation.y += ((resting ? 0.16 * Math.sin(time / 3200) : 0) - idle.rotation.y) * 0.04;
           }
-          if (beam && sheet) {
-            // Top-to-bottom sweep, eased, faster while SOZO is working.
-            const period = state === "thinking" ? 1500 : 2600;
-            const progress = reduced ? 0.5 : (time % period) / period;
-            const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-            const scanHeight = 1 - 2 * eased;
-            const intensity = state === "idle" ? 0.9 : 1.3;
-            beamMaterial.uniforms.uScan.value = scanHeight;
-            beamMaterial.uniforms.uIntensity.value = intensity;
-            sheetMaterial.uniforms.uIntensity.value = intensity * (reduced ? 0.8 : Math.min(1, Math.min(progress, 1 - progress) * 12));
-            sheet.rotation.z = Math.atan(scanHeight * beamTall);
+          if (beam && sheet && sheetSide) {
+            const working = state === "thinking";
+            if (!sweep || time - sweep.start > sweep.duration) {
+              sweep = null;
+              if (working) startSweep(time, reduced ? 1e9 : 1300 + Math.random() * 500);
+              else if (!reduced && time > nextIdleScan) {
+                startSweep(time, 2600 + Math.random() * 900);
+                nextIdleScan = time + 14000 + Math.random() * 14000;
+              }
+            }
+            const target = sweep ? 1 : 0;
+            presence += (target - presence) * (target > presence ? 0.22 : 0.08);
+            const visible = presence > 0.01;
+            beam.visible = visible;
+            lensSprite.opacity = 0.35 + 0.65 * presence;
+            if (visible && sweep) {
+              const progress = reduced ? 0.5 : Math.min(1, (time - sweep.start) / sweep.duration);
+              const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+              const position = sweep.from * (1 - 2 * eased);
+              const intensity = (working ? 1.3 : 1) * presence;
+              beamMaterial.uniforms.uScan.value = position;
+              beamMaterial.uniforms.uAxis.value = sweep.axis;
+              beamMaterial.uniforms.uIntensity.value = intensity;
+              sheetMaterial.uniforms.uIntensity.value = intensity * (reduced ? 0.8 : Math.min(1, Math.min(progress, 1 - progress) * 10));
+              sheet.visible = sweep.axis === 0;
+              sheetSide.visible = sweep.axis === 1;
+              sheet.rotation.z = Math.atan(position * beamTall);
+              sheetSide.rotation.y = Math.atan(position * beamWide);
+            } else {
+              beamMaterial.uniforms.uIntensity.value = 0.9 * presence;
+              sheetMaterial.uniforms.uIntensity.value = 0;
+            }
           }
           if (led) ledMaterial.color.setHSL(0.585, 1, (state === "speaking" ? 0.55 : 0.5) + (reduced ? 0 : 0.08 * Math.sin(time / (state === "speaking" ? 140 : 700))));
           controls.update();
@@ -569,7 +604,7 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         lensFlare.position.copy(lens);
         lensFlare.scale.setScalar(0.2);
         gltf.scene.add(lensFlare);
-        const length = 1.55, wide = Math.tan(0.4) * length, tall = beamTall * length;
+        const length = 1.55, wide = beamWide * length, tall = beamTall * length;
         const corners = [
           new THREE.Vector3(length, tall, wide),
           new THREE.Vector3(length, tall, -wide),
@@ -592,14 +627,22 @@ export default function RobotCompanion({ assetBase = "", speaking = false, signa
         sheetGeometry.setAttribute("uv", new THREE.Float32BufferAttribute([0.5, 0, 0, 1, 1, 1], 2));
         sheet = new THREE.Mesh(sheetGeometry, sheetMaterial);
         sheet.renderOrder = 3;
+        // A vertical sheet for side-to-side sweeps.
+        const sideGeometry = new THREE.BufferGeometry();
+        sideGeometry.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, length, tall, 0, length, -tall, 0], 3));
+        sideGeometry.setAttribute("uv", new THREE.Float32BufferAttribute([0.5, 0, 0, 1, 1, 1], 2));
+        sheetSide = new THREE.Mesh(sideGeometry, sheetMaterial);
+        sheetSide.renderOrder = 3;
+        sheetSide.visible = false;
         // Straight and level: aimed to the robot's left (screen right) and
         // slightly towards the viewer, with no tilt.
         const aim = new THREE.Group();
         aim.rotation.set(0, -0.62, 0);
-        aim.add(beamMesh, sheet);
+        aim.add(beamMesh, sheet, sheetSide);
         beam = new THREE.Group();
         beam.position.copy(lens);
         beam.add(aim);
+        beam.visible = false;
         gltf.scene.add(beam);
 
         // Blue light strip on the front-left bezel, placed on the actual surface.

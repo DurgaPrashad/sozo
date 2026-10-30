@@ -6,6 +6,8 @@ export interface CompanionStore {
   resolve(token: string): Promise<WidgetSession | null>;
   rateLimit(ownerId: string, bucket: string, maximum: number, windowMs: number): Promise<boolean>;
   revoke(ownerId: string, id: string): Promise<void>;
+  // Requests already counted in the current window, without counting one.
+  usage?(ownerId: string, bucket: string, windowMs: number): Promise<number>;
 }
 export function normalizeOrigin(value: string): string | null {
   try {
@@ -42,6 +44,12 @@ export class D1CompanionStore implements CompanionStore {
     return row ? { id: row.id, ownerId: row.owner_id, allowedOrigin: row.allowed_origin, expiresAt: row.expires_at } : null;
   }
   async revoke(ownerId: string, id: string) { await this.prepare(); await this.db.prepare("DELETE FROM sozo_widget_sessions WHERE owner_id = ? AND id = ?").bind(ownerId, id).run(); }
+  async usage(ownerId: string, kind: string, windowMs: number) {
+    await this.prepare();
+    const key = await hashSecret(`${ownerId}|${kind}|${Math.floor(Date.now() / windowMs)}`);
+    const row = await this.db.prepare("SELECT count FROM sozo_companion_limits WHERE key = ?").bind(key).first<{ count: number }>();
+    return Number(row?.count ?? 0);
+  }
   async rateLimit(ownerId: string, kind: string, maximum: number, windowMs: number) {
     await this.prepare();
     const bucket = Math.floor(Date.now() / windowMs), expires = new Date((bucket + 1) * windowMs).toISOString();
