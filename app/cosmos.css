@@ -1036,6 +1036,15 @@
   }
 }
 
+/* Companion palette: ceramic white, graphite and the blue signal colour. */
+.companion-palette i.silver {
+  background: linear-gradient(130deg, #ffffff, #c9d1da);
+}
+.companion-palette i.signal {
+  background: #4aa8ff;
+  box-shadow: 0 0 10px #2f8bff;
+}
+
 /* ── Landing page: shared display type ────────────────────────────────── */
 .premium-nav nav a,
 .premium-nav-actions a {

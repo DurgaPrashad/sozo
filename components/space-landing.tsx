@@ -259,7 +259,7 @@ export default function SpaceLanding() {
             <div className="companion-palette">
               <span>
                 <i className="silver" />
-                Silver
+                Ceramic white
               </span>
               <span>
                 <i className="graphite" />
@@ -267,7 +267,7 @@ export default function SpaceLanding() {
               </span>
               <span>
                 <i className="signal" />
-                Signal green
+                Signal blue
               </span>
             </div>
             <a href="/dashboard?view=companion" className="premium-text-link">

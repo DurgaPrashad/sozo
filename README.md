@@ -112,13 +112,13 @@ MOMAR Moon and Mars planners are linked from the Moon and Mars sections and the 
 
 ## Companion and interaction update — 28 October 2026
 
-The landing page uses the supplied GLB as `public/models/sozo-companion.glb`. Its original mesh is preserved; the viewer supplies silver/graphite materials, smooth panel masks, dark display surfaces, and blue eye accents. It loads near the viewport, disposes GPU resources on unmount, and offers horizontal inspection and a front-view reset. The reference image is a clearly labelled fallback when 3D cannot load.
+The landing page uses the supplied GLB as `public/models/sozo-companion.glb`. Its original mesh is preserved; the viewer supplies ceramic-white and graphite materials, smooth panel masks, a blue light strip, and a top sensor whose lens projects an animated holographic scan grid. It loads near the viewport, disposes GPU resources on unmount, and offers horizontal inspection and a front-view reset. The reference image is a clearly labelled fallback when 3D cannot load.
 
 Moon and Mars globe views now allow horizontal rotation only. Zoom, vertical orbit, panning, and two-finger orbit/zoom gestures are disabled in the shared viewer, including dashboard explorers. The zoom buttons are removed. The opening SOZO title begins at the center and settles at the lower left once per page load; reduced-motion preferences show the settled state immediately. Navbar items are plain text over the film.
 
 ## v0.4 — scientific companion and platform integration
 
-- Silver / graphite GLB companion with black shoulder connections, wrist/base joints, hands and fingers. The supplied single mesh is unrigged: arm motion is intentionally disabled. Its green digital face animates decorative characters and speech activity, with reduced-motion and visibility support.
+- White / graphite GLB companion with black shoulder connections, wrist/base joints, hands and fingers. The supplied single mesh is unrigged: arm motion is intentionally disabled; the whole companion hovers and sways gently when idle. Its blue display shows ring eyes that blink and follow the pointer over falling blue digits, with listening, thinking and speaking states, and reduced-motion and visibility support.
 - Sarvam conversation (`sarvam-105b-conversations`), voice (`bulbul:v4-flash`), transcription (`saaras:v4`) and explicit screenshot vision (`gemma4`). A pre-generated Sarvam greeting is public; paid interactive operations require workspace authentication or scoped sessions. Provider credentials live only in ignored `.dev.vars` / production runtime secrets.
 - Planetary intent classification, scientific metadata relevance rules, duplicate removal, source diagnostics, real Moon/Mars article collections and DOI links. Article records preserve publication type without guessing peer review.
 - Portable `<sozo-companion>` SDK, origin-bound ten-minute sessions, revocation, bounded input, usage limits, explicit screen snapshot preview, structured route context and approximate planetary polyline distance.
