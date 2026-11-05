@@ -111,6 +111,9 @@ export default function SpaceLanding() {
           <a href="#models" onClick={() => setMenu(false)}>
             Models
           </a>
+          <a href="/3dsim" onClick={() => setMenu(false)}>
+            3DSim
+          </a>
           <a href="#evidence" onClick={() => setMenu(false)}>
             The evidence
           </a>

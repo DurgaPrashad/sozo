@@ -2978,3 +2978,27 @@ html:has(.premium-site) {
     transform: none;
   }
 }
+/* 3DSim page */
+.sim-page { min-height: 100vh; background: #05080d; }
+.sim-nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 5.4%; border-bottom: 1px solid #ffffff14; }
+.sim-back { display: inline-flex; align-items: center; gap: 8px; font-family: var(--space-ui); letter-spacing: 4px; font-size: 14px; color: #e6f2ff; }
+.sim-hero { padding-block: 80px 30px; }
+.sim-hero p { max-width: 560px; font-size: 15px; line-height: 1.8; color: #99aabd; }
+.sim-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+.sim-ghost { border-color: #a6dfff44; color: #bce6ff; background: transparent; }
+.sim-ghost:disabled { opacity: 0.6; }
+.sim-stage { padding-block: 10px 40px; }
+.sim-frame { position: relative; aspect-ratio: 16 / 9; min-height: 320px; border: 1px solid #a6dfff30; border-radius: 16px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #16263a, #070b12); box-shadow: 0 0 60px #4aa8ff14; }
+.sim-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.sim-play { position: absolute; inset: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #e6f2ff; }
+.sim-play span { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: #a6dfff; color: #0c1a25; font-size: 24px; box-shadow: 0 0 40px #6cbcff66; transition: transform .25s; }
+.sim-play:hover span { transform: scale(1.08); }
+.sim-play strong { font-family: var(--space-ui); font-weight: 500; font-size: 18px; }
+.sim-play small { color: #8ea2b6; font-size: 12px; }
+.sim-note { margin-top: 12px; font-size: 11px; color: #7f94a8; }
+.sim-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding-top: 30px; }
+.sim-features article { border: 1px solid #aecce11c; border-radius: 14px; padding: 22px; background: #0b111b; color: #a6dfff; }
+.sim-features h3 { font-family: var(--space-ui); font-size: 17px; font-weight: 500; color: #edf3fb; margin-top: 14px; }
+.sim-features p { font-size: 12px; line-height: 1.8; color: #95a8bb; margin-top: 8px; }
+@media (max-width: 1000px) { .sim-features { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .sim-features { grid-template-columns: 1fr; } .sim-hero { padding-block: 50px 20px; } .sim-frame { aspect-ratio: 4 / 3; } }
