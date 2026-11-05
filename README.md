@@ -21,10 +21,10 @@ SOZO is built to run on more than one model family, and Meta's models are a firs
 
 **Working today**
 
-- **Meta Llama through any OpenAI-compatible host.** Set `META_LLAMA_API_KEY` (optionally `META_LLAMA_MODEL`, default `Llama-4-Maverick-17B-128E-Instruct-FP8`, and `META_LLAMA_BASE_URL`, default `https://api.llama.com/compat/v1`) and SOZO uses it as the primary model, or as an automatic fallback when another provider is slow or down.
-- **Choose per request.** Chat accepts `provider: "sarvam" | "meta"`; the answer reports which model produced it. Meta Llama uses the same calculator tool, citations and streaming as every other model.
+- **Meta Llama through any Llama-compatible host.** Set `META_LLAMA_API_KEY` (optionally `META_LLAMA_MODEL`, default `Llama-4-Maverick-17B-128E-Instruct-FP8`, and `META_LLAMA_BASE_URL`, default `https://api.llama.com/compat/v1`) and SOZO uses it as the primary model, or as an automatic fallback when another provider is slow or down.
+- **Choose per request.** Chat accepts `provider: "meta"`; the answer reports which model produced it. Meta Llama uses the same calculator tool, citations and streaming as every other model.
 - **Visible in the product.** The companion shows Meta Llama's connection state, and the Models section on the landing page lists it with an honest status (Ready to connect until a key is set).
-- **Open-weight friendly.** Because the integration is plain OpenAI-compatible HTTP, Llama open weights served from Baseten, Modal, Fireworks or your own GPUs work by changing the base URL.
+- **Open-weight friendly.** Because the integration is plain HTTP chat completions, Llama open weights served from Baseten, Modal, Fireworks or your own GPUs work by changing the base URL.
 
 **Where Meta's models take SOZO next** (planned, not yet built)
 
@@ -48,7 +48,7 @@ node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1
 npm run dev
 ```
 
-Apply `drizzle/0001_lumpy_magus.sql` once after the initial migration. Open the printed loopback URL. `/` is public; `/dashboard` requires sign-in. Configure `SOZO_WORKSPACE_EMAIL` and `SOZO_WORKSPACE_PASSWORD_HASH` in ignored `.dev.vars` for local email/password sign-in. The verifier uses `pbkdf2-sha256$100000$<16-byte-salt-hex>$<32-byte-hash-hex>`, PBKDF2 with SHA-256 and 100,000 iterations. Never commit credentials or put them in client code. The optional ChatGPT sign-in in the portable profile uses the isolated local identity `Seedy`; that simulation is excluded from production. Local D1 data survives preview restarts in `.wrangler/state/`. Do not reapply an already applied migration; append new migrations for subsequent schema changes.
+Apply `drizzle/0001_lumpy_magus.sql` once after the initial migration. Open the printed loopback URL. `/` is public; `/dashboard` requires sign-in. Configure `SOZO_WORKSPACE_EMAIL` and `SOZO_WORKSPACE_PASSWORD_HASH` in ignored `.dev.vars` for local email/password sign-in. The verifier uses `pbkdf2-sha256$100000$<16-byte-salt-hex>$<32-byte-hash-hex>`, PBKDF2 with SHA-256 and 100,000 iterations. Never commit credentials or put them in client code. Local D1 data survives preview restarts in `.wrangler/state/`. Do not reapply an already applied migration; append new migrations for subsequent schema changes.
 
 ```sh
 npm run typecheck
@@ -71,13 +71,12 @@ Import the repository in Vercel; `vercel.json` selects Next.js and runs `npm run
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `GOOGLE_CLIENT_ID` | "Continue with Google" through Supabase Auth; the client ID keeps the supabase.co address hidden. See [Google sign-in](docs/operations.md#google-sign-in-supabase-auth). |
 | `SOZO_ALLOWED_EMAILS`, `SOZO_OPEN_SIGNUP` | Who may sign in with Google or Facebook besides the owner. |
 | `SOZO_WORKSPACE_EMAIL`, `SOZO_WORKSPACE_PASSWORD_HASH` | Workspace owner; the hash enables the optional password form (PBKDF2 verifier as described above). |
-| `SARVAM_API_KEY` | Conversation, voice and synthesis. Optional. |
 | `META_LLAMA_API_KEY` | Meta Llama as a primary or fallback conversation model. Optional; also `META_LLAMA_MODEL`, `META_LLAMA_BASE_URL`, `SOZO_CHAT_PROVIDER=meta`. |
 | `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET` | Optional "Continue with Facebook". Access rules and Meta app setup: [Facebook login](docs/operations.md#facebook-login). |
 
 Fill the git-ignored `.env.vercel` (template in `.env.example`) and paste it into Vercel. Generate the password verifier with `npm run auth:hash-password`. Production: https://sozo.momar.si.
 
-ChatGPT sign-in is only available on Sites hosting. See [Deployment and troubleshooting](docs/operations.md#vercel).
+See [Deployment and troubleshooting](docs/operations.md#vercel).
 
 ## Connect other platforms
 
@@ -87,7 +86,7 @@ External platforms call SOZO from their backend with a workspace API key (`Autho
 
 1. Ask a focused scientific question, or select a starter discipline.
 2. Choose Crossref and/or Europe PMC. Broad mode requests up to eight records per source; focused mode requests four.
-3. Inspect the actual publications and any supplied abstracts. Records are filtered and ranked using body, topic and mission metadata. This is not an assessment of scientific evidence quality. When Sarvam is configured, the saved research record also includes a cited AI synthesis; original metadata remains available.
+3. Inspect the actual publications and any supplied abstracts. Records are filtered and ranked using body, topic and mission metadata. This is not an assessment of scientific evidence quality. When a model is configured, the saved research record also includes a cited AI synthesis; original metadata remains available.
 4. Save useful sources to the notebook, add your own notes, and export a Markdown or JSON report.
 5. Create projects and select one in research preferences to associate new questions.
 6. Use Analysis lab for a bounded, deterministic numeric analysis. The JSON export includes inputs, method, and computation time.
@@ -121,7 +120,7 @@ MOMAR coverage and source labels come from the owner-supplied brief in `lib/plan
 
 Implemented and tested: public landing page, protected dashboard, server-side email/password verification, hashed opaque eight-hour sessions, sign-in throttling, API token exchange, interactive Moon/Mars globes, searchable provenance catalog, real scientific retrieval, persisted asynchronous run records, partial failure reporting, cancellation, idempotent submission, polling and reconnecting SSE snapshots, per-owner access checks, hashed/revocable API keys, audit events, a bounded connector registry, CLI, source exports, project/notebook workflows, and deterministic numeric statistics.
 
-This is an initial working foundation, **not the full production platform described by the reference brief**. MCP, OAuth, GraphQL, browser adapters, generic file/dataset processing, sandboxed Python, arbitrary JSON Schema validation, granular project roles, resumable durable queues, distributed quotas, retention automation, and large-scale benchmarks are not implemented. Sarvam provides the configured AI and speech models. SOZO does not claim a proprietary foundation model, state-of-the-art performance, or production throughput.
+This is an initial working foundation, **not the full production platform described by the reference brief**. MCP, OAuth, GraphQL, browser adapters, generic file/dataset processing, sandboxed Python, arbitrary JSON Schema validation, granular project roles, resumable durable queues, distributed quotas, retention automation, and large-scale benchmarks are not implemented. Models are supplied by configured providers, with Meta Llama as a first-class option. SOZO does not claim a proprietary foundation model, state-of-the-art performance, or production throughput.
 
 Runs execute with Worker `waitUntil`, bounded source timeouts, and persisted results. This is not a crash-resumable job queue. Interrupted runs are marked failed when queried after 90 seconds and can be retried. Cancellation prevents a late result from overwriting the cancelled state; it does not necessarily interrupt an in-flight upstream request. Collections are currently bounded to 100 projects/runs/integrations and 200 notes per workspace read; pagination is a future improvement.
 
@@ -152,12 +151,12 @@ Moon and Mars globe views now allow horizontal rotation only. Zoom, vertical orb
 ## v0.4 — scientific companion and platform integration
 
 - White / graphite GLB companion with black shoulder connections, wrist/base joints, hands and fingers. The supplied single mesh is unrigged: arm motion is intentionally disabled; the whole companion hovers and sways gently when idle. Its blue display shows ring eyes that blink and follow the pointer over falling blue digits; while thinking it types research lines instead, and the eyes return to speak. The top sensor's scanner sweeps a laser sheet from top to bottom. Reduced-motion and visibility support.
-- Sarvam conversation (`sarvam-105b-conversations`), voice (`bulbul:v4-flash`), transcription (`saaras:v4`) and explicit screenshot vision (`gemma4`). A pre-generated Sarvam greeting is public; paid interactive operations require workspace authentication or scoped sessions. Provider credentials live only in ignored `.dev.vars` / production runtime secrets.
+- Model-backed conversation, voice, transcription and explicit screenshot vision, with Meta Llama as a first-class conversation model. A pre-generated greeting is public; paid interactive operations require workspace authentication or scoped sessions. Provider credentials live only in ignored `.dev.vars` / production runtime secrets.
 - Planetary intent classification, scientific metadata relevance rules, duplicate removal, source diagnostics, real Moon/Mars article collections and DOI links. Article records preserve publication type without guessing peer review.
 - Portable `<sozo-companion>` SDK, origin-bound ten-minute sessions, revocation, bounded input, usage limits, explicit screen snapshot preview, structured route context and approximate planetary polyline distance.
 - Self-hosted licensed WOFF2 fonts, a navy research workspace, text navbar, cinematic title intro and horizontal-only globe rotation.
 
-Set `SARVAM_API_KEY` in local `.dev.vars` and production secrets for conversation and speech. No key belongs in browser code. Model/source failures leave the source discovery record available. The article provider is queried on demand, with refresh and retrieval timestamps; no unattended ingestion scheduler or vector index is claimed.
+Set `META_LLAMA_API_KEY` in local `.dev.vars` and production secrets for Meta Llama conversation. No key belongs in browser code. Model/source failures leave the source discovery record available. The article provider is queried on demand, with refresh and retrieval timestamps; no unattended ingestion scheduler or vector index is claimed.
 
 See [companion integration and single API plan](docs/COMPANION-INTEGRATION.md), [MOMAR backend rebuild plan](docs/unified-api-backend-plan.md), and [release verification](docs/release-v0.4.md). Run `npm run widget:build` after companion UI changes; `npm run build` performs this automatically. The SDK demo is `/embed/demo.html` and the documented OpenAPI file is `/openapi.json`.
 
