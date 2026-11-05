@@ -1,10 +1,41 @@
 # SOZO
 
-**Intelligence for life beyond Earth.**
+**Intelligence for life beyond Earth.** An AI space scientist for astronauts and mission teams, built with [MOMAR](https://www.momar.si/), the planetary mission-planning platform for the Moon and Mars.
 
-SOZO v0.4 has a public cinematic landing page and a protected Moon + Mars scientific workspace. Three user-supplied concept films play sequentially, with pause, sound, and chapter controls. An orbital monogram and ice-blue / warm-Mars palette unify the landing page, login, and dashboard. It searches Crossref, Europe PMC, and the NASA Image and Video Library, stores research records in Cloudflare D1, preserves citations and source timestamps, and provides projects, a source library, a notebook, reproducible descriptive statistics, a versioned API, and a command-line client.
+Live: https://sozo.momar.si · 3D rover simulator: https://sozo3d.momar.si/ (page at `/3dsim`)
 
-The refreshed SOZO orbital monogram is supplied as SVG and PNG exports and a downloadable brand kit in `public/`. Original user video files are unchanged; the renamed fast-start H.264/AAC copies and posters live in `public/films/`.
+SOZO connects scientific literature, NASA archives, exact orbital calculations and a talking 3D companion into one workflow, with every claim traceable to a source and every number computed rather than guessed.
+
+## What it does
+
+- **Cited research.** Searches Crossref, Europe PMC and the NASA Image and Video Library, keeps source timestamps and citations, and stores projects, notebooks and reports.
+- **A scientist you can talk to.** A 3D companion answers by text or voice, streams its answers, and calls an exact two-body calculator for orbits, escape velocity, Hohmann and planet-to-planet transfers, and the rocket equation.
+- **Scans what you point at.** Ask it to scan a map or panel and the robot flies there, sweeps it top to bottom and side to side, reads the visible text and answers from it.
+- **MOMAR integration.** Explains terrain and route metrics, compares up to four alternative routes and keeps limitations visible. The landing page shows six views each of the lunar south pole and Jezero Crater.
+- **One API, any website.** A model catalog (`GET /api/companion/models`), a versioned REST API, a CLI, and an embeddable `<sozo-companion>` that works on a static site with a publishable key.
+- **Honest by design.** AI explanations are never presented as measurements. Mission decisions stay with people.
+
+## Meta AI in SOZO
+
+SOZO is built to run on more than one model family, and Meta's models are a first-class part of that design.
+
+**Working today**
+
+- **Meta Llama through any OpenAI-compatible host.** Set `META_LLAMA_API_KEY` (optionally `META_LLAMA_MODEL`, default `Llama-4-Maverick-17B-128E-Instruct-FP8`, and `META_LLAMA_BASE_URL`, default `https://api.llama.com/compat/v1`) and SOZO uses it as the primary model, or as an automatic fallback when another provider is slow or down.
+- **Choose per request.** Chat accepts `provider: "sarvam" | "meta"`; the answer reports which model produced it. Meta Llama uses the same calculator tool, citations and streaming as every other model.
+- **Visible in the product.** The companion shows Meta Llama's connection state, and the Models section on the landing page lists it with an honest status (Ready to connect until a key is set).
+- **Open-weight friendly.** Because the integration is plain OpenAI-compatible HTTP, Llama open weights served from Baseten, Modal, Fireworks or your own GPUs work by changing the base URL.
+
+**Where Meta's models take SOZO next** (planned, not yet built)
+
+| Capability | What it would add |
+| --- | --- |
+| Muse models | Multi-step scientific reasoning over route, terrain and literature context, checked against the exact calculator. |
+| SAM 3.1 | Segment craters, boulders, dunes and shadows in Moon and Mars imagery, so a region can be selected, outlined and measured with deterministic terrain tools. |
+| Muse Image | Visual explanations and research illustrations of an observation, clearly labelled as illustrations and never as data. |
+| Multimodal workflow | Select a region in MOMAR, segment it, ask SOZO about it, retrieve supporting papers and compare exploration options in one place. |
+
+The principle stays the same: Meta's models interpret and explain; sources, citations and deterministic calculations carry the facts.
 
 ## Run locally
 
@@ -41,6 +72,7 @@ Import the repository in Vercel; `vercel.json` selects Next.js and runs `npm run
 | `SOZO_ALLOWED_EMAILS`, `SOZO_OPEN_SIGNUP` | Who may sign in with Google or Facebook besides the owner. |
 | `SOZO_WORKSPACE_EMAIL`, `SOZO_WORKSPACE_PASSWORD_HASH` | Workspace owner; the hash enables the optional password form (PBKDF2 verifier as described above). |
 | `SARVAM_API_KEY` | Conversation, voice and synthesis. Optional. |
+| `META_LLAMA_API_KEY` | Meta Llama as a primary or fallback conversation model. Optional; also `META_LLAMA_MODEL`, `META_LLAMA_BASE_URL`, `SOZO_CHAT_PROVIDER=meta`. |
 | `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET` | Optional "Continue with Facebook". Access rules and Meta app setup: [Facebook login](docs/operations.md#facebook-login). |
 
 Fill the git-ignored `.env.vercel` (template in `.env.example`) and paste it into Vercel. Generate the password verifier with `npm run auth:hash-password`. Production: https://sozo.momar.si.
@@ -101,6 +133,7 @@ Runs execute with Worker `waitUntil`, bounded source timeouts, and persisted res
 - [Connector SDK, security, and MOMAR](docs/connectors.md)
 - [Validation and evaluation](docs/evaluation.md)
 - [Deployment and troubleshooting](docs/operations.md)
+- [Release notes v0.5](docs/release-v0.5.md) · [v0.6](docs/release-v0.6.md)
 
 Crossref API behavior follows its [official documentation](https://www.crossref.org/documentation/retrieve-metadata/rest-api/). Europe PMC retrieval follows its [REST service documentation](https://europepmc.org/RestfulWebService). Publication metadata may lack abstracts and may include preprints. Follow the original publication links and applicable licensing terms.
 
@@ -128,4 +161,4 @@ Set `SARVAM_API_KEY` in local `.dev.vars` and production secrets for conversatio
 
 See [companion integration and single API plan](docs/COMPANION-INTEGRATION.md), [MOMAR backend rebuild plan](docs/unified-api-backend-plan.md), and [release verification](docs/release-v0.4.md). Run `npm run widget:build` after companion UI changes; `npm run build` performs this automatically. The SDK demo is `/embed/demo.html` and the documented OpenAPI file is `/openapi.json`.
 
-MOMAR route endpoints have not been supplied. SOZO can analyse an explicitly shared map image and supplied route geometry/metrics; it does not ingest MOMAR terrain or compute a certified rover route. Model replies are not independently validated scientific conclusions. The saved research workflow polls real pipeline state; conversational replies return when the provider completes rather than simulating streaming tokens.
+MOMAR route endpoints have not been supplied. SOZO can analyse an explicitly shared map image and supplied route geometry/metrics; it does not ingest MOMAR terrain or compute a certified rover route. Model replies are not independently validated scientific conclusions. The saved research workflow polls real pipeline state. Companion answers stream over Server-Sent Events (see the v0.5 and v0.6 release notes).
