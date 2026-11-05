@@ -78,6 +78,7 @@ export default function SpaceLanding() {
   const [menu, setMenu] = useState(false),
     [body, setBody] = useState<PlanetaryBody>("moon"),
     [world, setWorld] = useState<PlanetaryBody>("moon"),
+    [simLive, setSimLive] = useState(false),
     [category, setCategory] = useState<(typeof modelCategories)[number]>("All");
   const current = metrics.bodies[body];
   const prototype = prototypes[world];
@@ -333,6 +334,42 @@ export default function SpaceLanding() {
             <span className="companion-concept">3D COMPANION · SARVAM AI &amp; VOICE · META LLAMA READY TO CONNECT</span>
           </div>
           <RobotCompanion />
+        </section>
+        <section className="landing-sim premium-section" id="3dsim">
+          <div className="landing-sim-copy">
+            <span className="premium-eyebrow">SOZO / 3D SIMULATION</span>
+            <h2>
+              Drive it.
+              <br />
+              <span>Live, in your browser.</span>
+            </h2>
+            <p>
+              A planetary rover on real physics. Drive it on the Moon and Mars,
+              float it in orbit, take it apart down to the pins. A design study:
+              nothing has been built.
+            </p>
+            <div className="sim-actions">
+              <a className="premium-button light" href="/3dsim">
+                Open the 3D simulation
+                <ArrowUpRight size={16} />
+              </a>
+              <a className="premium-text-link" href="https://sozo3d.momar.si/" target="_blank" rel="noreferrer">
+                Full screen
+                <ArrowUpRight size={14} />
+              </a>
+            </div>
+          </div>
+          <div className="sim-frame">
+            {simLive ? (
+              <iframe src="https://sozo3d.momar.si/" title="SOZO planetary rover simulator" allow="fullscreen; gamepad; accelerometer" loading="lazy" />
+            ) : (
+              <button className="sim-play" onClick={() => setSimLive(true)} aria-label="Start the live 3D simulation">
+                <span>▶</span>
+                <strong>Start the live simulation</strong>
+                <small>Loads from sozo3d.momar.si</small>
+              </button>
+            )}
+          </div>
         </section>
         <section
           className="intelligence-section premium-section"

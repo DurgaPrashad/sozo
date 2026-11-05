@@ -3002,3 +3002,8 @@ html:has(.premium-site) {
 .sim-features p { font-size: 12px; line-height: 1.8; color: #95a8bb; margin-top: 8px; }
 @media (max-width: 1000px) { .sim-features { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .sim-features { grid-template-columns: 1fr; } .sim-hero { padding-block: 50px 20px; } .sim-frame { aspect-ratio: 4 / 3; } }
+/* 3D simulation on the landing page */
+.landing-sim { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 50px; align-items: center; border-top: 1px solid #a6c8e51a; }
+.landing-sim-copy p { max-width: 440px; font-size: 14px; line-height: 1.8; color: #99aabd; }
+.landing-sim .sim-frame { aspect-ratio: 16 / 10; }
+@media (max-width: 900px) { .landing-sim { grid-template-columns: 1fr; gap: 30px; } }
